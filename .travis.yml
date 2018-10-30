@@ -1,0 +1,30 @@
+sudo: required
+dist: trusty
+language: python
+
+python:
+  - "2.7"
+  - "3.6"
+
+matrix:
+  - python: "2.7"
+  - python: "3.6"
+
+install:
+  # Display the Python version we are running now
+  - python --version
+
+  # Install additional requirements (Keras and Tensorflow CPU-Version)
+  - pip install -r requirements.txt
+
+  # List installed packages for debuggin purposes
+  - pip list
+
+script:
+  - pytest --cov=muscima test/
+  # Run the doc-tests only with Python 3, because in Python 2, it reports strings as u'...' instead of '...' and causes a failure
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pytest --doctest-modules --ignore setup.py; fi
+
+after_success:
+  - codecov
+  - coveralls
