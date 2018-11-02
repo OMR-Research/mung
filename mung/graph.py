@@ -9,7 +9,7 @@ import logging
 
 import operator
 
-from mung.node import CropObject, cropobject_mask_rpf
+from mung.node import Node, cropobject_mask_rpf
 from mung.inference_engine_constants import _CONST
 from mung.utils import resolve_notehead_wrt_staffline
 
@@ -37,7 +37,7 @@ class NotationGraph(object):
         return len(self.cropobjects)
 
     def __to_objid(self, cropobject_or_objid):
-        if isinstance(cropobject_or_objid, CropObject):
+        if isinstance(cropobject_or_objid, Node):
             objid = cropobject_or_objid.objid
         else:
             objid = cropobject_or_objid
@@ -56,7 +56,7 @@ class NotationGraph(object):
         """Find all children of the given node."""
         objid = self.__to_objid(cropobject_or_objid)
         if objid not in self._cdict:
-            raise ValueError('CropObject {0} not in graph!'.format(self._cdict[objid].uid))
+            raise ValueError('Node {0} not in graph!'.format(self._cdict[objid].uid))
 
         c = self._cdict[objid]
         output = []
@@ -72,7 +72,7 @@ class NotationGraph(object):
         """Find all parents of the given node."""
         objid = self.__to_objid(cropobject_or_objid)
         if objid not in self._cdict:
-            raise ValueError('CropObject {0} not in graph!'.format(self._cdict[objid].uid))
+            raise ValueError('Node {0} not in graph!'.format(self._cdict[objid].uid))
 
         c = self._cdict[objid]
         output = []
@@ -157,7 +157,7 @@ class NotationGraph(object):
             return False
 
     def __getitem__(self, objid):
-        """Returns a CropObject based on its objid."""
+        """Returns a Node based on its objid."""
         return self._cdict[objid]
 
     def is_stem_direction_above(self, notehead, stem):
@@ -850,7 +850,7 @@ def group_by_measure(cropobjects):
     If no measure separators are found, assumes everything belongs
     to one measure.
 
-    :returns: A list of CropObject lists corresponding to measures. The list
+    :returns: A list of Node lists corresponding to measures. The list
         is ordered left-to-right.
     """
     graph = NotationGraph(cropobjects)

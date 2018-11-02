@@ -100,7 +100,7 @@ class PitchInferenceEngineState(object):
         '''The octave where the pitch resides. C4 = c', the middle C.'''
 
         self._current_clef = None
-        '''Holds the clef CropObject that is currently valid.'''
+        '''Holds the clef Node that is currently valid.'''
 
         self._current_delta_steps = None
         '''Holds for each staffline delta step (i.e. staffline delta mod 7)
@@ -537,7 +537,7 @@ class PitchInferenceEngine(object):
     def process_notehead(self, notehead, with_name=False):
         """This is the main workhorse of the pitch inference engine.
 
-        :param notehead: The notehead-class CropObject for which we
+        :param notehead: The notehead-class Node for which we
             want to infer pitch.
 
         :param with_name: If set, will return not only the MIDI pitch
@@ -885,13 +885,13 @@ class PitchInferenceEngine(object):
             self.staff_to_noteheads_map[s.objid].append(n)
 
     def __children(self, c, clsnames):
-        """Retrieve the children of the given CropObject ``c``
+        """Retrieve the children of the given Node ``c``
         that have class in ``clsnames``."""
         return [self._cdict[o] for o in c.outlinks
                 if self._cdict[o].clsname in clsnames]
 
     def __parents(self, c, clsnames):
-        """Retrieve the parents of the given CropObject ``c``
+        """Retrieve the parents of the given Node ``c``
         that have class in ``clsnames``."""
         return [self._cdict[i] for i in c.inlinks
                 if self._cdict[i].clsname in clsnames]
@@ -906,7 +906,7 @@ class PitchInferenceEngine(object):
 class OnsetsInferenceEngine(object):
 
     def __init__(self, cropobjects, strategy=OnsetsInferenceStrategy()):
-        """Initialize the onset inference engine with the full CropObject
+        """Initialize the onset inference engine with the full Node
         list in a document."""
         self._CONST = InferenceEngineConstants()
         self._cdict = {c.objid: c for c in cropobjects}
@@ -1634,7 +1634,7 @@ class OnsetsInferenceEngine(object):
                                              duration=0,  # Durations will be filled in
                                              onset=None)
                          for i in range(len(ordered_msep_nodes) - 2)]
-        #: A list of PrecedenceGraph nodes. These don't really need any CropObject
+        #: A list of PrecedenceGraph nodes. These don't really need any Node
         #  or objid, they are just introducing through their duration the offsets
         #  between measure separators (mseps have legit 0 duration, so that they
         #  do not move the notes in their note descendants).
@@ -2182,7 +2182,7 @@ class OnsetsInferenceEngine(object):
                 onset = onset_proposals[0]
 
             q.onset = onset
-            # Some nodes do not have a CropObject assigned.
+            # Some nodes do not have a Node assigned.
             if q.obj is not None:
                 onsets[q.obj.objid] = onset
                 ### DEBUG -- add this to the Data dict
@@ -2191,13 +2191,13 @@ class OnsetsInferenceEngine(object):
         return onsets
 
     def __children(self, c, clsnames):
-        """Retrieve the children of the given CropObject ``c``
+        """Retrieve the children of the given Node ``c``
         that have class in ``clsnames``."""
         return [self._cdict[o] for o in c.outlinks
                 if self._cdict[o].clsname in clsnames]
 
     def __parents(self, c, clsnames):
-        """Retrieve the parents of the given CropObject ``c``
+        """Retrieve the parents of the given Node ``c``
         that have class in ``clsnames``."""
         return [self._cdict[i] for i in c.inlinks
                 if self._cdict[i].clsname in clsnames]

@@ -14,7 +14,7 @@ import numpy
 from skimage.filters import gaussian
 from skimage.morphology import watershed
 
-from mung.node import CropObject, cropobjects_on_canvas, link_cropobjects
+from mung.node import Node, cropobjects_on_canvas, link_cropobjects
 from mung.graph import NotationGraph, find_noteheads_on_staff_linked_to_ledger_line
 from mung.inference_engine_constants import InferenceEngineConstants as _CONST
 from mung.utils import compute_connected_components
@@ -101,13 +101,13 @@ def merge_staffline_segments(cropobjects, margin=10):
     #  - Create the staffline CropObjects
     staffline_cropobjects = []
     for sl_bb, sl_m in zip(staffline_bboxes, staffline_masks):
-        uid = CropObject.build_uid(dataset_namespace, docname, next_objid)
+        uid = Node.build_uid(dataset_namespace, docname, next_objid)
         t, l, b, r = sl_bb
-        c = CropObject(objid=next_objid,
-                       clsname=_CONST.STAFFLINE_CLSNAME,
-                       top=t, left=l, height=b - t, width=r - l,
-                       mask=sl_m,
-                       uid=uid)
+        c = Node(objid=next_objid,
+                 clsname=_CONST.STAFFLINE_CLSNAME,
+                 top=t, left=l, height=b - t, width=r - l,
+                 mask=sl_m,
+                 uid=uid)
         staffline_cropobjects.append(c)
         next_objid += 1
 
@@ -324,13 +324,13 @@ def build_staff_cropobjects(cropobjects):
 
     staff_cropobjects = []
     for s_bb, s_m in zip(staff_bboxes, staff_masks):
-        uid = CropObject.build_uid(dataset_namespace, docname, next_objid)
+        uid = Node.build_uid(dataset_namespace, docname, next_objid)
         t, l, b, r = s_bb
-        c = CropObject(objid=next_objid,
-                       clsname=_CONST.STAFF_CLSNAME,
-                       top=t, left=l, height=b - t, width=r - l,
-                       mask=s_m,
-                       uid=uid)
+        c = Node(objid=next_objid,
+                 clsname=_CONST.STAFF_CLSNAME,
+                 top=t, left=l, height=b - t, width=r - l,
+                 mask=s_m,
+                 uid=uid)
         staff_cropobjects.append(c)
         next_objid += 1
 
@@ -451,14 +451,14 @@ def build_staffspace_cropobjects(cropobjects):
             ss_left = l
             ss_right = r
 
-            uid = CropObject.build_uid(dataset_namespace, docname, next_objid)
+            uid = Node.build_uid(dataset_namespace, docname, next_objid)
 
-            staffspace = CropObject(next_objid, _CONST.STAFFSPACE_CLSNAME,
-                                    top=ss_top, left=ss_left,
-                                    height=ss_bottom - ss_top,
-                                    width=ss_right - ss_left,
-                                    mask=staffspace_mask,
-                                    uid=uid)
+            staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
+                              top=ss_top, left=ss_left,
+                              height=ss_bottom - ss_top,
+                              width=ss_right - ss_left,
+                              mask=staffspace_mask,
+                              uid=uid)
 
             staffspace.inlinks.append(staff.objid)
             staff.outlinks.append(staffspace.objid)
@@ -490,13 +490,13 @@ def build_staffspace_cropobjects(cropobjects):
         uss_top += tss.height - uss_height
         uss_mask = tss.mask[:uss_height, :] * 1
 
-        uid = CropObject.build_uid(dataset_namespace, docname, next_objid)
-        staffspace = CropObject(next_objid, _CONST.STAFFSPACE_CLSNAME,
-                                top=uss_top, left=uss_left,
-                                height=uss_height,
-                                width=uss_width,
-                                mask=uss_mask,
-                                uid=uid)
+        uid = Node.build_uid(dataset_namespace, docname, next_objid)
+        staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
+                          top=uss_top, left=uss_left,
+                          height=uss_height,
+                          width=uss_width,
+                          mask=uss_mask,
+                          uid=uid)
         current_staffspace_cropobjects.append(staffspace)
         staff.outlinks.append(staffspace.objid)
         staffspace.inlinks.append(staff.objid)
@@ -514,13 +514,13 @@ def build_staffspace_cropobjects(cropobjects):
         lss_height = int(bss.height / 1.2)
         lss_mask = bss.mask[:lss_height, :] * 1
 
-        uid = CropObject.build_uid(dataset_namespace, docname, next_objid)
-        staffspace = CropObject(next_objid, _CONST.STAFFSPACE_CLSNAME,
-                                top=lss_top, left=lss_left,
-                                height=lss_height,
-                                width=lss_width,
-                                mask=lss_mask,
-                                uid=uid)
+        uid = Node.build_uid(dataset_namespace, docname, next_objid)
+        staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
+                          top=lss_top, left=lss_left,
+                          height=lss_height,
+                          width=lss_width,
+                          mask=lss_mask,
+                          uid=uid)
         current_staffspace_cropobjects.append(staffspace)
         staff.outlinks.append(staffspace.objid)
         staffspace.inlinks.append(staff.objid)

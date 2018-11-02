@@ -259,7 +259,7 @@ import os
 import collections
 from lxml import etree
 
-from mung.node import CropObject
+from mung.node import Node
 from mung.node_class import CropObjectClass
 
 __version__ = "1.0"
@@ -447,16 +447,16 @@ def parse_cropobject_list(filename):
 
         #################################
         # Create the object.
-        obj = CropObject(objid=objid,
-                         uid=uid,
-                         clsname=clsname,
-                         top=top,
-                         left=left,
-                         width=width,
-                         height=height,
-                         inlinks=inlinks,
-                         outlinks=outlinks,
-                         data=data_dict)
+        obj = Node(objid=objid,
+                   uid=uid,
+                   clsname=clsname,
+                   top=top,
+                   left=left,
+                   width=width,
+                   height=height,
+                   inlinks=inlinks,
+                   outlinks=outlinks,
+                   data=data_dict)
 
         #################################
         # Add mask.

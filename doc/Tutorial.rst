@@ -50,7 +50,7 @@ Extracting notes
     
     def extract_notes_from_doc(cropobjects):
         """Finds all ``(full-notehead, stem)`` pairs that form
-        quarter or half notes. Returns two lists of CropObject tuples:
+        quarter or half notes. Returns two lists of Node tuples:
         one for quarter notes, one of half notes.
         
         :returns: quarter_notes, half_notes
@@ -111,7 +111,7 @@ half-notes in our data. Let's create their images now.
 Creating note images
 ~~~~~~~~~~~~~~~~~~~~
 
-Each notehead and stem CropObject has its own mask and its bounding box
+Each notehead and stem Node has its own mask and its bounding box
 coordinates. We need to combine these two things, in order to create a
 binary image of the note.
 
@@ -135,7 +135,7 @@ binary image of the note.
         canvas = numpy.zeros((height, width), dtype='uint8')
         
         for c in cropobjects:
-            # Get coordinates of upper left corner of the CropObject
+            # Get coordinates of upper left corner of the Node
             # relative to the canvas
             _pt = c.top - top + margin
             _pl = c.left - left + margin

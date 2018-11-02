@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""This module implements a Python representation of the CropObject,
-the basic unit of annotation. See the :class:`CropObject` documentation."""
+"""This module implements a Python representation of the Node,
+the basic unit of annotation. See the :class:`Node` documentation."""
 from __future__ import print_function, unicode_literals, division
 
 from builtins import zip
@@ -21,21 +21,21 @@ __author__ = "Jan Hajic jr."
 
 
 CROPOBJECT_MASK_ORDER = 'C'
-#: The CropObject mask uses this numpy ordering when flattening the data.
+#: The Node mask uses this numpy ordering when flattening the data.
 
 ##############################################################################
 
 
-class CropObject(object):
+class Node(object):
     """One annotated object.
 
-    The CropObject represents one instance of an annotation. It implements
+    The Node represents one instance of an annotation. It implements
     the following attributes:
 
     * ``objid``: the unique number of the given annotation instance in the set
       of annotations encoded in the containing `CropObjectList`.
     * ``uid``: the global unique identifier of the annotation instance. String.
-      See :meth:`CropObject.parse_uid` method for format details.
+      See :meth:`Node.parse_uid` method for format details.
     * ``clsname``: the name of the label that was given to the annotation
       (this is the human-readable string such as ``notehead-full``).
     * ``top``: the vertical dimension (row) of the upper left corner pixel.
@@ -46,16 +46,16 @@ class CropObject(object):
     * ``right``: the horizontal dimension (row) of the lower right corner pixel + 1,
       so that you can index the corresponding image columns using
       ``img[:, c.left:c.right]``.
-    * ``width``: the amount of rows that the CropObject spans.
-    * ``height``: the amount of columns that the CropObject spans.
+    * ``width``: the amount of rows that the Node spans.
+    * ``height``: the amount of columns that the Node spans.
     * ``mask``: a binary (0/1) numpy array that denotes the area within the
-      CropObject's bounding box (specified by ``top``, ``left``, ``height``
-      and ``width``) that the CropObject actually occupies. If the mask is
+      Node's bounding box (specified by ``top``, ``left``, ``height``
+      and ``width``) that the Node actually occupies. If the mask is
       ``None``, the object is understood to occupy the entire bounding box.
     * ``data``: a dictionary that can be empty, or can contain anything. It is
-      generated from the optional ``<Data>`` element of a CropObject.
+      generated from the optional ``<Data>`` element of a Node.
 
-    Constructing a simple CropObject that consists of the "b"-like flat music
+    Constructing a simple Node that consists of the "b"-like flat music
     notation symbol (never mind the ``uid`` for now):
 
     >>> top = 10
@@ -74,7 +74,7 @@ class CropObject(object):
     ...                     [0, 1, 0, 0]])
     >>> clsname = 'flat'
     >>> uid = 'MUSCIMA++_1.0___mung.node.Node.doctest___0'
-    >>> c = CropObject(objid=0, clsname=clsname,
+    >>> c = Node(objid=0, clsname=clsname,
     ...                top=top, left=left, height=height, width=width,
     ...                inlinks=[], outlinks=[],
     ...                mask=mask,
@@ -87,23 +87,23 @@ class CropObject(object):
     * ``inlinks``: Incoming edges. A list of integers; it is assumed they are
       valid ``objid`` within the same global/doc namespace.
 
-    So far, CropObject graphs do not support multiple relationship types.
+    So far, Node graphs do not support multiple relationship types.
 
     **Unique identification**
 
-    The ``uid`` serves to identify the CropObject uniquely,
+    The ``uid`` serves to identify the Node uniquely,
     at least within the MUSCIMA dataset system. (We anticipate further
     versions of the dataset, and need to plan for that.)
 
-    To uniquely identify a CropObject, we need three "levels":
+    To uniquely identify a Node, we need three "levels":
 
     * The "global", **dataset-level identification**: which dataset is this
-      CropObject coming from? (For this dataset: ``MUSCIMA++_1.0``)
+      Node coming from? (For this dataset: ``MUSCIMA++_1.0``)
     * The "local", **document-level identification**: which document
-      (within the given dataset) is this CropObject coming from?
+      (within the given dataset) is this Node coming from?
       For MUSCIMA++ 1.0, this will usually be a string like
       ``CVC-MUSCIMA_W-35_N-08_D-ideal``, derived from the filename
-      under which the CropObjectList containing the given CropObject
+      under which the CropObjectList containing the given Node
       is stored.
     * The **within-document identification**, which is identical
       to the ``objid``.
@@ -111,7 +111,7 @@ class CropObject(object):
     These three components are joined together into one string by
     a delimiter: ``___``
 
-    The full ``uid`` of a CropObject then might look like this::
+    The full ``uid`` of a Node then might look like this::
 
       MUSCIMA-pp_1.0___CVC-MUSCIMA_W-35_N-08_D-ideal___611
 
@@ -137,7 +137,7 @@ class CropObject(object):
     documents without UIDs to those that have them.)
 
     On the other hand, the ``objid`` is a field intended to uniquely identify
-    a CropObject within the scope of one CropObject list (one annotation
+    a Node within the scope of one Node list (one annotation
     document).
 
     .. caution::
@@ -157,11 +157,11 @@ class CropObject(object):
 
     Because CropObjects do not correspond to any given image, there is
     no facility in the data format to link them to a specific one. You have to
-    take care of matching CropObject annotations to the right images by yourself.
+    take care of matching Node annotations to the right images by yourself.
 
-    The ``CropObject`` class implements some interactions with images.
+    The ``Node`` class implements some interactions with images.
 
-    To recover the area corresponding to a CropObject `c`, use:
+    To recover the area corresponding to a Node `c`, use:
 
     >>> if c.mask is not None: crop = img[c.top:c.bottom, c.left:c.right] * c.mask  #doctest: +SKIP
     >>> if c.mask is None: crop = img[c.top:c.bottom, c.left:c.right]               #doctest: +SKIP
@@ -170,7 +170,7 @@ class CropObject(object):
 
     >>> crop = c.project_to(img)    #doctest: +SKIP
 
-    And to get the CropObject projected onto the entire image:
+    And to get the Node projected onto the entire image:
 
     >>> crop = c.project_on(img)    #doctest: +SKIP
 
@@ -178,19 +178,19 @@ class CropObject(object):
     expect the mask to be binary, in principle, this is not strictly necessary.
     You could supply a different mask interpration, such as probabilistic.
     However, we strongly advise not to misuse this feature unless you have
-    a really good reason; remember that the CropObject is supposed to represent
+    a really good reason; remember that the Node is supposed to represent
     an annotation of a given image. (One possible use for a non-binary mask
     that we can envision is aggregating multiple annotations of the same
     image.)
 
     For visualization, there is a more sophisticated method that renders
-    the CropObject as a transparent colored transparent rectangle over
+    the Node as a transparent colored transparent rectangle over
     an RGB image. (NOTE: this really changes the input image!)
 
     >>> c_obj.render(img)           #doctest: +SKIP
     >>> plt.imshow(img); plt.show() #doctest: +SKIP
 
-    However, `CropObject.render()` currently does not support rendering
+    However, `Node.render()` currently does not support rendering
     the mask.
 
     **Disambiguating class names**
@@ -209,7 +209,7 @@ class CropObject(object):
         In MUSCIMarker, the MLClassList is currently necessary to define
         how CropObjects are displayed: their color. (All noteheads are red,
         all barlines are green, etc.) The other function, matching names
-        to ``clsid``, has been superseeded by the ``clsname`` CropObject
+        to ``clsid``, has been superseeded by the ``clsname`` Node
         attribute.
 
     **Merging CropObjects**
@@ -252,7 +252,7 @@ class CropObject(object):
                  mask=None,
                  uid=None,
                  data=None):
-        # logging.debug('Initializing CropObject with objid {0}, uid {5}, x={1},'
+        # logging.debug('Initializing Node with objid {0}, uid {5}, x={1},'
         #              ' y={2}, h={3}, w={4}'
         #               ''.format(objid, top, left, height, width, uid))
         self.objid = objid
@@ -266,7 +266,7 @@ class CropObject(object):
         self.to_integer_bounds()
 
         # The mask presupposes integer bounds.
-        # Applied relative to CropObject bounds, not the whole image.
+        # Applied relative to Node bounds, not the whole image.
         self.mask = None
         self.set_mask(mask)
 
@@ -291,11 +291,11 @@ class CropObject(object):
         self.data = data
 
     ##########################################################################
-    # Dealing with unique identification of a CropObject, also across
+    # Dealing with unique identification of a Node, also across
     # anticipated dataset versions.
 
     UID_DELIMITER = '___'
-    #: Delimits the CropObject UID fields (global, document namespaces, objid)
+    #: Delimits the Node UID fields (global, document namespaces, objid)
 
     UID_DEFAULT_DATASET_NAMESPACE = 'MUSCIMA_DEFAULT_DATASET_PLACEHOLDER'
     #: Default dataset name for CropObjects.
@@ -305,7 +305,7 @@ class CropObject(object):
 
     @property
     def default_uid(self):
-        """Constructs the default ``uid`` that the CropObject would
+        """Constructs the default ``uid`` that the Node would
         have, unless one was supplied at initialization.
 
         >>> c.default_uid   # doctest: +SKIP
@@ -316,10 +316,10 @@ class CropObject(object):
                                         str(self.objid)])
 
     def parse_uid(self):
-        """Parse the unique identifier of the CropObject. This
+        """Parse the unique identifier of the Node. This
         breaks down the UID into the global namespace, document
         namespace (ie. CropObjectList name -- usually per image),
-        and the numeric ID of the CropObject within one CropObjectList.
+        and the numeric ID of the Node within one CropObjectList.
         This numeric ID should always match the ``objid``, which
         acts as the "technical" identifier, since it is known to be
         an integer and therefore usable for e.g. indexing within
@@ -327,11 +327,11 @@ class CropObject(object):
 
         See :meth:`_parse_uid` for format & test. Compared
         to :meth:`_parse_uid`, this method checks the parsed ``num``
-        in the ``uid`` against this CropObject's ``objid``,
+        in the ``uid`` against this Node's ``objid``,
         to verify that the UID is really valid for this object.
 
         The delimiter is expected to be ``___``
-        (kept as ``CropObject.UID_DELIMITER``)
+        (kept as ``Node.UID_DELIMITER``)
         """
         gn, dn, num = self._parse_uid(self.uid)
         # Dealing with missing uid
@@ -339,49 +339,49 @@ class CropObject(object):
             num = self.objid
 
         if num != self.objid:
-            raise ValueError('Got CropObject with different numeric ID'
+            raise ValueError('Got Node with different numeric ID'
                              ' in UID and technical objid. UID record:'
                              ' {0}, objid: {1}'.format(num, self.objid))
         return gn, dn, num
 
     @staticmethod
     def _parse_uid(uid):
-        """Parse the unique identifier of the CropObject. This
+        """Parse the unique identifier of the Node. This
         breaks down the UID into the global namespace, document
         namespace (ie. CropObjectList name -- usually per image),
-        and the numeric ID of the CropObject within one CropObjectList.
+        and the numeric ID of the Node within one CropObjectList.
 
         The delimiter is expected to be ``___``
-        (kept as ``CropObject.UID_DELIMITER``)
+        (kept as ``Node.UID_DELIMITER``)
 
-        >>> CropObject._parse_uid('MUSCIMA++_1.0___CVC-MUSCIMA_W-05_N-19_D-ideal___424')
+        >>> Node._parse_uid('MUSCIMA++_1.0___CVC-MUSCIMA_W-05_N-19_D-ideal___424')
         ('MUSCIMA++_1.0', 'CVC-MUSCIMA_W-05_N-19_D-ideal', 424)
 
         :returns: ``global_namespace, document_namespace, objid`` triplet.
             The namespaces are strings, ``objid`` is an integer. If ``uid``
             is ``None``, returns ``None`` as ``objid`` and expects it
-            to be filled in from the caller CropObject instance.
+            to be filled in from the caller Node instance.
         """
         if uid is None:
-            global_name = CropObject.UID_DEFAULT_DATASET_NAMESPACE
-            document_name = CropObject.UID_DEFAULT_DOCUMENT_NAMESPACE
+            global_name = Node.UID_DEFAULT_DATASET_NAMESPACE
+            document_name = Node.UID_DEFAULT_DOCUMENT_NAMESPACE
             numid = None
         else:
-            global_name, document_name, numid_str = uid.split(CropObject.UID_DELIMITER)
+            global_name, document_name, numid_str = uid.split(Node.UID_DELIMITER)
             numid = int(numid_str)
         return global_name, document_name, numid
 
     @staticmethod
     def build_uid(global_name, document_name, numid):
-        return CropObject.UID_DELIMITER.join([str(global_name),
-                                              str(document_name),
-                                              str(numid)])
+        return Node.UID_DELIMITER.join([str(global_name),
+                                        str(document_name),
+                                        str(numid)])
 
     def set_uid(self, uid):
-        """Assigns the given ``uid`` to the CropObject. This is the way
+        """Assigns the given ``uid`` to the Node. This is the way
         to do it, do not assign directly to ``cropobject.uid``! You need
         to update other things (and perform integrity checks) when changing
-        the unique ID! See :class:`CropObject` class documentation for
+        the unique ID! See :class:`Node` class documentation for
         information on how ``uid`` attributes work.
 
         Do **NOT** use this function, unless you know what you are doing!
@@ -405,7 +405,7 @@ class CropObject(object):
         self.set_uid(new_uid)
 
     def set_mask(self, mask):
-        """Sets the CropObject's mask to the given array. Performs
+        """Sets the Node's mask to the given array. Performs
         some compatibilty checks: size, dtype (converts to ``uint8``)."""
         if mask is None:
             self.mask = None
@@ -417,10 +417,10 @@ class CropObject(object):
                                                      self.right)#.count()
             if mask.shape != (b - t, r - l):
                 raise ValueError('Mask shape {0} does not correspond'
-                                 ' to integer shape {1} of CropObject.'
+                                 ' to integer shape {1} of Node.'
                                  ''.format(mask.shape, (b - t, r - l)))
             if str(mask.dtype) != 'uint8':
-                logging.debug('CropObject.set_mask(): Supplied non-integer mask'
+                logging.debug('Node.set_mask(): Supplied non-integer mask'
                               ' with dtype={0}'.format(mask.dtype))
 
             self.mask = mask.astype('uint8')
@@ -443,23 +443,23 @@ class CropObject(object):
 
     @property
     def dataset(self):
-        """Which dataset is this CropObject coming from?
+        """Which dataset is this Node coming from?
         For bookkeeping."""
         # The ``_dataset_namespace`` is set during initialization.
         return self._dataset_namespace
 
     @property
     def doc(self):
-        """Which document within the dataset is this CropObject
+        """Which document within the dataset is this Node
         coming from? The ``_document_namespace``
 
         This is important when working with CropObjects
         from multiple CropObjectList files, especially for properly
-        constructing CropObject graphs, because ``inlinks`` and
+        constructing Node graphs, because ``inlinks`` and
         ``outlinks`` use the numeric ``objids``, which point to
         CropObjects within the same document.
 
-        ``objid`` of each CropObject has to be unique within a document.
+        ``objid`` of each Node has to be unique within a document.
         """
         # The ``_document_namespace`` is set during initialization.
         return self._document_namespace
@@ -488,14 +488,14 @@ class CropObject(object):
 
     @property
     def bounding_box(self):
-        """The ``top, left, bottom, right`` tuple of the CropObject's
+        """The ``top, left, bottom, right`` tuple of the Node's
         coordinates."""
         return self.top, self.left, self.bottom, self.right
 
     @property
     def middle(self):
         """Returns the integer representation of where the middle
-        of the CropObject lies, as a ``(m_vert, m_horz)`` tuple.
+        of the Node lies, as a ``(m_vert, m_horz)`` tuple.
 
         The integers just get rounded down.
         """
@@ -505,7 +505,7 @@ class CropObject(object):
 
     @property
     def is_empty(self):
-        """A CropObject is empty if it is composed of zero pixels.
+        """A Node is empty if it is composed of zero pixels.
         This is measured through the mask. CropObjects without
         a mask are assumed to be non-empty."""
         if self.mask is None:
@@ -523,16 +523,16 @@ class CropObject(object):
 
     @staticmethod
     def bbox_to_integer_bounds(ftop, fleft, fbottom, fright):
-        """Rounds off the CropObject bounds to the nearest integer
+        """Rounds off the Node bounds to the nearest integer
         so that no area is lost (e.g. bottom and right bounds are
         rounded up, top and left bounds are rounded down).
 
         Returns the rounded-off integers (top, left, bottom, right)
         as integers.
 
-        >>> CropObject.bbox_to_integer_bounds(44.2, 18.9, 55.1, 92.99)
+        >>> Node.bbox_to_integer_bounds(44.2, 18.9, 55.1, 92.99)
         (44, 18, 56, 93)
-        >>> CropObject.bbox_to_integer_bounds(44, 18, 56, 92.99)
+        >>> Node.bbox_to_integer_bounds(44, 18, 56, 92.99)
         (44, 18, 56, 93)
 
         """
@@ -559,7 +559,7 @@ class CropObject(object):
         return int(top), int(left), int(bottom), int(right)
 
     def to_integer_bounds(self):
-        """Ensures that the CropObject has an integer position and size.
+        """Ensures that the Node has an integer position and size.
         (This is important whenever you want to use a mask, and reasonable
         whenever you do not need sub-pixel resolution...)
         """
@@ -575,7 +575,7 @@ class CropObject(object):
 
     def project_to(self, img):
         """This function returns the *crop* of the input image
-        corresponding to the CropObject (incl. masking).
+        corresponding to the Node (incl. masking).
         Assumes zeros are background."""
         # Make a copy! We don't want to modify the original image by the mask.
         # Copy forced by the "* 1" part.
@@ -586,7 +586,7 @@ class CropObject(object):
 
     def project_on(self, img):
         """This function returns only those parts of the input image
-        that correspond to the CropObject and masks out everything else
+        that correspond to the Node and masks out everything else
         with zeros. The dimension of the returned array is the same
         as of the input image. This function basically reconstructs
         the symbol as an indicator function over the pixels of
@@ -618,9 +618,9 @@ class CropObject(object):
         return img
 
     def overlaps(self, bounding_box_or_cropobject):
-        """Check whether this CropObject overlaps the given bounding box or CropObject.
+        """Check whether this Node overlaps the given bounding box or Node.
 
-        >>> c = CropObject(0, 'test', 10, 100, height=20, width=10)
+        >>> c = Node(0, 'test', 10, 100, height=20, width=10)
         >>> c.bounding_box
         (10, 100, 30, 110)
         >>> c.overlaps((10, 100, 30, 110))  # Exact match
@@ -631,9 +631,9 @@ class CropObject(object):
         False
         >>> c.overlaps((0, 0, 8, 89))       # Total mismatch
         False
-        >>> c.overlaps((9, 99, 31, 111))    # Encompasses CropObject
+        >>> c.overlaps((9, 99, 31, 111))    # Encompasses Node
         True
-        >>> c.overlaps((11, 101, 29, 109))  # Within CropObject
+        >>> c.overlaps((11, 101, 29, 109))
         True
         >>> c.overlaps((9, 101, 31, 109))   # Encompass horz., within vert.
         True
@@ -649,12 +649,11 @@ class CropObject(object):
         True
 
         """
-        if isinstance(bounding_box_or_cropobject, CropObject):
+        if isinstance(bounding_box_or_cropobject, Node):
             t, l, b, r = bounding_box_or_cropobject.bounding_box
         else:
             t, l, b, r = bounding_box_or_cropobject
-        # Does it overlap vertically? Includes situations where the CropObject is
-        # inside the bounding box.
+        # Does it overlap vertically? Includes situations where the CropObject is inside the bounding box.
         # Note that the bottom is +1 (fencepost), so the checks bottom vs. top need to be "less than",
         # not leq. If one object's top would be equal to the other's bottom, they would be touching,
         # not overlapping.
@@ -664,9 +663,9 @@ class CropObject(object):
         return False
 
     def contains(self, bounding_box_or_cropobject):
-        """Check if this CropObject entirely contains the other bounding
+        """Check if this CropObject entiNodeins the other bounding
         box (or, the other cropobject's bounding box)."""
-        if isinstance(bounding_box_or_cropobject, CropObject):
+        if isinstance(bounding_box_or_cropobject, Node):
             t, l, b, r = bounding_box_or_cropobject.bounding_box
         else:
             t, l, b, r = bounding_box_or_cropobject
@@ -677,11 +676,11 @@ class CropObject(object):
         return False
 
     def bbox_intersection(self, bounding_box):
-        """Returns the sub-bounding box of this CropObject, relative to its size (so: 0,0
-        is the CropObject's upper left corner), that intersects the given bounding box.
+        """Returns the sub-bounding box of this CropObject, relNodets size (so: 0,0
+        is the CropObject's upNodeorner), that intersects the given bounding box.
         If the intersection is empty, returns None.
 
-        >>> c = CropObject(0, 'test', 10, 100, height=20, width=10)
+        >>> c = Node(0, 'test', 10, 100, height=20, width=10)
         >>> c.bounding_box
         (10, 100, 30, 110)
         >>> other_bbox = 20, 100, 40, 105
@@ -724,7 +723,7 @@ class CropObject(object):
 
         >>> mask = numpy.zeros((20, 10))
         >>> mask[5:15, 3:8] = 1
-        >>> c = CropObject(0, 'test', 10, 100, width=10, height=20, mask=mask)
+        >>> c = Node(0, 'test', 10, 100, width=10, height=20, mask=mask)
         >>> c.bounding_box
         (10, 100, 30, 110)
         >>> c.crop_to_mask()
@@ -733,7 +732,7 @@ class CropObject(object):
         >>> c.height, c.width
         (10, 5)
 
-        Assumes integer bounds, which is ensured during CropObject initialization.
+        Assumes integer bounds, which is ensured during CropObject initNode.
         """
         if self.mask is None:
             return
@@ -784,8 +783,7 @@ class CropObject(object):
         logging.debug('Cropobject.crop: Old mask shape {0}, new mask shape {1}'
                      ''.format(self.mask.shape, new_mask.shape))
 
-        # new bounding box, relative to image -- used to compute the CropObject's
-        # new position and size
+        # new bounding box, relative to image -- used to compute the CropObject's position and size
         abs_t = self.top + trim_top
         abs_l = self.left + trim_left
         abs_b = self.bottom - trim_bottom
@@ -799,10 +797,10 @@ class CropObject(object):
         self.set_mask(new_mask)
 
     def __str__(self):
-        """Format the CropObject as its XML representation. See the documentation
+        """Format the CropObject as string representation. See the documentation
         of :module:`mung.io` for details."""
         lines = []
-        lines.append('<CropObject xml:id="{0}">'.format(self.uid))
+        lines.append('<CropObject xml:id={}>'.format(self.uid))
         lines.append('\t<Id>{0}</Id>'.format(self.objid))
         # lines.append('\t<UniqueId>{0}</UniqueId>'.format(self.uid))
         lines.append('\t<ClassName>{0}</ClassName>'.format(self.clsname))
@@ -830,7 +828,7 @@ class CropObject(object):
 
     def encode_mask(self, mask, compress=False, mode='rle'):
         """Encode a binary array ``mask`` as a string, compliant
-        with the CropObject format specification in :mod:`mung.io`.
+        with the CropObject formNodecation in :mod:`mung.io`.
         """
         if mode == 'rle':
             return self.encode_mask_rle(mask, compress=compress)
@@ -883,7 +881,7 @@ class CropObject(object):
         is None. If the mask is not None, uses the following algorithm:
 
         * Flatten the mask (then use width and height of CropObject for
-          reshaping).
+Nodereshaping).
         * Record as string, with whitespace separator
         * Compress string using gz2 (if compress=True) NOT IMPLEMENTED
         * Return resulting string
@@ -928,7 +926,7 @@ class CropObject(object):
         return output
 
     def decode_mask(self, mask_string, shape):
-        """Decodes a CropObject mask string into a binary
+        """Decodes a CropObject maskNodeto a binary
         numpy array of the given shape."""
         mode = self._determine_mask_mode(mask_string)
         if mode == 'rle':
@@ -954,12 +952,12 @@ class CropObject(object):
         try:
             values = list(map(float, mask_string.split()))
         except ValueError:
-            logging.info('CropObject.decode_mask(): Cannot decode mask values:\n{0}'.format(mask_string))
+            logging.info('CropObject.decoNode Cannot decode mask values:\n{0}'.format(mask_string))
             raise
         mask = numpy.array(values).reshape(shape)
         #s = base64.decodestring(mask_string)
         #mask = numpy.frombuffer(s)
-        #logging.info('CropObject.decode_mask(): shape={0}\nmask={1}'.format(mask.shape, mask))
+        #logging.info('CropObject.decoNode shape={0}\nmask={1}'.format(mask.shape, mask))
         return mask
 
     @staticmethod
@@ -992,8 +990,8 @@ class CropObject(object):
         The ``clsname`` of the ``other`` is ignored.
         """
         if self.doc != other.doc:
-            logging.warning('Trying to join CropObject from doc {0}'
-                            ' into this CropObject from doc {1}, skipping.'
+            logging.warning('Trying to join CropObject from'
+                            ' into this CropObject from skipping.'
                             ''.format(other.doc, self.doc))
             return
 
@@ -1039,8 +1037,7 @@ class CropObject(object):
 
     def get_outlink_objects(self, cropobjects):
         """Out of the given ``cropobject`` list, return a list
-        of those to which this CropObject has outlinks.
-
+        of those to which this CropObject has Node
         Can deal with CropObjects from multiple documents.
         """
         output = []
@@ -1060,9 +1057,7 @@ class CropObject(object):
 
     def get_inlink_objects(self, cropobjects):
         """Out of the given ``cropobject`` list, return a list
-        of those from which this CropObject has inlinks.
-
-        Can deal with CropObjects from multiple documents.
+        of those from which this CropObject has Node        Can deal with CropObjects from multiple documents.
         """
         output = []
         if len(self.inlinks) == 0:
@@ -1085,7 +1080,7 @@ class CropObject(object):
         self.y += right
 
     def scale(self, zoom=1.0):
-        """Re-compute the CropObject with the given scaling factor."""
+        """Re-compute the CropObject withNode scaling factor."""
         mask = self.mask * 1.0
         import skimage.transform
         new_mask_shape = max(int(self.height * zoom), 1), max(int(self.width * zoom), 1)
@@ -1109,7 +1104,7 @@ class CropObject(object):
 ##############################################################################
 # Functions for merging CropObjects and CropObjectLists
 def split_cropobject_on_connected_components(c, next_objid):
-    """Split the CropObject into one object per connected component
+    """Split the CropObject intoNodet per connected component
     of the mask. All inlinks/outlinks are retained in all the newly
     created CropObjects, and the old object is not changed. (If there
     is only one connected component, the object is returned unchanged
@@ -1127,7 +1122,7 @@ def split_cropobject_on_connected_components(c, next_objid):
     canvas[1:-1, 1:-1] = mask
     cc, labels, bboxes = compute_connected_components(canvas)
 
-    logging.info('CropObject.split(): {0} ccs, bboxes: {1}'.format(cc, bboxes))
+    logging.info('CropObject.spliNodecs, bboxes: {1}'.format(cc, bboxes))
 
     if len(bboxes) == 1:
         return [c]
@@ -1151,9 +1146,9 @@ def split_cropobject_on_connected_components(c, next_objid):
         outlinks = copy.deepcopy(c.outlinks)
         data = copy.deepcopy(c.data)
 
-        new_c = CropObject(objid, c.clsname, top, left, w, h,
-                           inlinks=inlinks, outlinks=outlinks,
-                           mask=m, data=data)
+        new_c = Node(objid, c.clsname, top, left, w, h,
+                     inlinks=inlinks, outlinks=outlinks,
+                     mask=m, data=data)
         output.append(new_c)
 
         _next_objid += 1
@@ -1163,7 +1158,7 @@ def split_cropobject_on_connected_components(c, next_objid):
 
 def cropobjects_merge(fr, to, clsname, objid):
     """Merge the given CropObjects with respect to the other.
-    Returns the new CropObject (without modifying any of the inputs)."""
+    Returns the new CropObject (witNodeying any of the inputs)."""
     if fr.doc != to.doc:
         raise ValueError('Cannot merge CropObjects from different documents!'
                          ' fr: {0}, to: {1}'.format(fr.doc, to.doc))
@@ -1176,13 +1171,13 @@ def cropobjects_merge(fr, to, clsname, objid):
 
     m_doc = fr.doc
     m_dataset = fr.dataset
-    m_uid = CropObject.build_uid(m_dataset, m_doc, objid)
+    m_uid = Node.build_uid(m_dataset, m_doc, objid)
 
-    output = CropObject(objid, clsname,
-                        top=mt, left=ml, height=mh, width=mw,
-                        mask=mmask,
-                        inlinks=m_inlinks, outlinks=m_outlinks,
-                        uid=m_uid)
+    output = Node(objid, clsname,
+                  top=mt, left=ml, height=mh, width=mw,
+                  mask=mmask,
+                  inlinks=m_inlinks, outlinks=m_outlinks,
+                  uid=m_uid)
     return output
 
 
@@ -1197,19 +1192,18 @@ def cropobjects_merge_multiple(cropobjects, clsname, objid):
 
     m_doc = cropobjects[0].doc
     m_dataset = cropobjects[0].dataset
-    m_uid = CropObject.build_uid(m_dataset, m_doc, objid)
+    m_uid = Node.build_uid(m_dataset, m_doc, objid)
 
-    output = CropObject(objid, clsname,
-                        top=mt, left=ml, height=mh, width=mw,
-                        mask=m_mask,
-                        inlinks=m_inlinks, outlinks=m_outlinks,
-                        uid=m_uid)
+    output = Node(objid, clsname,
+                  top=mt, left=ml, height=mh, width=mw,
+                  mask=m_mask,
+                  inlinks=m_inlinks, outlinks=m_outlinks,
+                  uid=m_uid)
     return output
 
 
 def cropobjects_merge_bbox(cropobjects):
-    """Computes the bounding box of a CropObject that would
-    result from merging the given list of CropObjects.
+    """Computes the bounding box of a CropObject thatNode result from merging the given list of CropObjects.
     """
     # Find extremes. This will define the output cropobject.
     t, l, b, r = numpy.inf, numpy.inf, -1, -1
@@ -1231,9 +1225,9 @@ def cropobjects_merge_mask(cropobjects, intersection=False):
     """Merges the given list of cropobjects into one. Masks are combined
     by an OR operation.
 
-    >>> c1 = CropObject(0, 'name', 10, 10, 4, 1, mask=numpy.ones((1, 4), dtype='uint8'))
-    >>> c2 = CropObject(1, 'name', 11, 10, 6, 1, mask=numpy.ones((1, 6), dtype='uint8'))
-    >>> c3 = CropObject(2, 'name', 9, 14,  2, 4, mask=numpy.ones((4, 2), dtype='uint8'))
+    >>> c1 = Node(0, 'name', 10, 10, 4, 1, mask=numpy.ones((1, 4), dtype='uint8'))
+    >>> c2 = Node(1, 'name', 11, 10, 6, 1, mask=numpy.ones((1, 6), dtype='uint8'))
+    >>> c3 = Node(2, 'name', 9, 14,  2, 4, mask=numpy.ones((4, 2), dtype='uint8'))
     >>> c = [c1, c2, c3]
     >>> m1 = cropobjects_merge_mask(c)
     >>> m1.shape
@@ -1314,7 +1308,7 @@ def cropobjects_merge_links(cropobjects):
 
 
 def merge_cropobject_lists(*cropobject_lists):
-    """Combines the CropObject lists from different documents
+    """Combines the CropObject listNodeferent documents
     into one list, so that inlink/outlink references still work.
     This is useful only if you want to merge two documents
     into one (e.g., if your annotators worked on different "layers"
@@ -1368,7 +1362,7 @@ def merge_cropobject_lists(*cropobject_lists):
 
 def link_cropobjects(fr, to, check_docname=True):
     """Add a relationship from the ``fr`` CropObject
-    to the ``to`` CropObject. Modifies the CropObjects
+    Nodeo`` CropObject. ModNodeCropObjects
     in-place.
 
     If the objects are already linked, does nothing.

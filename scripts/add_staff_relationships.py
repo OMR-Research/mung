@@ -143,7 +143,7 @@ def add_staff_relationships(cropobjects,
     _ss_sl_idx_wrt_staff = {}
     # Reverse indexes:
     # If I know which staff (by objid) and which index of staffline/staffspace,
-    # I want to retrieve the given staffline/staffspace CropObject:
+    # I want to retrieve the given staffline/staffspace Node:
     _staff_and_idx2ss = collections.defaultdict(dict)
     _staff_and_idx2sl = collections.defaultdict(dict)
 
@@ -348,7 +348,7 @@ def build_argument_parser():
 
     parser.add_argument('-a', '--annot', action='store', required=True,
                         help='The annotation file for which the staffline and staff'
-                             ' CropObject relationships should be added.')
+                             ' Node relationships should be added.')
     parser.add_argument('-e', '--export', action='store',
                         help='A filename to which the output CropObjectList'
                              ' should be saved. If not given, will print to'
@@ -373,7 +373,7 @@ def main(args):
     _start_time = time.clock()
 
     ##########################################################################
-    logging.info('Import the CropObject list')
+    logging.info('Import the Node list')
     if not os.path.isfile(args.annot):
         raise ValueError('Annotation file {0} not found!'
                          ''.format(args.annot))

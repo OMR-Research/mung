@@ -122,7 +122,7 @@ def main(args):
     logging.info('Starting main...')
     _start_time = time.clock()
 
-    # Parse individual CropObject lists.
+    # Parse individual Node lists.
     cropobject_lists = []
     _n_parsed_cropobjects = 0
     for i, f in enumerate(args.input):
@@ -138,7 +138,7 @@ def main(args):
                          ''.format(_n_parsed_cropobjects,
                                    _time_parsing, _cropobjects_per_second))
 
-    # Merge the CropObject lists into one.
+    # Merge the Node lists into one.
     # This is done so that the resulting object graph can be manipulated
     # at once, without objid clashes.
     cropobjects = merge_cropobject_lists(*cropobject_lists)

@@ -102,7 +102,7 @@ def bbox_intersection(origin, intersect):
 
 def pixel_metrics(truth, prediction):
     """Computes the recall, precision and f-score for the prediction
-    CropObject given the truth CropObject."""
+    Node given the truth Node."""
     recall, precision, fscore = 0, 0, 0
 
     intersection_truth = bbox_intersection(truth.bounding_box,
@@ -151,14 +151,14 @@ def pixel_metrics(truth, prediction):
 
 
 def cropobjects_rpf(truth, prediction):
-    """Computes CropObject pixel-level metrics.
+    """Computes Node pixel-level metrics.
 
     :param truth: A list of the ground truth CropObjects.
 
     :param prediction: A list of the predicted CropObjects.
 
     :returns: Three matrices with shape ``(len(truth), len(prediction)``:
-        recall, precision, and f-score for each truth/prediction CropObject
+        recall, precision, and f-score for each truth/prediction Node
         pair. Truth cropobjects are rows, prediction columns.
     """
     recall = numpy.zeros((len(truth), len(prediction)))
@@ -182,7 +182,7 @@ def align_cropobjects(truth, prediction, fscore=None):
 
     :param prediction: A list of the predicted CropObjects.
 
-    :returns: A list of (t, p) pairs of CropObject indices into
+    :returns: A list of (t, p) pairs of Node indices into
         the truth and prediction lists. There will be one
         pair for each predicted symbol.
     """
@@ -414,7 +414,7 @@ def main(args):
                                     for t in t_aln_dict
                                     if len(t_aln_dict[t]) > 1}
 
-        print('Truth multi-aligned CropObject classes:\n{0}'
+        print('Truth multi-aligned Node classes:\n{0}'
               ''.format(pprint.pformat(
             {(truth[t].objid, truth[t].clsname): [(p.objid, p.clsname)
                                                   for p in t_aln_dict[t]]

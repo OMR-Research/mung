@@ -1,4 +1,9 @@
-"""This module implements the :class:`CropObjectClass`, which
+"""
+
+**NOTE: This file should become obsolete. The list of classes will be
+implemented as a sub-JSON from SMuFL.**
+
+This module implements the :class:`CropObjectClass`, which
 represents one possible :class:`CropObject` class, such as
 a notehead or a time signature. Aside from defining the "vocabulary"
 of available object classes for annotation, it also contains

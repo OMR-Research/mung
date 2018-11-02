@@ -155,7 +155,7 @@ class MungMatcher(object):
 
         :param vs2: A list of CropObjects.
 
-        :return: A matching of these two CropObject lists. The matching
+        :return: A matching of these two Node lists. The matching
             is a dict of ``(n1.objid, n2.objid) --> weight``.
         """
         # logging.warning('Compatibilityre sets: {0}, {1}. Matching is currently very stupid!'

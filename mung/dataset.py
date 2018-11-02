@@ -1,4 +1,4 @@
-"""This module acts as an abstraction over the dataset.
+"""This module acts as an abstraction over the CVC-MUSCIMA dataset.
 
 It mostly implements utility functions, like getting the absolute
 path to a specific image in the CVC-MUSCIMA dataset, specified

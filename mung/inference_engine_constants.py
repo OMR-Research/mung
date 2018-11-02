@@ -223,7 +223,7 @@ class InferenceEngineConstants(object):
 
     @property
     def clsnames_affecting_onsets(self):
-        """Returns a list of CropObject class names for objects
+        """Returns a list of Node class names for objects
         that affect onsets. Assumes notehead and rest durations
         have already been given."""
         output = set()
@@ -246,7 +246,7 @@ class InferenceEngineConstants(object):
 
     @staticmethod
     def interpret_numerals(numerals):
-        """Returns the given numeral CropObject as a number, left to right."""
+        """Returns the given numeral Node as a number, left to right."""
         for n in numerals:
             if n.clsname not in InferenceEngineConstants.NUMERALS:
                 raise ValueError('Symbol {0} is not a numeral!'.format(n.uid))
