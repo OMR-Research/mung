@@ -29,7 +29,7 @@ import logging
 import os
 import time
 
-from mung.inference import PitchInferenceEngine, OnsetsInferenceEngine,  MIDIBuilder
+from mung.inference.inference import PitchInferenceEngine, OnsetsInferenceEngine,  MIDIBuilder
 from mung.io import parse_cropobject_list, export_cropobject_list
 
 __version__ = "0.0.1"

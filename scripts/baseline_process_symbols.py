@@ -22,8 +22,8 @@ from sklearn.feature_extraction import DictVectorizer
 from mung.graph import find_beams_incoherent_with_stems, NotationGraph
 from mung.graph import find_contained_cropobjects, remove_contained_cropobjects
 from mung.graph import find_misdirected_ledger_line_edges
-from mung.inference import OnsetsInferenceEngine, MIDIBuilder
-from mung.inference import PitchInferenceEngine
+from mung.inference.inference import OnsetsInferenceEngine, MIDIBuilder
+from mung.inference.inference import PitchInferenceEngine
 from mung.inference.constants import _CONST
 from mung.io import parse_cropobject_class_list, parse_cropobject_list, export_cropobject_list
 from mung.node import cropobject_distance, bbox_intersection, cropobjects_merge_multiple, link_cropobjects
