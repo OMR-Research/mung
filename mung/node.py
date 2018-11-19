@@ -800,7 +800,7 @@ class Node(object):
         """Format the CropObject as string representation. See the documentation
         of :module:`mung.io` for details."""
         lines = []
-        lines.append('<CropObject xml:id={}>'.format(self.uid))
+        lines.append('<CropObject xml:id="{}">'.format(self.uid))
         lines.append('\t<Id>{0}</Id>'.format(self.objid))
         # lines.append('\t<UniqueId>{0}</UniqueId>'.format(self.uid))
         lines.append('\t<ClassName>{0}</ClassName>'.format(self.clsname))
