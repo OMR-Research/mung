@@ -281,11 +281,11 @@ if __name__ == '__main__':
     de_root = os.path.join(test_data_root, 'detected')
     wc_root = os.path.join(test_data_root, 'without_contained')
 
-    names = ['CVC-MUSCIMA_W-03_N-01_D-ideal.xml',
-             'CVC-MUSCIMA_W-15_N-10_D-ideal.xml']
+    names = ['minifull.xml',
+             'mini2full.xml']
 
-    gt = NotationGraph(parse_cropobject_list(os.path.join(gt_root, names[0])))
-    wc = NotationGraph(parse_cropobject_list(os.path.join(wc_root, names[0])))
+    gt = NotationGraph(parse_cropobject_list(os.path.join(test_data_root, names[0])))
+    wc = NotationGraph(parse_cropobject_list(os.path.join(test_data_root, names[1])))
 
     matcher = MungMatcher()
 

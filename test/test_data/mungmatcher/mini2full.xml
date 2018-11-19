@@ -1,0 +1,901 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CropObjectList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<CropObjects>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___23">
+	<Id>23</Id>
+	<ClassName>flat</ClassName>
+	<Top>251</Top>
+	<Left>333</Left>
+	<Width>18</Width>
+	<Height>41</Height>
+	<Mask>0:3 1:2 0:16 1:2 0:16 1:3 0:15 1:3 0:14 1:4 0:14 1:4 0:15 1:3 0:15 1:3 0:15 1:3 0:12 1:8 0:10 1:8 0:13 1:4 0:14 1:4 0:14 1:4 0:14 1:4 0:14 1:4 0:14 1:4 0:5 1:2 0:7 1:4 0:4 1:5 0:5 1:4 0:2 1:8 0:4 1:4 0:2 1:9 0:3 1:15 0:3 1:4 0:3 1:8 0:3 1:4 0:6 1:5 0:3 1:4 0:6 1:5 0:3 1:4 0:6 1:5 0:3 1:4 0:5 1:5 0:4 1:4 0:5 1:5 0:4 1:4 0:5 1:4 0:5 1:4 0:4 1:3 0:7 1:4 0:3 1:4 0:7 1:4 0:3 1:3 0:8 1:4 0:3 1:3 0:8 1:4 0:2 1:3 0:9 1:8 0:10 1:7 0:11 1:6 0:12 1:6 0:12 1:5 0:10 1:7 0:11 1:7 0:16 1:1 0:12</Mask>
+	<Inlinks>71</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___24">
+	<Id>24</Id>
+	<ClassName>flat</ClassName>
+	<Top>299</Top>
+	<Left>354</Left>
+	<Width>19</Width>
+	<Height>46</Height>
+	<Mask>0:3 1:2 0:17 1:4 0:15 1:4 0:15 1:5 0:14 1:5 0:14 1:5 0:14 1:5 0:14 1:5 0:14 1:5 0:14 1:5 0:14 1:5 0:14 1:5 0:15 1:4 0:15 1:4 0:14 1:6 0:14 1:5 0:14 1:5 0:14 1:5 0:14 1:5 0:10 1:18 0:1 1:19 0:4 1:13 0:6 1:13 0:6 1:13 0:6 1:15 0:4 1:15 0:4 1:15 0:4 1:5 0:3 1:7 0:4 1:5 0:4 1:6 0:4 1:5 0:4 1:6 0:4 1:5 0:4 1:6 0:4 1:5 0:3 1:7 0:4 1:4 0:4 1:6 0:5 1:4 0:4 1:6 0:5 1:4 0:3 1:6 0:6 1:5 0:2 1:5 0:6 1:12 0:8 1:11 0:8 1:11 0:8 1:11 0:8 1:10 0:9 1:9 0:10 1:8 0:12 1:5 0:15 1:4 0:15 1:3 0:10</Mask>
+	<Inlinks>71</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___25">
+	<Id>25</Id>
+	<ClassName>flat</ClassName>
+	<Top>284</Top>
+	<Left>306</Left>
+	<Width>19</Width>
+	<Height>50</Height>
+	<Mask>0:6 1:1 0:18 1:1 0:18 1:1 0:18 1:2 0:16 1:4 0:11 1:8 0:11 1:9 0:14 1:3 0:16 1:3 0:16 1:3 0:16 1:3 0:16 1:3 0:16 1:3 0:15 1:4 0:15 1:4 0:15 1:3 0:16 1:3 0:16 1:4 0:15 1:3 0:16 1:3 0:5 1:6 0:5 1:3 0:2 1:10 0:4 1:15 0:4 1:15 0:4 1:8 0:3 1:4 0:4 1:5 0:6 1:3 0:5 1:3 0:7 1:4 0:5 1:3 0:7 1:4 0:4 1:4 0:7 1:3 0:5 1:4 0:6 1:3 0:6 1:4 0:6 1:3 0:6 1:4 0:5 1:4 0:6 1:4 0:5 1:4 0:6 1:4 0:5 1:4 0:6 1:4 0:4 1:4 0:4 1:5 0:6 1:5 0:3 1:5 0:6 1:5 0:6 1:3 0:4 1:3 0:9 1:4 0:3 1:3 0:9 1:4 0:3 1:3 0:9 1:4 0:2 1:4 0:8 1:4 0:2 1:5 0:9 1:3 0:2 1:4 0:10 1:9 0:10 1:8 0:10 1:9 0:10 1:9 0:10 1:8 0:11 1:6 0:13 1:5 0:14 1:3 0:14</Mask>
+	<Inlinks>71</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___26">
+	<Id>26</Id>
+	<ClassName>flat</ClassName>
+	<Top>501</Top>
+	<Left>337</Left>
+	<Width>24</Width>
+	<Height>53</Height>
+	<Mask>0:2 1:2 0:21 1:3 0:21 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:5 0:20 1:4 0:21 1:3 0:20 1:4 0:20 1:4 0:20 1:5 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:20 1:4 0:17 1:48 0:2 1:6 0:1 1:10 0:8 1:5 0:2 1:9 0:8 1:17 0:7 1:18 0:6 1:18 0:6 1:17 0:7 1:9 0:3 1:5 0:7 1:7 0:5 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:6 1:5 0:8 1:5 0:6 1:4 0:9 1:5 0:5 1:5 0:9 1:5 0:5 1:5 0:9 1:5 0:4 1:5 0:11 1:4 0:4 1:5 0:11 1:4 0:3 1:5 0:11 1:5 0:2 1:6 0:12 1:4 0:2 1:6 0:12 1:11 0:13 1:10 0:14 1:9 0:15 1:9 0:15 1:8 0:16 1:8 0:16 1:8 0:17 1:9 0:16 1:8 0:10</Mask>
+	<Inlinks>72</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___27">
+	<Id>27</Id>
+	<ClassName>flat</ClassName>
+	<Top>562</Top>
+	<Left>356</Left>
+	<Width>28</Width>
+	<Height>51</Height>
+	<Mask>0:6 1:1 0:27 1:2 0:26 1:2 0:26 1:2 0:25 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:5 0:23 1:5 0:23 1:5 0:23 1:5 0:23 1:5 0:23 1:5 0:23 1:5 0:23 1:5 0:9 1:1 0:14 1:4 0:6 1:7 0:5 1:56 0:5 1:5 0:2 1:13 0:8 1:20 0:8 1:11 0:4 1:5 0:8 1:10 0:5 1:4 0:9 1:9 0:6 1:4 0:8 1:8 0:7 1:6 0:8 1:6 0:8 1:6 0:8 1:5 0:9 1:5 0:9 1:5 0:8 1:6 0:9 1:6 0:7 1:5 0:10 1:5 0:8 1:5 0:10 1:5 0:7 1:6 0:11 1:4 0:7 1:5 0:12 1:4 0:6 1:6 0:12 1:4 0:6 1:5 0:13 1:4 0:5 1:6 0:13 1:4 0:4 1:6 0:14 1:4 0:4 1:6 0:14 1:5 0:3 1:6 0:15 1:4 0:2 1:6 0:16 1:11 0:17 1:11 0:17 1:11 0:17 1:10 0:18 1:9 0:18 1:12 0:17 1:11 0:19 1:5 0:24 1:4 0:14</Mask>
+	<Inlinks>72</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___28">
+	<Id>28</Id>
+	<ClassName>flat</ClassName>
+	<Top>547</Top>
+	<Left>308</Left>
+	<Width>28</Width>
+	<Height>52</Height>
+	<Mask>0:6 1:1 0:26 1:4 0:25 1:3 0:25 1:3 0:25 1:3 0:19 1:9 0:4 1:1 0:14 1:14 0:19 1:8 0:20 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:24 1:4 0:23 1:6 0:3 1:8 0:11 1:5 0:4 1:8 0:11 1:5 0:11 1:1 0:11 1:8 0:8 1:1 0:11 1:18 0:10 1:18 0:10 1:18 0:10 1:19 0:9 1:19 0:9 1:5 0:2 1:3 0:2 1:7 0:9 1:5 0:7 1:7 0:9 1:5 0:7 1:7 0:9 1:4 0:7 1:7 0:10 1:4 0:7 1:7 0:10 1:4 0:6 1:7 0:7 1:56 0:4 1:4 0:5 1:7 0:12 1:5 0:3 1:7 0:13 1:5 0:2 1:8 0:13 1:4 0:2 1:7 0:15 1:4 0:2 1:7 0:15 1:12 0:16 1:11 0:17 1:11 0:17 1:11 0:17 1:9 0:18 1:10 0:19 1:8 0:20 1:7 0:21 1:6 0:23 1:4 0:19</Mask>
+	<Inlinks>72</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___29">
+	<Id>29</Id>
+	<ClassName>g-clef</ClassName>
+	<Top>246</Top>
+	<Left>227</Left>
+	<Width>79</Width>
+	<Height>190</Height>
+	<Mask>0:40 1:3 0:75 1:5 0:74 1:5 0:73 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:71 1:9 0:70 1:9 0:70 1:4 0:2 1:3 0:70 1:4 0:2 1:3 0:69 1:5 0:2 1:3 0:69 1:4 0:3 1:3 0:69 1:4 0:4 1:2 0:68 1:5 0:4 1:5 0:65 1:4 0:5 1:5 0:66 1:3 0:4 1:3 0:69 1:3 0:4 1:4 0:68 1:4 0:3 1:3 0:69 1:4 0:4 1:2 0:68 1:5 0:4 1:2 0:68 1:5 0:4 1:2 0:68 1:5 0:3 1:4 0:67 1:5 0:3 1:3 0:68 1:5 0:3 1:3 0:68 1:5 0:3 1:3 0:68 1:5 0:3 1:3 0:68 1:4 0:4 1:2 0:69 1:4 0:4 1:2 0:69 1:4 0:3 1:3 0:69 1:4 0:2 1:4 0:69 1:4 0:2 1:3 0:70 1:4 0:2 1:3 0:70 1:9 0:70 1:8 0:71 1:8 0:71 1:8 0:71 1:7 0:72 1:7 0:72 1:6 0:73 1:6 0:73 1:5 0:71 1:7 0:72 1:11 0:71 1:8 0:71 1:4 0:74 1:5 0:73 1:6 0:72 1:7 0:72 1:7 0:71 1:8 0:71 1:8 0:70 1:9 0:70 1:3 0:2 1:4 0:68 1:4 0:3 1:4 0:68 1:4 0:3 1:3 0:68 1:4 0:4 1:3 0:68 1:3 0:5 1:3 0:67 1:4 0:5 1:3 0:66 1:4 0:6 1:3 0:66 1:3 0:7 1:3 0:65 1:3 0:8 1:3 0:64 1:4 0:8 1:3 0:63 1:4 0:9 1:3 0:62 1:4 0:10 1:3 0:61 1:5 0:10 1:3 0:61 1:4 0:11 1:4 0:59 1:4 0:12 1:4 0:58 1:4 0:13 1:4 0:57 1:5 0:13 1:4 0:57 1:3 0:15 1:4 0:43 1:4 0:9 1:15 0:4 1:4 0:40 1:6 0:5 1:29 0:4 1:7 0:39 1:8 0:12 1:9 0:2 1:12 0:39 1:5 0:17 1:3 0:7 1:8 0:38 1:5 0:17 1:4 0:7 1:7 0:38 1:6 0:17 1:4 0:4 1:12 0:35 1:6 0:18 1:4 0:2 1:15 0:34 1:5 0:19 1:23 0:31 1:6 0:20 1:22 0:30 1:5 0:22 1:24 0:28 1:4 0:22 1:11 0:6 1:8 0:27 1:5 0:21 1:10 0:10 1:7 0:25 1:5 0:22 1:8 0:13 1:7 0:23 1:5 0:22 1:8 0:15 1:7 0:22 1:5 0:20 1:9 0:17 1:6 0:21 1:4 0:22 1:8 0:19 1:5 0:21 1:3 0:22 1:9 0:19 1:6 0:19 1:4 0:21 1:10 0:20 1:5 0:19 1:4 0:21 1:10 0:20 1:6 0:7 1:3 0:7 1:4 0:22 1:5 0:2 1:3 0:21 1:6 0:5 1:6 0:5 1:3 0:23 1:4 0:3 1:3 0:21 1:6 0:4 1:8 0:4 1:3 0:23 1:4 0:3 1:3 0:21 1:6 0:6 1:6 0:3 1:4 0:22 1:5 0:2 1:4 0:22 1:6 0:5 1:6 0:3 1:4 0:23 1:4 0:3 1:4 0:21 1:6 0:6 1:4 0:3 1:4 0:24 1:5 0:2 1:3 0:22 1:6 0:13 1:4 0:25 1:9 0:22 1:6 0:13 1:5 0:24 1:9 0:22 1:6 0:13 1:5 0:25 1:8 0:22 1:6 0:13 1:4 0:27 1:7 0:23 1:5 0:13 1:8 0:24 1:7 0:22 1:5 0:13 1:67 0:12 1:3 0:5 1:59 0:12 1:3 0:31 1:5 0:22 1:5 0:13 1:4 0:30 1:6 0:20 1:6 0:13 1:5 0:30 1:4 0:21 1:6 0:14 1:4 0:30 1:4 0:21 1:6 0:14 1:4 0:29 1:5 0:21 1:6 0:15 1:3 0:30 1:3 0:21 1:6 0:16 1:4 0:30 1:2 0:21 1:6 0:9 1:3 0:4 1:4 0:30 1:2 0:21 1:5 0:9 1:4 0:5 1:4 0:28 1:3 0:20 1:6 0:9 1:5 0:4 1:4 0:28 1:4 0:18 1:7 0:9 1:5 0:5 1:5 0:26 1:4 0:18 1:6 0:11 1:4 0:6 1:4 0:27 1:3 0:17 1:6 0:12 1:4 0:6 1:5 0:26 1:3 0:17 1:5 0:24 1:5 0:25 1:3 0:16 1:6 0:25 1:5 0:24 1:3 0:15 1:6 0:27 1:5 0:23 1:3 0:14 1:7 0:28 1:6 0:21 1:3 0:13 1:8 0:29 1:7 0:19 1:3 0:12 1:8 0:31 1:6 0:17 1:5 0:10 1:9 0:35 1:5 0:14 1:6 0:9 1:8 0:38 1:7 0:10 1:7 0:7 1:10 0:41 1:5 0:8 1:8 0:5 1:11 0:44 1:5 0:6 1:8 0:3 1:11 0:47 1:30 0:49 1:28 0:51 1:32 0:48 1:29 0:58 1:10 0:70 1:9 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:7 0:72 1:8 0:71 1:8 0:71 1:8 0:70 1:6 0:2 1:1 0:70 1:6 0:2 1:1 0:70 1:6 0:2 1:1 0:70 1:6 0:2 1:2 0:69 1:6 0:2 1:2 0:69 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:6 0:73 1:5 0:74 1:5 0:74 1:6 0:73 1:5 0:75 1:4 0:75 1:4 0:74 1:5 0:75 1:5 0:74 1:5 0:74 1:5 0:71 1:7 0:72 1:7 0:71 1:9 0:70 1:9 0:69 1:10 0:69 1:10 0:69 1:10 0:69 1:10 0:68 1:11 0:69 1:10 0:69 1:9 0:70 1:9 0:70 1:8 0:73 1:4 0:44</Mask>
+	<Outlinks>85</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___30">
+	<Id>30</Id>
+	<ClassName>f-clef</ClassName>
+	<Top>511</Top>
+	<Left>245</Left>
+	<Width>56</Width>
+	<Height>83</Height>
+	<Mask>0:21 1:10 0:44 1:13 0:41 1:16 0:38 1:19 0:35 1:11 0:6 1:5 0:34 1:9 0:9 1:5 0:31 1:8 0:13 1:5 0:29 1:7 0:16 1:5 0:27 1:7 0:18 1:4 0:26 1:7 0:19 1:5 0:24 1:7 0:21 1:4 0:23 1:7 0:22 1:5 0:22 1:5 0:25 1:4 0:21 1:12 0:13 1:10 0:20 1:13 0:14 1:9 0:19 1:6 0:28 1:3 0:19 1:6 0:29 1:2 0:19 1:5 0:30 1:3 0:17 1:5 0:31 1:3 0:17 1:5 0:31 1:3 0:16 1:4 0:33 1:3 0:16 1:4 0:33 1:3 0:15 1:5 0:33 1:3 0:15 1:5 0:33 1:3 0:15 1:5 0:33 1:3 0:15 1:5 0:33 1:3 0:16 1:4 0:33 1:3 0:15 1:5 0:33 1:2 0:13 1:8 0:33 1:2 0:11 1:4 0:1 1:5 0:32 1:3 0:10 1:4 0:3 1:4 0:32 1:3 0:10 1:3 0:4 1:4 0:32 1:3 0:17 1:4 0:32 1:2 0:53 1:3 0:53 1:3 0:53 1:3 0:53 1:2 0:54 1:2 0:53 1:3 0:53 1:3 0:52 1:4 0:48 1:2 0:2 1:8 0:43 1:13 0:46 1:5 0:52 1:3 0:53 1:3 0:53 1:2 0:54 1:2 0:53 1:3 0:53 1:2 0:53 1:3 0:53 1:3 0:53 1:2 0:53 1:3 0:53 1:3 0:53 1:2 0:53 1:3 0:53 1:2 0:53 1:3 0:53 1:2 0:53 1:3 0:52 1:3 0:53 1:3 0:52 1:3 0:52 1:4 0:52 1:3 0:53 1:3 0:52 1:3 0:52 1:3 0:52 1:4 0:52 1:8 0:46 1:12 0:44 1:5 0:5 1:1 0:45 1:3 0:52 1:3 0:52 1:4 0:51 1:4 0:52 1:3 0:51 1:5 0:47 1:1 0:3 1:3 0:48 1:7 0:49 1:7 0:50 1:4 0:42</Mask>
+	<Outlinks>86</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___31">
+	<Id>31</Id>
+	<ClassName>whole-time_mark</ClassName>
+	<Top>305</Top>
+	<Left>402</Left>
+	<Width>33</Width>
+	<Height>44</Height>
+	<Mask>0:15 1:6 0:26 1:9 0:21 1:13 0:19 1:8 0:3 1:4 0:18 1:5 0:7 1:4 0:16 1:5 0:9 1:3 0:15 1:5 0:11 1:2 0:14 1:5 0:13 1:1 0:14 1:4 0:14 1:1 0:13 1:4 0:29 1:4 0:28 1:4 0:28 1:5 0:25 1:9 0:23 1:10 0:26 1:5 0:28 1:4 0:29 1:4 0:28 1:5 0:28 1:5 0:27 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:24 1:3 0:2 1:4 0:23 1:4 0:2 1:5 0:20 1:5 0:3 1:5 0:19 1:5 0:4 1:5 0:18 1:5 0:6 1:6 0:14 1:6 0:8 1:6 0:12 1:6 0:9 1:6 0:9 1:7 0:12 1:21 0:13 1:18 0:16 1:16 0:19 1:12 0:25 1:4 0:29 1:4 0:26 1:13 0:22 1:10 0:11</Mask>
+	<Inlinks>73</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___32">
+	<Id>32</Id>
+	<ClassName>whole-time_mark</ClassName>
+	<Top>528</Top>
+	<Left>398</Left>
+	<Width>52</Width>
+	<Height>46</Height>
+	<Mask>0:22 1:9 0:41 1:12 0:38 1:17 0:34 1:7 0:3 1:10 0:31 1:7 0:9 1:5 0:31 1:6 0:12 1:4 0:29 1:5 0:15 1:4 0:26 1:7 0:16 1:3 0:26 1:6 0:17 1:4 0:24 1:6 0:19 1:3 0:24 1:5 0:21 1:3 0:21 1:7 0:21 1:3 0:21 1:5 0:24 1:2 0:20 1:6 0:24 1:2 0:19 1:7 0:23 1:3 0:19 1:6 0:24 1:2 0:20 1:5 0:46 1:6 0:46 1:5 0:47 1:5 0:46 1:6 0:46 1:5 0:47 1:5 0:46 1:6 0:46 1:6 0:42 1:13 0:38 1:13 0:44 1:5 0:46 1:6 0:46 1:6 0:46 1:6 0:40 1:2 0:5 1:5 0:38 1:3 0:6 1:5 0:37 1:3 0:7 1:5 0:35 1:4 0:8 1:5 0:33 1:5 0:9 1:5 0:32 1:5 0:11 1:5 0:29 1:5 0:13 1:6 0:26 1:5 0:16 1:6 0:22 1:7 0:18 1:7 0:18 1:7 0:20 1:10 0:12 1:9 0:23 1:27 0:25 1:26 0:28 1:22 0:33 1:16 0:39 1:12 0:22</Mask>
+	<Inlinks>74</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___33">
+	<Id>33</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>363</Top>
+	<Left>581</Left>
+	<Width>23</Width>
+	<Height>24</Height>
+	<Mask>0:17 1:4 0:18 1:6 0:17 1:6 0:13 1:9 0:13 1:10 0:12 1:11 0:11 1:11 0:11 1:12 0:10 1:13 0:10 1:12 0:10 1:13 0:10 1:12 0:5 1:23 0:1 1:22 0:4 1:11 0:11 1:10 0:12 1:11 0:11 1:11 0:12 1:10 0:12 1:11 0:12 1:10 0:13 1:9 0:15 1:7 0:17 1:5 0:16</Mask>
+	<Outlinks>52 85 70 79</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">4</DataItem>
+		<DataItem key="duration_beats" type="float">1.0</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">34</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">43</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">Eb</DataItem>
+		<DataItem key="onset_beats" type="int">2</DataItem>
+		<DataItem key="midi_pitch_code" type="int">63</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___34">
+	<Id>34</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>368</Top>
+	<Left>641</Left>
+	<Width>22</Width>
+	<Height>20</Height>
+	<Mask>0:11 1:6 0:16 1:7 0:13 1:9 0:13 1:8 0:12 1:10 0:11 1:11 0:10 1:12 0:6 1:21 0:1 1:21 0:3 1:11 0:11 1:11 0:10 1:11 0:10 1:11 0:11 1:11 0:10 1:11 0:11 1:10 0:12 1:9 0:14 1:8 0:14 1:7 0:16 1:5 0:15</Mask>
+	<Outlinks>47 79 53 85 63</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">4</DataItem>
+		<DataItem key="duration_beats" type="float">0.75</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">35</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">33</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">Eb</DataItem>
+		<DataItem key="onset_beats" type="float">3.0</DataItem>
+		<DataItem key="midi_pitch_code" type="int">63</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___35">
+	<Id>35</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>366</Top>
+	<Left>709</Left>
+	<Width>19</Width>
+	<Height>22</Height>
+	<Mask>0:12 1:2 0:16 1:5 0:13 1:6 0:12 1:7 0:11 1:8 0:10 1:9 0:10 1:8 0:10 1:9 0:9 1:14 0:5 1:14 0:4 1:9 0:9 1:9 0:10 1:8 0:10 1:9 0:9 1:10 0:9 1:9 0:10 1:9 0:9 1:9 0:10 1:8 0:11 1:8 0:12 1:6 0:15 1:3 0:13</Mask>
+	<Outlinks>47 48 79 85 54</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">4</DataItem>
+		<DataItem key="duration_beats" type="float">0.25</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">36</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">34</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">Eb</DataItem>
+		<DataItem key="onset_beats" type="float">3.75</DataItem>
+		<DataItem key="midi_pitch_code" type="int">63</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___36">
+	<Id>36</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>394</Top>
+	<Left>815</Left>
+	<Width>22</Width>
+	<Height>22</Height>
+	<Mask>0:13 1:1 0:20 1:3 0:18 1:5 0:16 1:7 0:14 1:8 0:14 1:9 0:12 1:14 0:5 1:17 0:4 1:18 0:3 1:18 0:3 1:15 0:6 1:14 0:8 1:12 0:10 1:11 0:11 1:10 0:12 1:10 0:11 1:11 0:11 1:10 0:12 1:10 0:12 1:9 0:14 1:7 0:16 1:4 0:16</Mask>
+	<Outlinks>67 85 46 55</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">4</DataItem>
+		<DataItem key="duration_beats" type="float">1.0</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">37</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">35</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">C</DataItem>
+		<DataItem key="onset_beats" type="float">4.0</DataItem>
+		<DataItem key="midi_pitch_code" type="int">60</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___37">
+	<Id>37</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>360</Top>
+	<Left>876</Left>
+	<Width>20</Width>
+	<Height>29</Height>
+	<Mask>0:18 1:2 0:18 1:2 0:94 1:1 0:15 1:1 0:2 1:3 0:13 1:8 0:11 1:10 0:10 1:11 0:8 1:12 0:7 1:13 0:7 1:13 0:3 1:18 0:1 1:19 0:4 1:13 0:7 1:12 0:7 1:13 0:6 1:12 0:8 1:12 0:8 1:11 0:8 1:11 0:9 1:11 0:8 1:12 0:8 1:11 0:10 1:9 0:11 1:7 0:14 1:4 0:14</Mask>
+	<Outlinks>56 65 67 85 79</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">4</DataItem>
+		<DataItem key="duration_beats" type="float">0.5</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">36</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">Eb</DataItem>
+		<DataItem key="onset_beats" type="float">5.0</DataItem>
+		<DataItem key="midi_pitch_code" type="int">63</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___38">
+	<Id>38</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>557</Top>
+	<Left>803</Left>
+	<Width>18</Width>
+	<Height>26</Height>
+	<Mask>0:11 1:4 0:14 1:5 0:12 1:7 0:10 1:9 0:8 1:10 0:7 1:11 0:6 1:11 0:6 1:11 0:7 1:11 0:6 1:12 0:6 1:11 0:6 1:11 0:6 1:12 0:5 1:12 0:6 1:11 0:6 1:12 0:6 1:11 0:7 1:10 0:8 1:9 0:9 1:8 0:11 1:6 0:13 1:2 0:50 1:7 0:11 1:6 0:12</Mask>
+	<Outlinks>58 68 86 95</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">3</DataItem>
+		<DataItem key="duration_beats" type="float">1.0</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">39</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">40</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">C</DataItem>
+		<DataItem key="onset_beats" type="float">4.0</DataItem>
+		<DataItem key="midi_pitch_code" type="int">48</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___39">
+	<Id>39</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>529</Top>
+	<Left>881</Left>
+	<Width>17</Width>
+	<Height>21</Height>
+	<Mask>0:15 1:1 0:12 1:6 0:10 1:7 0:8 1:9 0:8 1:8 0:8 1:9 0:7 1:9 0:7 1:9 0:8 1:9 0:7 1:9 0:7 1:10 0:7 1:9 0:7 1:9 0:7 1:10 0:7 1:9 0:7 1:9 0:8 1:8 0:9 1:7 0:10 1:6 0:11 1:6 0:12 1:5 0:11</Mask>
+	<Outlinks>57 66 68 94 86</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">3</DataItem>
+		<DataItem key="duration_beats" type="float">0.5</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">38</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">Eb</DataItem>
+		<DataItem key="onset_beats" type="float">5.0</DataItem>
+		<DataItem key="midi_pitch_code" type="int">51</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___40">
+	<Id>40</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>524</Top>
+	<Left>708</Left>
+	<Width>21</Width>
+	<Height>30</Height>
+	<Mask>0:16 1:5 0:15 1:6 0:14 1:7 0:13 1:8 0:12 1:9 0:12 1:9 0:9 1:11 0:10 1:11 0:9 1:12 0:8 1:11 0:9 1:12 0:9 1:11 0:9 1:11 0:9 1:12 0:9 1:12 0:8 1:12 0:8 1:12 0:9 1:11 0:9 1:12 0:9 1:11 0:10 1:10 0:11 1:7 0:14 1:7 0:14 1:7 0:14 1:7 0:15 1:5 0:16 1:4 0:17 1:4 0:16 1:4 0:16 1:4 0:17</Mask>
+	<Outlinks>49 50 86 59 94</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">3</DataItem>
+		<DataItem key="duration_beats" type="float">0.25</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">38</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">41</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">Eb</DataItem>
+		<DataItem key="onset_beats" type="float">3.75</DataItem>
+		<DataItem key="midi_pitch_code" type="int">51</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___41">
+	<Id>41</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>526</Top>
+	<Left>638</Left>
+	<Width>20</Width>
+	<Height>24</Height>
+	<Mask>0:15 1:3 0:16 1:4 0:13 1:8 0:12 1:9 0:10 1:10 0:10 1:10 0:9 1:10 0:9 1:10 0:9 1:11 0:9 1:10 0:9 1:10 0:9 1:10 0:9 1:11 0:8 1:11 0:9 1:11 0:8 1:11 0:8 1:11 0:9 1:10 0:10 1:10 0:9 1:10 0:10 1:10 0:10 1:9 0:11 1:8 0:14 1:4 0:14</Mask>
+	<Outlinks>64 50 86 60 94</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">3</DataItem>
+		<DataItem key="duration_beats" type="float">0.75</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">40</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">42</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">Eb</DataItem>
+		<DataItem key="onset_beats" type="float">3.0</DataItem>
+		<DataItem key="midi_pitch_code" type="int">51</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___42">
+	<Id>42</Id>
+	<ClassName>notehead-full</ClassName>
+	<Top>526</Top>
+	<Left>582</Left>
+	<Width>22</Width>
+	<Height>26</Height>
+	<Mask>0:16 1:4 0:18 1:4 0:17 1:5 0:16 1:6 0:15 1:9 0:12 1:10 0:10 1:11 0:10 1:12 0:9 1:12 0:9 1:12 0:10 1:11 0:10 1:12 0:9 1:12 0:9 1:12 0:10 1:11 0:10 1:11 0:10 1:12 0:9 1:12 0:9 1:12 0:10 1:11 0:11 1:10 0:12 1:9 0:15 1:6 0:17 1:4 0:18 1:3 0:20 1:2 0:16</Mask>
+	<Outlinks>94 61 69 86</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">3</DataItem>
+		<DataItem key="duration_beats" type="float">1.0</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">41</DataItem>
+		<DataItem key="precedence_inlinks" type="list[int]">44</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">Eb</DataItem>
+		<DataItem key="onset_beats" type="int">2</DataItem>
+		<DataItem key="midi_pitch_code" type="int">51</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___43">
+	<Id>43</Id>
+	<ClassName>notehead-empty</ClassName>
+	<Top>387</Top>
+	<Left>498</Left>
+	<Width>26</Width>
+	<Height>28</Height>
+	<Mask>0:17 1:6 0:19 1:9 0:16 1:10 0:15 1:12 0:12 1:14 0:11 1:8 0:3 1:4 0:10 1:7 0:5 1:4 0:9 1:7 0:6 1:4 0:8 1:7 0:6 1:5 0:7 1:7 0:6 1:6 0:6 1:8 0:6 1:6 0:3 1:22 0:3 1:23 0:2 1:24 0:3 1:22 0:4 1:8 0:6 1:7 0:4 1:6 0:9 1:6 0:5 1:6 0:8 1:6 0:6 1:6 0:7 1:6 0:6 1:6 0:7 1:6 0:7 1:5 0:7 1:6 0:8 1:5 0:6 1:6 0:10 1:15 0:11 1:14 0:12 1:14 0:13 1:12 0:16 1:8 0:19 1:4 0:17</Mask>
+	<Outlinks>45 51 85 70</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">4</DataItem>
+		<DataItem key="duration_beats" type="int">2</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">33</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">C</DataItem>
+		<DataItem key="onset_beats" type="int">0</DataItem>
+		<DataItem key="midi_pitch_code" type="int">60</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___44">
+	<Id>44</Id>
+	<ClassName>notehead-empty</ClassName>
+	<Top>553</Top>
+	<Left>483</Left>
+	<Width>30</Width>
+	<Height>26</Height>
+	<Mask>0:15 1:8 0:21 1:10 0:18 1:12 0:17 1:14 0:1 1:2 0:11 1:19 0:10 1:21 0:8 1:23 0:6 1:24 0:5 1:9 0:3 1:3 0:3 1:7 0:4 1:10 0:10 1:6 0:4 1:9 0:11 1:5 0:4 1:9 0:11 1:6 0:4 1:7 0:12 1:7 0:3 1:7 0:13 1:6 0:4 1:7 0:12 1:7 0:3 1:7 0:12 1:7 0:4 1:7 0:11 1:8 0:3 1:7 0:11 1:8 0:4 1:7 0:10 1:8 0:5 1:6 0:10 1:9 0:5 1:6 0:8 1:10 0:6 1:6 0:7 1:10 0:7 1:6 0:5 1:11 0:8 1:7 0:3 1:11 0:10 1:19 0:12 1:17 0:11</Mask>
+	<Outlinks>62 69 86 95</Outlinks>
+	<Data>
+		<DataItem key="pitch_octave" type="int">3</DataItem>
+		<DataItem key="duration_beats" type="int">2</DataItem>
+		<DataItem key="precedence_outlinks" type="list[int]">42</DataItem>
+		<DataItem key="normalized_pitch_step" type="str">C</DataItem>
+		<DataItem key="onset_beats" type="int">0</DataItem>
+		<DataItem key="midi_pitch_code" type="int">48</DataItem>
+	</Data>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___45">
+	<Id>45</Id>
+	<ClassName>ledger_line</ClassName>
+	<Top>397</Top>
+	<Left>498</Left>
+	<Width>30</Width>
+	<Height>5</Height>
+	<Mask>0:6 1:8 0:6 1:9 0:1 1:30 0:4 1:26 0:5 1:24 0:6 1:20 0:5</Mask>
+	<Inlinks>43</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___46">
+	<Id>46</Id>
+	<ClassName>ledger_line</ClassName>
+	<Top>400</Top>
+	<Left>808</Left>
+	<Width>37</Width>
+	<Height>8</Height>
+	<Mask>0:15 1:22 0:12 1:25 0:1 1:66 0:8 1:23 0:15 1:20 0:29 1:6 0:35 1:1 0:18</Mask>
+	<Inlinks>36</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___47">
+	<Id>47</Id>
+	<ClassName>beam</ClassName>
+	<Top>303</Top>
+	<Left>665</Left>
+	<Width>81</Width>
+	<Height>10</Height>
+	<Mask>0:67 1:2 0:75 1:15 0:55 1:29 0:49 1:31 0:1 1:6 0:31 1:36 0:8 1:11 0:16 1:28 0:11 1:4 0:11 1:49 0:17 1:3 0:15 1:42 0:21 1:3 0:17 1:30 0:31 1:3 0:21 1:19 0:37 1:3 0:13</Mask>
+	<Inlinks>34 35</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___48">
+	<Id>48</Id>
+	<ClassName>beam</ClassName>
+	<Top>322</Top>
+	<Left>702</Left>
+	<Width>32</Width>
+	<Height>7</Height>
+	<Mask>0:26 1:10 0:8 1:52 0:1 1:21 0:5 1:5 0:3 1:11 0:13 1:4 0:7 1:6 0:15 1:4 0:28 1:1 0:4</Mask>
+	<Inlinks>35</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___49">
+	<Id>49</Id>
+	<ClassName>beam</ClassName>
+	<Top>590</Top>
+	<Left>685</Left>
+	<Width>31</Width>
+	<Height>8</Height>
+	<Mask>0:24 1:5 0:24 1:8 0:1 1:4 0:12 1:103 0:5 1:25 0:8 1:19 0:10</Mask>
+	<Inlinks>40</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___50">
+	<Id>50</Id>
+	<ClassName>beam</ClassName>
+	<Top>602</Top>
+	<Left>636</Left>
+	<Width>86</Width>
+	<Height>18</Height>
+	<Mask>0:81 1:4 0:75 1:4 0:2 1:6 0:74 1:12 0:73 1:13 0:33 1:11 0:2 1:4 0:3 1:7 0:3 1:21 0:25 1:58 0:22 1:63 0:14 1:76 0:4 1:81 0:4 1:77 0:8 1:22 0:64 1:18 0:68 1:13 0:73 1:11 0:75 1:8 0:78 1:6 0:81 1:4 0:83 1:2 0:82</Mask>
+	<Inlinks>40 41</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___51">
+	<Id>51</Id>
+	<ClassName>stem</ClassName>
+	<Top>319</Top>
+	<Left>516</Left>
+	<Width>14</Width>
+	<Height>62</Height>
+	<Mask>0:1 1:11 0:6 1:4 0:11 1:3 0:11 1:3 0:10 1:5 0:9 1:5 0:10 1:4 0:10 1:4 0:9 1:6 0:8 1:5 0:9 1:5 0:9 1:5 0:9 1:5 0:9 1:5 0:9 1:5 0:9 1:5 0:9 1:5 0:9 1:5 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:10 1:4 0:6 1:13 0:1 1:13 0:6 1:3 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:3 0:10 1:4 0:11 1:4 0:10 1:4 0:10 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:4 0:9 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:6 1:8 0:3 1:17 0:4 1:7 0:8 1:4 0:9 1:5 0:10 1:3 0:12 1:1 0:7</Mask>
+	<Inlinks>43</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___52">
+	<Id>52</Id>
+	<ClassName>stem</ClassName>
+	<Top>314</Top>
+	<Left>596</Left>
+	<Width>8</Width>
+	<Height>63</Height>
+	<Mask>0:4 1:2 0:5 1:3 0:5 1:2 0:6 1:2 0:3 1:6 0:2 1:6 0:5 1:2 0:5 1:3 0:5 1:3 0:5 1:3 0:5 1:4 0:4 1:3 0:5 1:3 0:5 1:3 0:5 1:4 0:4 1:4 0:5 1:3 0:5 1:3 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:5 1:3 0:5 1:3 0:5 1:3 0:2 1:6 0:2 1:6 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:3 1:6 0:2 1:6 0:2 1:5 0:3 1:5 0:4 1:4 0:4 1:3 0:5 1:3 0:6 1:2 0:6 1:1 0:7 1:1 0:17 1:3 0:6 1:2</Mask>
+	<Inlinks>33</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___53">
+	<Id>53</Id>
+	<ClassName>stem</ClassName>
+	<Top>307</Top>
+	<Left>662</Left>
+	<Width>8</Width>
+	<Height>56</Height>
+	<Mask>0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:4 0:3 1:5 0:4 1:4 0:4 1:4 0:4 1:21 0:3 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:5 0:3 1:5 0:3 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:5 0:1 1:16 0:2 1:4 0:4 1:4 0:4 1:4 0:4 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:3 1:5 0:4 1:4 0:5 1:1 0:3</Mask>
+	<Inlinks>34</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___54">
+	<Id>54</Id>
+	<ClassName>stem</ClassName>
+	<Top>302</Top>
+	<Left>723</Left>
+	<Width>14</Width>
+	<Height>67</Height>
+	<Mask>0:10 1:1 0:12 1:2 0:9 1:8 0:6 1:8 0:5 1:9 0:5 1:8 0:9 1:4 0:10 1:3 0:11 1:3 0:11 1:3 0:10 1:4 0:10 1:5 0:9 1:5 0:9 1:4 0:10 1:4 0:8 1:7 0:7 1:7 0:9 1:5 0:9 1:4 0:10 1:4 0:7 1:7 0:7 1:7 0:7 1:7 0:9 1:5 0:9 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:3 0:10 1:4 0:11 1:3 0:11 1:3 0:11 1:3 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:3 0:11 1:3 0:8 1:9 0:5 1:9 0:7 1:5 0:9 1:4 0:10 1:4 0:10 1:4 0:10 1:4 0:10 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:11 1:3 0:21 1:2 0:13 1:1 0:12</Mask>
+	<Inlinks>35</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___55">
+	<Id>55</Id>
+	<ClassName>stem</ClassName>
+	<Top>342</Top>
+	<Left>832</Left>
+	<Width>8</Width>
+	<Height>51</Height>
+	<Mask>0:2 1:2 0:5 1:4 0:4 1:4 0:4 1:4 0:3 1:5 0:1 1:1 0:1 1:7 0:2 1:5 0:3 1:5 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:2 1:16 0:2 1:4 0:4 1:3 0:5 1:3 0:5 1:4 0:4 1:4 0:4 1:4 0:4 1:3 0:5 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:3 0:5 1:5 0:3 1:5 0:3 1:5 0:4 1:4 0:1</Mask>
+	<Inlinks>36</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___56">
+	<Id>56</Id>
+	<ClassName>stem</ClassName>
+	<Top>313</Top>
+	<Left>891</Left>
+	<Width>11</Width>
+	<Height>49</Height>
+	<Mask>0:1 1:1 0:9 1:4 0:7 1:4 0:7 1:5 0:6 1:5 0:8 1:3 0:8 1:3 0:8 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:5 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:5 0:6 1:5 0:6 1:5 0:7 1:3 0:8 1:3 0:8 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:4 1:2 0:1 1:3 0:1 1:3 0:1 1:10 0:3 1:5 0:7 1:3 0:7 1:5 0:6 1:5 0:6 1:5 0:6 1:5 0:6 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:3 0:8 1:2 0:6</Mask>
+	<Inlinks>37</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___57">
+	<Id>57</Id>
+	<ClassName>stem</ClassName>
+	<Top>548</Top>
+	<Left>880</Left>
+	<Width>9</Width>
+	<Height>63</Height>
+	<Mask>0:1 1:3 0:6 1:4 0:5 1:5 0:4 1:5 0:4 1:5 0:4 1:6 0:3 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:5 1:4 0:5 1:4 0:3 1:7 0:3 1:6 0:2 1:17 0:2 1:5 0:5 1:4 0:5 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:4 1:5 0:5 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:6 1:3 0:4 1:5 0:5 1:4 0:3</Mask>
+	<Inlinks>39</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___58">
+	<Id>58</Id>
+	<ClassName>stem</ClassName>
+	<Top>506</Top>
+	<Left>821</Left>
+	<Width>10</Width>
+	<Height>51</Height>
+	<Mask>0:1 1:1 0:8 1:2 0:9 1:1 0:10 1:1 0:9 1:1 0:9 1:2 0:8 1:2 0:8 1:2 0:9 1:2 0:8 1:2 0:8 1:2 0:7 1:3 0:7 1:4 0:7 1:3 0:7 1:3 0:7 1:2 0:8 1:2 0:8 1:2 0:5 1:9 0:1 1:9 0:3 1:4 0:7 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:3 0:7 1:3 0:7 1:3 0:7 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:8 1:2 0:9 1:1 0:6 1:9 0:1 1:9 0:2 1:3 0:8 1:2 0:8 1:2 0:5</Mask>
+	<Inlinks>38</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___59">
+	<Id>59</Id>
+	<ClassName>stem</ClassName>
+	<Top>542</Top>
+	<Left>707</Left>
+	<Width>11</Width>
+	<Height>70</Height>
+	<Mask>0:9 1:2 0:7 1:4 0:4 1:7 0:2 1:7 0:4 1:7 0:4 1:7 0:4 1:7 0:5 1:5 0:6 1:4 0:7 1:4 0:6 1:27 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:6 1:8 0:3 1:8 0:3 1:5 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:6 1:5 0:6 1:6 0:5 1:7 0:4 1:7 0:4 1:7 0:4 1:6 0:5 1:5 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:2 1:1 0:4 1:4 0:7 1:4 0:7 1:6 0:5 1:6 0:5 1:5 0:6 1:5 0:6 1:4 0:7 1:4 0:7 1:4 0:7 1:4 0:4</Mask>
+	<Inlinks>40</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___60">
+	<Id>60</Id>
+	<ClassName>stem</ClassName>
+	<Top>553</Top>
+	<Left>633</Left>
+	<Width>12</Width>
+	<Height>67</Height>
+	<Mask>0:4 1:3 0:9 1:4 0:8 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:6 0:6 1:6 0:6 1:6 0:6 1:6 0:6 1:6 0:6 1:6 0:6 1:6 0:6 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:6 1:6 0:5 1:10 0:2 1:10 0:4 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:6 1:6 0:4 1:25 0:3 1:9 0:3 1:9 0:3 1:9 0:3 1:8 0:4 1:8 0:4 1:6 0:7 1:4 0:9 1:2 0:5</Mask>
+	<Inlinks>41</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___61">
+	<Id>61</Id>
+	<ClassName>stem</ClassName>
+	<Top>544</Top>
+	<Left>581</Left>
+	<Width>10</Width>
+	<Height>63</Height>
+	<Mask>0:1 1:2 0:8 1:3 0:7 1:4 0:6 1:4 0:6 1:5 0:5 1:6 0:4 1:6 0:4 1:6 0:4 1:6 0:3 1:7 0:3 1:7 0:5 1:4 0:5 1:5 0:5 1:5 0:6 1:4 0:5 1:5 0:5 1:5 0:6 1:4 0:6 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:6 1:3 0:7 1:3 0:6 1:4 0:4 1:20 0:3 1:4 0:6 1:4 0:6 1:4 0:6 1:4 0:6 1:4 0:6 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:6 1:4 0:6 1:4 0:6 1:4 0:6 1:4 0:6 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:5 1:5 0:6 1:3 0:2</Mask>
+	<Inlinks>42</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___62">
+	<Id>62</Id>
+	<ClassName>stem</ClassName>
+	<Top>504</Top>
+	<Left>508</Left>
+	<Width>8</Width>
+	<Height>56</Height>
+	<Mask>0:1 1:3 0:5 1:3 0:5 1:3 0:5 1:2 0:6 1:2 0:6 1:3 0:6 1:3 0:5 1:3 0:5 1:3 0:5 1:3 0:5 1:3 0:5 1:2 0:6 1:2 0:6 1:2 0:6 1:3 0:4 1:4 0:4 1:4 0:5 1:3 0:5 1:3 0:4 1:4 0:3 1:5 0:3 1:5 0:5 1:3 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:5 1:3 0:5 1:3 0:5 1:3 0:5 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:4 0:4 1:5 0:3 1:5 0:2 1:6 0:2 1:7 0:1 1:7 0:2 1:5 0:2 1:6 0:2 1:6 0:2 1:5 0:3 1:4 0:3</Mask>
+	<Inlinks>44</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___63">
+	<Id>63</Id>
+	<ClassName>duration-dot</ClassName>
+	<Top>372</Top>
+	<Left>673</Left>
+	<Width>10</Width>
+	<Height>6</Height>
+	<Mask>0:3 1:3 0:6 1:7 0:2 1:18 0:1 1:9 0:5 1:5 0:1</Mask>
+	<Inlinks>34</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___64">
+	<Id>64</Id>
+	<ClassName>duration-dot</ClassName>
+	<Top>533</Top>
+	<Left>665</Left>
+	<Width>8</Width>
+	<Height>10</Height>
+	<Mask>0:3 1:4 0:2 1:7 0:1 1:7 0:1 1:22 0:1 1:7 0:1 1:6 0:3 1:5 0:3 1:4 0:3</Mask>
+	<Inlinks>41</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___65">
+	<Id>65</Id>
+	<ClassName>8th_flag</ClassName>
+	<Top>311</Top>
+	<Left>897</Left>
+	<Width>26</Width>
+	<Height>37</Height>
+	<Mask>0:1 1:2 0:23 1:4 0:22 1:4 0:22 1:8 0:18 1:10 0:17 1:10 0:16 1:12 0:15 1:2 0:4 1:6 0:21 1:6 0:21 1:11 0:17 1:10 0:19 1:9 0:19 1:8 0:19 1:7 0:21 1:6 0:20 1:6 0:21 1:5 0:21 1:5 0:21 1:5 0:21 1:5 0:21 1:5 0:21 1:5 0:21 1:5 0:20 1:6 0:20 1:5 0:20 1:6 0:19 1:7 0:18 1:7 0:19 1:7 0:18 1:7 0:19 1:6 0:19 1:7 0:18 1:7 0:18 1:7 0:19 1:6 0:16 1:10 0:16 1:8 0:9</Mask>
+	<Inlinks>37</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___66">
+	<Id>66</Id>
+	<ClassName>8th_flag</ClassName>
+	<Top>560</Top>
+	<Left>882</Left>
+	<Width>31</Width>
+	<Height>50</Height>
+	<Mask>0:20 1:2 0:24 1:10 0:22 1:10 0:24 1:8 0:26 1:6 0:26 1:6 0:27 1:4 0:28 1:4 0:27 1:5 0:27 1:4 0:26 1:5 0:26 1:5 0:26 1:5 0:25 1:5 0:26 1:5 0:25 1:5 0:25 1:6 0:24 1:6 0:25 1:5 0:25 1:5 0:25 1:3 0:27 1:4 0:22 1:8 0:23 1:8 0:25 1:6 0:25 1:5 0:25 1:6 0:24 1:6 0:24 1:6 0:24 1:6 0:24 1:6 0:24 1:7 0:23 1:7 0:23 1:7 0:23 1:7 0:23 1:7 0:22 1:8 0:23 1:8 0:22 1:8 0:23 1:7 0:24 1:6 0:24 1:5 0:26 1:5 0:25 1:5 0:26 1:4 0:27 1:3 0:28 1:3 0:28 1:2 0:29 1:1 0:29 1:1 0:30</Mask>
+	<Inlinks>39</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___67">
+	<Id>67</Id>
+	<ClassName>slur</ClassName>
+	<Top>406</Top>
+	<Left>831</Left>
+	<Width>52</Width>
+	<Height>25</Height>
+	<Mask>0:49 1:1 0:50 1:3 0:48 1:5 0:46 1:6 0:45 1:7 0:44 1:7 0:44 1:8 0:43 1:8 0:43 1:8 0:43 1:9 0:42 1:8 0:43 1:8 0:42 1:9 0:8 1:1 0:33 1:8 0:9 1:3 0:30 1:8 0:11 1:5 0:26 1:9 0:12 1:5 0:25 1:9 0:14 1:5 0:22 1:10 0:16 1:5 0:19 1:10 0:18 1:9 0:11 1:12 0:22 1:29 0:23 1:26 0:28 1:23 0:31 1:19 0:37 1:10 0:30</Mask>
+	<Inlinks>36 37</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___68">
+	<Id>68</Id>
+	<ClassName>slur</ClassName>
+	<Top>490</Top>
+	<Left>835</Left>
+	<Width>55</Width>
+	<Height>17</Height>
+	<Mask>0:26 1:13 0:37 1:22 0:30 1:28 0:22 1:42 0:11 1:15 0:3 1:2 0:4 1:3 0:2 1:15 0:9 1:16 0:16 1:9 0:13 1:15 0:21 1:6 0:11 1:14 0:24 1:7 0:9 1:12 0:28 1:7 0:7 1:11 0:30 1:7 0:6 1:9 0:34 1:6 0:5 1:8 0:36 1:6 0:5 1:7 0:38 1:5 0:4 1:6 0:40 1:5 0:3 1:6 0:49 1:5 0:52 1:2 0:51</Mask>
+	<Inlinks>38 39</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___69">
+	<Id>69</Id>
+	<ClassName>slur</ClassName>
+	<Top>494</Top>
+	<Left>517</Left>
+	<Width>69</Width>
+	<Height>28</Height>
+	<Mask>0:19 1:7 0:2 1:18 0:40 1:31 0:42 1:28 0:42 1:27 0:37 1:35 0:32 1:38 0:27 1:44 0:23 1:24 0:12 1:11 0:19 1:18 0:25 1:8 0:17 1:16 0:30 1:7 0:14 1:14 0:35 1:7 0:11 1:14 0:38 1:6 0:10 1:12 0:42 1:6 0:10 1:8 0:45 1:7 0:10 1:6 0:47 1:6 0:11 1:3 0:50 1:6 0:64 1:6 0:63 1:7 0:63 1:6 0:64 1:6 0:63 1:7 0:63 1:7 0:62 1:8 0:62 1:8 0:62 1:7 0:62 1:7 0:63 1:5 0:65 1:3 0:2</Mask>
+	<Inlinks>42 44</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___70">
+	<Id>70</Id>
+	<ClassName>slur</ClassName>
+	<Top>400</Top>
+	<Left>508</Left>
+	<Width>78</Width>
+	<Height>33</Height>
+	<Mask>0:72 1:4 0:73 1:6 0:72 1:7 0:71 1:7 0:70 1:7 0:70 1:8 0:70 1:7 0:69 1:8 0:69 1:8 0:70 1:7 0:70 1:7 0:70 1:8 0:69 1:7 0:70 1:8 0:68 1:9 0:69 1:8 0:69 1:8 0:68 1:8 0:13 1:1 0:55 1:8 0:15 1:4 0:49 1:9 0:16 1:5 0:47 1:9 0:17 1:6 0:45 1:9 0:19 1:7 0:41 1:9 0:22 1:8 0:37 1:9 0:25 1:9 0:33 1:11 0:27 1:9 0:29 1:11 0:30 1:11 0:24 1:11 0:33 1:14 0:16 1:13 0:37 1:39 0:41 1:36 0:45 1:30 0:51 1:25 0:57 1:15 0:41</Mask>
+	<Inlinks>33 43</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___71">
+	<Id>71</Id>
+	<ClassName>key_signature</ClassName>
+	<Top>251</Top>
+	<Left>306</Left>
+	<Width>67</Width>
+	<Height>94</Height>
+	<Mask>0:30 1:2 0:65 1:2 0:65 1:3 0:64 1:3 0:63 1:4 0:63 1:4 0:64 1:3 0:64 1:3 0:64 1:3 0:61 1:8 0:59 1:8 0:62 1:4 0:63 1:4 0:63 1:4 0:63 1:4 0:63 1:4 0:63 1:4 0:5 1:2 0:56 1:4 0:4 1:5 0:54 1:4 0:2 1:8 0:53 1:4 0:2 1:9 0:52 1:15 0:52 1:4 0:3 1:8 0:52 1:4 0:6 1:5 0:52 1:4 0:6 1:5 0:52 1:4 0:6 1:5 0:52 1:4 0:5 1:5 0:53 1:4 0:5 1:5 0:53 1:4 0:5 1:4 0:54 1:4 0:4 1:3 0:56 1:4 0:3 1:4 0:56 1:4 0:3 1:3 0:57 1:4 0:3 1:3 0:57 1:4 0:2 1:3 0:34 1:1 0:23 1:8 0:35 1:1 0:23 1:7 0:36 1:1 0:23 1:6 0:37 1:2 0:22 1:6 0:36 1:4 0:21 1:5 0:33 1:8 0:18 1:7 0:34 1:9 0:17 1:7 0:38 1:3 0:24 1:1 0:39 1:3 0:64 1:3 0:64 1:3 0:64 1:3 0:64 1:3 0:63 1:4 0:63 1:4 0:63 1:3 0:44 1:2 0:18 1:3 0:44 1:4 0:16 1:4 0:43 1:4 0:16 1:3 0:44 1:5 0:15 1:3 0:5 1:6 0:33 1:5 0:15 1:3 0:2 1:10 0:32 1:5 0:15 1:15 0:32 1:5 0:15 1:15 0:32 1:5 0:15 1:8 0:3 1:4 0:32 1:5 0:15 1:5 0:6 1:3 0:33 1:5 0:15 1:3 0:7 1:4 0:33 1:5 0:15 1:3 0:7 1:4 0:33 1:5 0:14 1:4 0:7 1:3 0:35 1:4 0:14 1:4 0:6 1:3 0:36 1:4 0:14 1:4 0:6 1:3 0:35 1:6 0:13 1:4 0:5 1:4 0:36 1:5 0:13 1:4 0:5 1:4 0:36 1:5 0:13 1:4 0:5 1:4 0:36 1:5 0:13 1:4 0:4 1:4 0:37 1:5 0:10 1:5 0:6 1:5 0:32 1:18 0:1 1:5 0:6 1:5 0:32 1:19 0:3 1:3 0:4 1:3 0:39 1:13 0:5 1:4 0:3 1:3 0:39 1:13 0:5 1:4 0:3 1:3 0:39 1:13 0:5 1:4 0:2 1:4 0:39 1:15 0:2 1:4 0:2 1:5 0:39 1:15 0:3 1:3 0:2 1:4 0:40 1:15 0:3 1:9 0:40 1:5 0:3 1:7 0:3 1:8 0:41 1:5 0:4 1:6 0:2 1:9 0:41 1:5 0:4 1:6 0:2 1:9 0:41 1:5 0:4 1:6 0:2 1:8 0:42 1:5 0:3 1:7 0:2 1:6 0:44 1:4 0:4 1:6 0:3 1:5 0:45 1:4 0:4 1:6 0:3 1:3 0:47 1:4 0:3 1:6 0:54 1:5 0:2 1:5 0:54 1:12 0:56 1:11 0:56 1:11 0:56 1:11 0:56 1:10 0:57 1:9 0:58 1:8 0:60 1:5 0:63 1:4 0:63 1:3 0:10</Mask>
+	<Outlinks>24 25 85 23</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___72">
+	<Id>72</Id>
+	<ClassName>key_signature</ClassName>
+	<Top>501</Top>
+	<Left>308</Left>
+	<Width>76</Width>
+	<Height>112</Height>
+	<Mask>0:31 1:2 0:73 1:3 0:73 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:5 0:72 1:4 0:73 1:3 0:72 1:4 0:72 1:4 0:72 1:5 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:69 1:24 0:52 1:24 0:54 1:6 0:1 1:10 0:60 1:5 0:2 1:9 0:60 1:17 0:59 1:18 0:58 1:18 0:58 1:17 0:59 1:9 0:3 1:5 0:59 1:7 0:5 1:5 0:59 1:5 0:7 1:5 0:59 1:5 0:7 1:5 0:59 1:5 0:6 1:5 0:60 1:5 0:6 1:4 0:61 1:5 0:5 1:5 0:61 1:5 0:5 1:5 0:61 1:5 0:4 1:5 0:63 1:4 0:4 1:5 0:63 1:4 0:3 1:5 0:63 1:5 0:2 1:6 0:64 1:4 0:2 1:6 0:64 1:11 0:65 1:10 0:39 1:1 0:26 1:9 0:39 1:4 0:24 1:9 0:40 1:3 0:24 1:8 0:41 1:3 0:24 1:8 0:41 1:3 0:24 1:8 0:35 1:9 0:4 1:1 0:20 1:9 0:33 1:14 0:21 1:8 0:38 1:8 0:68 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:72 1:4 0:45 1:1 0:26 1:4 0:45 1:2 0:25 1:4 0:45 1:2 0:25 1:4 0:45 1:2 0:25 1:4 0:44 1:4 0:23 1:6 0:3 1:8 0:32 1:4 0:23 1:5 0:4 1:8 0:32 1:4 0:23 1:5 0:11 1:1 0:32 1:4 0:23 1:8 0:8 1:1 0:32 1:4 0:23 1:18 0:31 1:4 0:23 1:18 0:31 1:4 0:23 1:18 0:31 1:5 0:22 1:19 0:30 1:5 0:22 1:19 0:30 1:5 0:22 1:5 0:2 1:3 0:2 1:7 0:30 1:5 0:22 1:5 0:7 1:7 0:30 1:5 0:22 1:5 0:7 1:7 0:30 1:5 0:22 1:4 0:7 1:7 0:31 1:5 0:22 1:4 0:7 1:7 0:31 1:5 0:9 1:1 0:12 1:4 0:6 1:7 0:33 1:4 0:6 1:7 0:5 1:28 0:20 1:56 0:20 1:28 0:4 1:4 0:5 1:7 0:33 1:5 0:2 1:13 0:7 1:5 0:3 1:7 0:34 1:20 0:7 1:5 0:2 1:8 0:34 1:11 0:4 1:5 0:7 1:4 0:2 1:7 0:36 1:10 0:5 1:4 0:8 1:4 0:2 1:7 0:36 1:9 0:6 1:4 0:8 1:12 0:36 1:8 0:7 1:6 0:7 1:11 0:38 1:6 0:8 1:6 0:7 1:11 0:38 1:5 0:9 1:5 0:8 1:11 0:38 1:5 0:8 1:6 0:8 1:9 0:40 1:6 0:7 1:5 0:8 1:10 0:40 1:5 0:8 1:5 0:9 1:8 0:41 1:5 0:7 1:6 0:9 1:7 0:43 1:4 0:7 1:5 0:10 1:6 0:44 1:4 0:6 1:6 0:11 1:4 0:45 1:4 0:6 1:5 0:61 1:4 0:5 1:6 0:61 1:4 0:4 1:6 0:62 1:4 0:4 1:6 0:62 1:5 0:3 1:6 0:63 1:4 0:2 1:6 0:64 1:11 0:65 1:11 0:65 1:11 0:65 1:10 0:66 1:9 0:66 1:12 0:65 1:11 0:67 1:5 0:72 1:4 0:14</Mask>
+	<Outlinks>26 27 28 86</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___73">
+	<Id>73</Id>
+	<ClassName>time_signature</ClassName>
+	<Top>305</Top>
+	<Left>402</Left>
+	<Width>33</Width>
+	<Height>44</Height>
+	<Mask>0:15 1:6 0:26 1:9 0:21 1:13 0:19 1:8 0:3 1:4 0:18 1:5 0:7 1:4 0:16 1:5 0:9 1:3 0:15 1:5 0:11 1:2 0:14 1:5 0:13 1:1 0:14 1:4 0:14 1:1 0:13 1:4 0:29 1:4 0:28 1:4 0:28 1:5 0:25 1:9 0:23 1:10 0:26 1:5 0:28 1:4 0:29 1:4 0:28 1:5 0:28 1:5 0:27 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:28 1:5 0:24 1:3 0:2 1:4 0:23 1:4 0:2 1:5 0:20 1:5 0:3 1:5 0:19 1:5 0:4 1:5 0:18 1:5 0:6 1:6 0:14 1:6 0:8 1:6 0:12 1:6 0:9 1:6 0:9 1:7 0:12 1:21 0:13 1:18 0:16 1:16 0:19 1:12 0:25 1:4 0:29 1:4 0:26 1:13 0:22 1:10 0:11</Mask>
+	<Outlinks>85 31</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___74">
+	<Id>74</Id>
+	<ClassName>time_signature</ClassName>
+	<Top>528</Top>
+	<Left>398</Left>
+	<Width>52</Width>
+	<Height>46</Height>
+	<Mask>0:22 1:9 0:41 1:12 0:38 1:17 0:34 1:7 0:3 1:10 0:31 1:7 0:9 1:5 0:31 1:6 0:12 1:4 0:29 1:5 0:15 1:4 0:26 1:7 0:16 1:3 0:26 1:6 0:17 1:4 0:24 1:6 0:19 1:3 0:24 1:5 0:21 1:3 0:21 1:7 0:21 1:3 0:21 1:5 0:24 1:2 0:20 1:6 0:24 1:2 0:19 1:7 0:23 1:3 0:19 1:6 0:24 1:2 0:20 1:5 0:46 1:6 0:46 1:5 0:47 1:5 0:46 1:6 0:46 1:5 0:47 1:5 0:46 1:6 0:46 1:6 0:42 1:13 0:38 1:13 0:44 1:5 0:46 1:6 0:46 1:6 0:46 1:6 0:40 1:2 0:5 1:5 0:38 1:3 0:6 1:5 0:37 1:3 0:7 1:5 0:35 1:4 0:8 1:5 0:33 1:5 0:9 1:5 0:32 1:5 0:11 1:5 0:29 1:5 0:13 1:6 0:26 1:5 0:16 1:6 0:22 1:7 0:18 1:7 0:18 1:7 0:20 1:10 0:12 1:9 0:23 1:27 0:25 1:26 0:28 1:22 0:33 1:16 0:39 1:12 0:22</Mask>
+	<Outlinks>32 86</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___75">
+	<Id>75</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>260</Top>
+	<Left>224</Left>
+	<Width>737</Width>
+	<Height>2</Height>
+	<Mask>0:0 1:22 0:680 1:57 0:680 1:35</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___76">
+	<Id>76</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>288</Top>
+	<Left>224</Left>
+	<Width>738</Width>
+	<Height>2</Height>
+	<Mask>0:0 1:22 0:683 1:55 0:683 1:33</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___77">
+	<Id>77</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>317</Top>
+	<Left>220</Left>
+	<Width>742</Width>
+	<Height>3</Height>
+	<Mask>0:0 1:17 0:693 1:30 0:2 1:17 0:693 1:32 0:740 1:2</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___78">
+	<Id>78</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>346</Top>
+	<Left>236</Left>
+	<Width>731</Width>
+	<Height>3</Height>
+	<Mask>0:691 1:15 0:6 1:3 0:16 1:19 0:672 1:40 0:1 1:18 0:687 1:6 0:3 1:16</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___79">
+	<Id>79</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>374</Top>
+	<Left>220</Left>
+	<Width>752</Width>
+	<Height>2</Height>
+	<Mask>0:0 1:21 0:683 1:70 0:681 1:49</Mask>
+	<Inlinks>33 34 35 85 37</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___80">
+	<Id>80</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>493</Top>
+	<Left>220</Left>
+	<Width>726</Width>
+	<Height>3</Height>
+	<Mask>0:1 1:22 0:668 1:20 0:15 1:23 0:668 1:35 0:711 1:15</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___81">
+	<Id>81</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>523</Top>
+	<Left>220</Left>
+	<Width>727</Width>
+	<Height>3</Height>
+	<Mask>0:0 1:3 0:6 1:2 0:716 1:20 0:674 1:33 0:3 1:6 0:2 1:9 0:674 1:33</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___82">
+	<Id>82</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>552</Top>
+	<Left>220</Left>
+	<Width>731</Width>
+	<Height>2</Height>
+	<Mask>0:0 1:22 0:674 1:57 0:674 1:35</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___83">
+	<Id>83</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>581</Top>
+	<Left>220</Left>
+	<Width>734</Width>
+	<Height>3</Height>
+	<Mask>0:0 1:24 0:673 1:29 0:8 1:24 0:673 1:37 0:726 1:8</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___84">
+	<Id>84</Id>
+	<ClassName>staff_line</ClassName>
+	<Top>609</Top>
+	<Left>220</Left>
+	<Width>739</Width>
+	<Height>2</Height>
+	<Mask>0:0 1:24 0:671 1:68 0:671 1:44</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___85">
+	<Id>85</Id>
+	<ClassName>staff</ClassName>
+	<Top>260</Top>
+	<Left>220</Left>
+	<Width>752</Width>
+	<Height>116</Height>
+	<Mask>0:4 1:22 0:680 1:35 0:15 1:22 0:680 1:35 0:19567 1:22 0:683 1:33 0:14 1:22 0:683 1:33 0:20314 1:17 0:693 1:30 0:12 1:17 0:693 1:32 0:750 1:2 0:20269 1:15 0:6 1:3 0:37 1:19 0:672 1:40 0:22 1:18 0:687 1:6 0:3 1:16 0:18805 1:21 0:683 1:70 0:681 1:49</Mask>
+	<Inlinks>33 34 35 36 37 100 71 101 73 43 29</Inlinks>
+	<Outlinks>75 76 77 78 79 87 88 89 90 91 92</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___86">
+	<Id>86</Id>
+	<ClassName>staff</ClassName>
+	<Top>493</Top>
+	<Left>220</Left>
+	<Width>739</Width>
+	<Height>118</Height>
+	<Mask>0:1 1:22 0:668 1:20 0:28 1:23 0:668 1:35 0:724 1:15 0:19966 1:3 0:6 1:2 0:728 1:20 0:674 1:33 0:15 1:6 0:2 1:9 0:674 1:33 0:19226 1:22 0:674 1:35 0:8 1:22 0:674 1:35 0:19961 1:24 0:673 1:29 0:13 1:24 0:673 1:37 0:731 1:8 0:18480 1:24 0:671 1:68 0:671 1:44</Mask>
+	<Inlinks>100 101 38 39 40 41 42 72 44 74 30</Inlinks>
+	<Outlinks>96 97 98 80 81 82 83 84 93 94 95</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___87">
+	<Id>87</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>260</Top>
+	<Left>224</Left>
+	<Width>737</Width>
+	<Height>30</Height>
+	<Mask>0:0 1:737 0:737 1:19162 0:737 1:737</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___88">
+	<Id>88</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>288</Top>
+	<Left>224</Left>
+	<Width>738</Width>
+	<Height>32</Height>
+	<Mask>0:0 1:738 0:738 1:19938 0:695 1:28 0:3 1:13 0:5 1:2 0:4 1:4 0:7 1:9 0:16 1:16 0:38 1:26 0:110 1:18 0:56 1:200 0:182 1:30 0:2 1:737 0:1</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___89">
+	<Id>89</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>317</Top>
+	<Left>236</Left>
+	<Width>726</Width>
+	<Height>32</Height>
+	<Mask>0:0 1:695 0:28 1:3 0:1 1:5 0:2 1:4 0:4 1:7 0:9 1:16 0:16 1:38 0:26 1:110 0:18 1:56 0:200 1:182 0:30 1:2 0:725 1:18877 0:692 1:13 0:8 1:1 0:36 1:7 0:15 1:17 0:36 1:28 0:104 1:24 0:73 1:183 0:180 1:15 0:6 1:3 0:11 1:2 0:16 1:689 0:4 1:5 0:10</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___90">
+	<Id>90</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>346</Top>
+	<Left>236</Left>
+	<Width>731</Width>
+	<Height>30</Height>
+	<Mask>0:0 1:692 0:13 1:8 0:1 1:41 0:7 1:15 0:17 1:36 0:28 1:104 0:24 1:73 0:183 1:180 0:15 1:6 0:3 1:16 0:2 1:16 0:689 1:4 0:5 1:18290 0:731 1:731</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___91">
+	<Id>91</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>237</Top>
+	<Left>224</Left>
+	<Width>737</Width>
+	<Height>25</Height>
+	<Mask>0:0 1:737 0:737 1:16951</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___92">
+	<Id>92</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>376</Top>
+	<Left>236</Left>
+	<Width>731</Width>
+	<Height>25</Height>
+	<Mask>0:0 1:692 0:13 1:8 0:1 1:41 0:7 1:15 0:17 1:36 0:28 1:104 0:24 1:73 0:183 1:180 0:15 1:6 0:3 1:16 0:2 1:16 0:689 1:4 0:5 1:16097</Mask>
+	<Inlinks>85</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___93">
+	<Id>93</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>493</Top>
+	<Left>220</Left>
+	<Width>726</Width>
+	<Height>33</Height>
+	<Mask>0:0 1:2 0:20 1:670 0:18 1:16 0:23 1:5 0:1 1:4 0:4 1:7 0:9 1:16 0:16 1:37 0:27 1:108 0:20 1:62 0:194 1:158 0:20 1:15 0:712 1:19618 0:724 1:3 0:6 1:2 0:17 1:8 0:16 1:16 0:38 1:26 0:110 1:18 0:56 1:200 0:210 1:4 0:4 1:4 0:7 1:676 0:31</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___94">
+	<Id>94</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>523</Top>
+	<Left>220</Left>
+	<Width>727</Width>
+	<Height>31</Height>
+	<Mask>0:2 1:725 0:3 1:6 0:2 1:17 0:8 1:16 0:16 1:38 0:26 1:110 0:18 1:56 0:200 1:211 0:4 1:4 0:4 1:7 0:676 1:18934 0:727 1:727</Mask>
+	<Inlinks>40 41 42 86 39</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___95">
+	<Id>95</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>552</Top>
+	<Left>220</Left>
+	<Width>731</Width>
+	<Height>32</Height>
+	<Mask>0:0 1:731 0:731 1:19760 0:675 1:27 0:6 1:24 0:5 1:2 0:4 1:4 0:7 1:9 0:16 1:16 0:37 1:27 0:108 1:20 0:63 1:193 0:162 1:29 0:5 1:727 0:4</Mask>
+	<Inlinks>86 44 38</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___96">
+	<Id>96</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>581</Top>
+	<Left>220</Left>
+	<Width>734</Width>
+	<Height>30</Height>
+	<Mask>0:23 1:675 0:27 1:9 0:24 1:5 0:2 1:4 0:4 1:7 0:9 1:16 0:16 1:37 0:27 1:108 0:20 1:63 0:193 1:162 0:29 1:8 0:727 1:18357 0:734 1:734</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___97">
+	<Id>97</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>468</Top>
+	<Left>220</Left>
+	<Width>726</Width>
+	<Height>27</Height>
+	<Mask>0:0 1:2 0:20 1:670 0:18 1:16 0:23 1:5 0:1 1:4 0:4 1:7 0:9 1:16 0:16 1:37 0:27 1:108 0:20 1:62 0:194 1:158 0:20 1:15 0:712 1:17438</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___98">
+	<Id>98</Id>
+	<ClassName>staff_space</ClassName>
+	<Top>611</Top>
+	<Left>220</Left>
+	<Width>734</Width>
+	<Height>25</Height>
+	<Mask>0:23 1:675 0:27 1:9 0:24 1:5 0:2 1:4 0:4 1:7 0:9 1:16 0:16 1:37 0:27 1:108 0:20 1:63 0:193 1:162 0:29 1:8 0:727 1:16155</Mask>
+	<Inlinks>86</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___99">
+	<Id>99</Id>
+	<ClassName>thin_barline</ClassName>
+	<Top>260</Top>
+	<Left>768</Left>
+	<Width>12</Width>
+	<Height>357</Height>
+	<Mask>0:0 1:11 0:1 1:11 0:6 1:3 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:8 1:4 0:8 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:4 1:11 0:1 1:11 0:5 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:3 0:9 1:3 0:9 1:3 0:9 1:4 0:4 1:24 0:4 1:4 0:8 1:4 0:8 1:4 0:8 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:5 1:24 0:4 1:4 0:8 1:3 0:9 1:3 0:9 1:3 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:9 1:3 0:9 1:3 0:9 1:3 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:9 1:3 0:9 1:3 0:9 1:3 0:8 1:4 0:8 1:4 0:8 1:4 0:9 1:3 0:5 1:24 0:3 1:5 0:7 1:4 0:8 1:5 0:7 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:3 0:9 1:3 0:9 1:3 0:9 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:8 1:3 0:9 1:4 0:8 1:4 0:8 1:3 0:8 1:4 0:8 1:5 0:7 1:5 0:5 1:23 0:3 1:6 0:7 1:4 0:8 1:4 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:5 0:7 1:5 0:7 1:4 0:8 1:5 0:7 1:5 0:7 1:5 0:8 1:4 0:8 1:3 0:9 1:3 0:9 1:4 0:8 1:4 0:8 1:4 0:8 1:5 0:7 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:5 1:11 0:1 1:11 0:3 1:5 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:5 1:11 0:1 1:11 0:3 1:5 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:6 0:6 1:5 0:7 1:5 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:5 1:11 0:1 1:11 0:3 1:4 0:9 1:3 0:8 1:5 0:7 1:5 0:7 1:5 0:7 1:6 0:6 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:5 1:11 0:1 1:11 0:3 1:4 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:2 0:7</Mask>
+	<Inlinks>100</Inlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___100">
+	<Id>100</Id>
+	<ClassName>measure_separator</ClassName>
+	<Top>260</Top>
+	<Left>768</Left>
+	<Width>12</Width>
+	<Height>357</Height>
+	<Mask>0:0 1:11 0:1 1:11 0:6 1:3 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:8 1:4 0:8 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:4 1:11 0:1 1:11 0:5 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:3 0:9 1:3 0:9 1:3 0:9 1:4 0:4 1:24 0:4 1:4 0:8 1:4 0:8 1:4 0:8 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:5 1:24 0:4 1:4 0:8 1:3 0:9 1:3 0:9 1:3 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:9 1:3 0:9 1:3 0:9 1:3 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:9 1:3 0:9 1:3 0:9 1:3 0:8 1:4 0:8 1:4 0:8 1:4 0:9 1:3 0:5 1:24 0:3 1:5 0:7 1:4 0:8 1:5 0:7 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:3 0:9 1:3 0:9 1:3 0:9 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:8 1:3 0:9 1:4 0:8 1:4 0:8 1:3 0:8 1:4 0:8 1:5 0:7 1:5 0:5 1:23 0:3 1:6 0:7 1:4 0:8 1:4 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:5 0:7 1:5 0:7 1:4 0:8 1:5 0:7 1:5 0:7 1:5 0:8 1:4 0:8 1:3 0:9 1:3 0:9 1:4 0:8 1:4 0:8 1:4 0:8 1:5 0:7 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:5 0:7 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:5 1:11 0:1 1:11 0:3 1:5 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:5 1:11 0:1 1:11 0:3 1:5 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:6 0:6 1:5 0:7 1:5 0:8 1:4 0:8 1:4 0:8 1:4 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:5 1:11 0:1 1:11 0:3 1:4 0:9 1:3 0:8 1:5 0:7 1:5 0:7 1:5 0:7 1:6 0:6 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:8 1:4 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:7 1:5 0:5 1:11 0:1 1:11 0:3 1:4 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:3 0:9 1:2 0:7</Mask>
+	<Outlinks>99 85 86</Outlinks>
+</CropObject>
+<CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini2full___101">
+	<Id>101</Id>
+	<ClassName>multi-staff_brace</ClassName>
+	<Top>268</Top>
+	<Left>180</Left>
+	<Width>24</Width>
+	<Height>341</Height>
+	<Mask>0:16 1:4 0:20 1:5 0:19 1:5 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:17 1:7 0:17 1:7 0:17 1:6 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:5 0:19 1:5 0:19 1:5 0:19 1:5 0:19 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:19 1:5 0:19 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:19 1:5 0:19 1:5 0:19 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:19 1:5 0:19 1:6 0:18 1:6 0:18 1:5 0:19 1:5 0:19 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:5 0:19 1:5 0:19 1:5 0:19 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:5 0:19 1:5 0:19 1:5 0:19 1:5 0:18 1:6 0:18 1:6 0:19 1:5 0:19 1:5 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:5 0:19 1:5 0:19 1:5 0:19 1:5 0:19 1:5 0:19 1:5 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:5 0:19 1:5 0:19 1:5 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:5 0:19 1:5 0:19 1:5 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:5 0:19 1:5 0:19 1:5 0:19 1:5 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:5 0:18 1:6 0:18 1:6 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:6 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:6 0:17 1:7 0:17 1:6 0:17 1:7 0:17 1:7 0:17 1:6 0:17 1:7 0:17 1:7 0:17 1:6 0:17 1:7 0:17 1:6 0:18 1:6 0:18 1:6 0:17 1:7 0:17 1:6 0:18 1:6 0:17 1:7 0:17 1:7 0:17 1:7 0:16 1:7 0:16 1:9 0:15 1:10 0:14 1:11 0:14 1:11 0:14 1:11 0:16 1:8 0:17 1:8 0:17 1:7 0:17 1:8 0:16 1:8 0:17 1:7 0:17 1:8 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:8 0:16 1:8 0:17 1:7 0:17 1:7 0:17 1:7 0:18 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:18 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:17 1:8 0:17 1:7 0:17 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:6 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:17 1:7 0:17 1:6 0:19 1:5 0:19 1:5 0:19 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:17 1:7 0:17 1:7 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:18 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:18 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:18 1:6 0:18 1:6 0:18 1:6 0:18 1:7 0:17 1:7 0:17 1:7 0:17 1:7 0:19 1:5 0:20 1:3 0:1</Mask>
+	<Outlinks>85 86</Outlinks>
+</CropObject>
+</CropObjects>
+</CropObjectList>
