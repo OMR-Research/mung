@@ -2,31 +2,31 @@
 """This is a script that processes a set of symbols in order to obtain the pitch
 recognition baseline. Intended to be used on top of an object detection stage."""
 from __future__ import print_function, unicode_literals
-from builtins import str
-from builtins import range
-from builtins import object
+
 import argparse
 import codecs
 import collections
 import logging
 import os
+import pickle
 import pprint
 import time
-
-import pickle
 import traceback
+from builtins import object
+from builtins import range
+from builtins import str
 
 import numpy
 from sklearn.feature_extraction import DictVectorizer
 
-from mung.node import cropobject_distance, bbox_intersection, cropobjects_merge_multiple, link_cropobjects
 from mung.graph import find_beams_incoherent_with_stems, NotationGraph
-from mung.graph import find_misdirected_ledger_line_edges
 from mung.graph import find_contained_cropobjects, remove_contained_cropobjects
+from mung.graph import find_misdirected_ledger_line_edges
 from mung.inference import OnsetsInferenceEngine, MIDIBuilder
 from mung.inference import PitchInferenceEngine
-from mung.inference_engine_constants import _CONST
+from mung.inference.constants import _CONST
 from mung.io import parse_cropobject_class_list, parse_cropobject_list, export_cropobject_list
+from mung.node import cropobject_distance, bbox_intersection, cropobjects_merge_multiple, link_cropobjects
 from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, build_staffspace_cropobjects, add_staff_relationships
 
 __version__ = "0.0.1"

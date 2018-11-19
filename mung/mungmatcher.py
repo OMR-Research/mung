@@ -1,13 +1,10 @@
 """This module implements a class that..."""
 from __future__ import print_function, unicode_literals
 
-import copy
-
 import collections
-import logging
-
+import copy
 # from mung.graph import NotationGraph
-from mung.inference_engine_constants import _CONST
+from mung.inference.constants import _CONST
 
 __version__ = "0.0.1"
 __author__ = "Jan Hajic jr."

@@ -23,22 +23,14 @@ and A-flat.
 
 """
 from __future__ import print_function, unicode_literals, division
+
 import argparse
-import copy
 import logging
 import os
-import pprint
 import time
 
-import collections
-
-import itertools
-import numpy
-
-from mung.io import parse_cropobject_list, export_cropobject_list
-from mung.node import link_cropobjects
-from mung.inference_engine_constants import InferenceEngineConstants
 from mung.inference import PitchInferenceEngine, OnsetsInferenceEngine,  MIDIBuilder
+from mung.io import parse_cropobject_list, export_cropobject_list
 
 __version__ = "0.0.1"
 __author__ = "Jan Hajic jr."

@@ -52,7 +52,7 @@ setup(
     description='Tools for the Music Notation Graph representation of music notation,'
                 ' used primarily for optical music recognition.',
     long_description=get_long_description(),
-    packages=['mung'],
+    packages=['mung', 'mung2midi'],
     include_package_data=True,
     scripts=['scripts/analyze_agreement.py',
              'scripts/analyze_annotations.py',

@@ -1,19 +1,19 @@
 """This module implements a class that..."""
 from __future__ import print_function, unicode_literals, division
-from builtins import str
-from builtins import zip
-from builtins import range
-from builtins import object
+
 import collections
 import copy
 import logging
-import os
-
 import operator
+import os
+from builtins import object
+from builtins import range
+from builtins import str
+from builtins import zip
 
-from mung.node import bbox_dice
 from mung.graph import group_staffs_into_systems, NotationGraph, NotationGraphError
-from mung.inference_engine_constants import InferenceEngineConstants
+from mung.inference.constants import InferenceEngineConstants
+from mung.node import bbox_dice
 
 __version__ = "0.0.1"
 __author__ = "Jan Hajic jr."

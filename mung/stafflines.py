@@ -4,19 +4,19 @@ to full staff objects and relationships; this machinery is called
 e.g. by pressing "shift+s" in MUSCIMarker."""
 from __future__ import print_function, unicode_literals, division
 
-from builtins import zip
-from builtins import range
 import collections
 import logging
 import pprint
+from builtins import range
+from builtins import zip
 
 import numpy
 from skimage.filters import gaussian
 from skimage.morphology import watershed
 
-from mung.node import Node, cropobjects_on_canvas, link_cropobjects
 from mung.graph import NotationGraph, find_noteheads_on_staff_linked_to_ledger_line
-from mung.inference_engine_constants import InferenceEngineConstants as _CONST
+from mung.inference.constants import InferenceEngineConstants as _CONST
+from mung.node import Node, cropobjects_on_canvas, link_cropobjects
 from mung.utils import compute_connected_components
 
 

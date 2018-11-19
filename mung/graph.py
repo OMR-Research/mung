@@ -2,15 +2,14 @@
 functions for manipulating notation graphs."""
 from __future__ import print_function, unicode_literals
 
-from builtins import range
-from builtins import object
 import copy
 import logging
-
 import operator
+from builtins import object
+from builtins import range
 
+from mung.inference.constants import _CONST
 from mung.node import Node, cropobject_mask_rpf
-from mung.inference_engine_constants import _CONST
 from mung.utils import resolve_notehead_wrt_staffline
 
 __version__ = "0.0.1"

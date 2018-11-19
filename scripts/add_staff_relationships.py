@@ -12,6 +12,7 @@ The symbols in question are:
 
 """
 from __future__ import print_function, unicode_literals, division
+
 import argparse
 import collections
 import logging
@@ -19,7 +20,7 @@ import os
 import pprint
 import time
 
-from mung.inference_engine_constants import InferenceEngineConstants as _CONST
+from mung.inference.constants import InferenceEngineConstants as _CONST
 from mung.io import parse_cropobject_list, export_cropobject_list
 from mung.node import link_cropobjects
 
