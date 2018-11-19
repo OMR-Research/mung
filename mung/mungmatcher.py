@@ -128,10 +128,10 @@ class MungMatcher(object):
         # larger than one.
         for csig_2 in compatible_sets:
             compatible_set_objids = compatible_sets[csig_2]
-            print('Resolving csig_2={0}: compatible set objids [{1}, {2}]'
-                  ''.format(csig_2,
-                            [o for o in compatible_set_objids[0]],
-                            [o for o in compatible_set_objids[1]]))
+            # print('Resolving csig_2={0}: compatible set objids [{1}, {2}]'
+            #       ''.format(csig_2,
+            #                 [o for o in compatible_set_objids[0]],
+            #                 [o for o in compatible_set_objids[1]]))
             compatible_vertices_1 = [g1._cdict[objid]
                                          for objid in compatible_set_objids[0]]
             compatible_vertices_2 = [g2._cdict[objid]
@@ -162,20 +162,20 @@ class MungMatcher(object):
         _clsnames = set([c.clsname for c in vs1 + vs2])
 
         ### DEBUG
-        _suspicious_objids = set(map(int, '469 470 471 472 476 477 491 492 493 494 495 496 497 498 499 500 501 502 503 504 512 513 520 522 599 600 606 608 609 610 619 624 625 626 627 630 631 632 633 634 657 658 659 660 661 662 663 664 665 666 667 668 669 670 671 672 673 674 744 748 751 752 753 754 757 758 759 760 761 762 763 764 767 768 783 785 789 790 793 794 796 803 804 807 828 829 831 833 834 835 836 838'.split()))
+        # _suspicious_objids = set(map(int, '469 470 471 472 476 477 491 492 493 494 495 496 497 498 499 500 501 502 503 504 512 513 520 522 599 600 606 608 609 610 619 624 625 626 627 630 631 632 633 634 657 658 659 660 661 662 663 664 665 666 667 668 669 670 671 672 673 674 744 748 751 752 753 754 757 758 759 760 761 762 763 764 767 768 783 785 789 790 793 794 796 803 804 807 828 829 831 833 834 835 836 838'.split()))
 
         for _clsname in _clsnames:
             vs1_by_class = [c for c in vs1 if c.clsname == _clsname]
             vs2_by_class = [c for c in vs2 if c.clsname == _clsname]
 
             ### DEBUG
-            for v1 in vs1_by_class:
-                if v1.objid in _suspicious_objids:
-                    print('Suspicious objid in the following compatible set:'
-                          ' class {0}, objids_1 = {1}, objids_2 = {2}'
-                          ''.format(_clsname,
-                                    [c.objid for c in sorted(vs1_by_class, key=lambda x: x.top)],
-                                    [c.objid for c in sorted(vs2_by_class, key=lambda x: x.top)]))
+            # for v1 in vs1_by_class:
+            #     if v1.objid in _suspicious_objids:
+            #         print('Suspicious objid in the following compatible set:'
+            #               ' class {0}, objids_1 = {1}, objids_2 = {2}'
+            #               ''.format(_clsname,
+            #                         [c.objid for c in sorted(vs1_by_class, key=lambda x: x.top)],
+            #                         [c.objid for c in sorted(vs2_by_class, key=lambda x: x.top)]))
 
             for v1, v2 in zip(sorted(vs1_by_class, key=lambda x: x.top),
                               sorted(vs2_by_class, key=lambda y: y.top)):
@@ -238,8 +238,8 @@ class MungMatcher(object):
             n2 = ns2[j]
             # Make ns2 pointer catch up with the current note
             while onset_1 > n2.data['onset_beats']:
-                print('onset 1 ({0}) is behind onset 2 ({1}): n1={2}, n2={3}'
-                      ''.format(onset_1, n2.data['onset_beats'], n1.objid, n2.objid))
+                # print('onset 1 ({0}) is behind onset 2 ({1}): n1={2}, n2={3}'
+                #       ''.format(onset_1, n2.data['onset_beats'], n1.objid, n2.objid))
                 j += 1
                 if j >= len(ns2):
                     # We will not match anything anymore: noteheads_2 are exhausted.
@@ -248,17 +248,17 @@ class MungMatcher(object):
 
             if onset_1 == n2.data['onset_beats']:
                 if self._notehead_signature(n1) == self._notehead_signature(n2):
-                    print('matched signature: {0} in noteheads n1={1}, n2={2}'
-                          ''.format(self._notehead_signature(n1), n1.objid, n2.objid))
+                    # print('matched signature: {0} in noteheads n1={1}, n2={2}'
+                    #       ''.format(self._notehead_signature(n1), n1.objid, n2.objid))
                     output[(n1.objid, n2.objid)] = 1.0
                     j += 1
                     continue
-                else:
-                    print('matched onset, but not signature: n1={0}, n2={1}'.format(onset_1, n1.objid, n2.objid))
+                # else:
+                #     pass# print('matched onset, but not signature: n1={0}, n2={1}'.format(onset_1, n1.objid, n2.objid))
 
             elif onset_1 < n2.data['onset_beats']:
-                print('onset 1 ({0}) is ahead of onset 2 ({1}): n1={2}, n2={3}'
-                      ''.format(onset_1, n2.data['onset_beats'], n1.objid, n2.objid))
+                # print('onset 1 ({0}) is ahead of onset 2 ({1}): n1={2}, n2={3}'
+                #       ''.format(onset_1, n2.data['onset_beats'], n1.objid, n2.objid))
                 continue
 
         return output
@@ -266,3 +266,37 @@ class MungMatcher(object):
 
 def show_matching(g1, g2, matching):
     raise NotImplementedError()
+
+
+if __name__ == '__main__':
+
+    import os
+    from mung.io import parse_cropobject_list
+    from mung.graph import NotationGraph
+    test_data_root = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  '..', 'test',
+                                  'test_data',
+                                  'mungmatcher')
+    gt_root = os.path.join(test_data_root, 'gt')
+    de_root = os.path.join(test_data_root, 'detected')
+    wc_root = os.path.join(test_data_root, 'without_contained')
+
+    names = ['CVC-MUSCIMA_W-03_N-01_D-ideal.xml',
+             'CVC-MUSCIMA_W-15_N-10_D-ideal.xml']
+
+    gt = NotationGraph(parse_cropobject_list(os.path.join(gt_root, names[0])))
+    wc = NotationGraph(parse_cropobject_list(os.path.join(wc_root, names[0])))
+
+    matcher = MungMatcher()
+
+    aln = matcher.run(gt, gt)
+    print('Matched GT against GT: {} gt, {} gt, {} matched'
+          ''.format(len(gt), len(gt), len(aln)))
+
+    aln = matcher.run(gt, wc)
+    print('Matched GT against WC: {} gt, {} wc, {} matched'
+          ''.format(len(gt), len(wc), len(aln)))
+
+    aln = matcher.run(gt, gt)
+    print('Matched WC against WC: {} wc, {} wc, {} matched'
+          ''.format(len(wc), len(wc), len(aln)))

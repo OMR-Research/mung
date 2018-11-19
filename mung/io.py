@@ -260,7 +260,7 @@ import collections
 from lxml import etree
 
 from mung.node import Node
-from mung.node_class import CropObjectClass
+from mung.cropobject_class import CropObjectClass
 
 __version__ = "1.0"
 __author__ = "Jan Hajic jr."
