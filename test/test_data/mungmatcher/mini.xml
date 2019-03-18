@@ -3,7 +3,7 @@
 <CropObjects>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___0">
 	<Id>0</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>372</Top>
 	<Left>492</Left>
 	<Width>35</Width>
@@ -13,7 +13,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___1">
 	<Id>1</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>372</Top>
 	<Left>555</Left>
 	<Width>30</Width>
@@ -23,7 +23,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___2">
 	<Id>2</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>373</Top>
 	<Left>607</Left>
 	<Width>28</Width>
@@ -33,7 +33,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___3">
 	<Id>3</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>397</Top>
 	<Left>718</Left>
 	<Width>28</Width>
@@ -43,7 +43,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___4">
 	<Id>4</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>370</Top>
 	<Left>775</Left>
 	<Width>25</Width>
@@ -301,7 +301,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___30">
 	<Id>30</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>531</Top>
 	<Left>503</Left>
 	<Width>28</Width>
@@ -311,7 +311,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___31">
 	<Id>31</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>538</Top>
 	<Left>560</Left>
 	<Width>24</Width>
@@ -321,7 +321,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___32">
 	<Id>32</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>538</Top>
 	<Left>606</Left>
 	<Width>23</Width>
@@ -331,7 +331,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___33">
 	<Id>33</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>564</Top>
 	<Left>712</Left>
 	<Width>22</Width>
@@ -341,7 +341,7 @@
 </CropObject>
 <CropObject xml:id="MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___mini___34">
 	<Id>34</Id>
-	<ClassName>notehead-full</ClassName>
+	<ClassName>noteheadFull</ClassName>
 	<Top>536</Top>
 	<Left>776</Left>
 	<Width>24</Width>

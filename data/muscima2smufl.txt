@@ -1,4 +1,4 @@
-notehead-full   noteheadBlack   # Potentially: noteShapeRoundBlack
+noteheadFull   noteheadBlack   # Potentially: noteShapeRoundBlack
 notehead-empty  noteheadHalf,noteheadWhole  # Potentially: noteShapeRoundWhite
 stem    stem
 8th_flag    flag8thUp,flag8thDown

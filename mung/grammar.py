@@ -89,7 +89,7 @@ class DependencyGrammar(object):
 
     The relationship of noteheads to ledger lines is generally ``m:n``::
 
-      notehead-full | ledger_line
+      noteheadFull | ledger_line
 
     A time signature may consist of multiple numerals, but only one
     other symbol::
@@ -141,7 +141,7 @@ class DependencyGrammar(object):
     If we have the following notation objects ``0``, ``1``, ``2``, and ``3``,
     with the following symbol classes:
 
-    >>> vertices = {0: 'notehead-full', 1: 'stem', 2: '8th_flag', 3: 'notehead_empty'}
+    >>> vertices = {0: 'noteheadFull', 1: 'stem', 2: '8th_flag', 3: 'notehead_empty'}
 
     And the following relationships were recorded:
 
@@ -209,10 +209,10 @@ class DependencyGrammar(object):
     >>> l = 'notehead-*{,2} | stem'
     >>> rules, inlink_cards, outlink_cards, _, _ = g.parse_dependency_grammar_line(l)
     >>> rules
-    [('notehead-empty', 'stem'), ('notehead-full', 'stem')]
+    [('notehead-empty', 'stem'), ('noteheadFull', 'stem')]
     >>> outlink_cards['notehead-empty'] == {'stem': (0, 2)}
     True
-    >>> inlink_cards['stem'] == {'notehead-empty': (0, 10000), 'notehead-full': (0, 10000)}
+    >>> inlink_cards['stem'] == {'notehead-empty': (0, 10000), 'noteheadFull': (0, 10000)}
     True
 
 

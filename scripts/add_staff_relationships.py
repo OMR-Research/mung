@@ -45,7 +45,7 @@ STAFF_RELATED_CLSNAMES = {
 }
 
 NOTEHEAD_CLSNAMES = {
-    'notehead-full',
+    'noteheadFull',
     'notehead-empty',
     'grace-notehead-full',
     'grace-notehead-empty',

@@ -44,7 +44,7 @@ class InferenceEngineConstants(object):
     }
 
     NOTEHEAD_CLSNAMES = {
-        'notehead-full',
+        'noteheadFull',
         'notehead-empty',
         'notehead-square',
         'notehead-square-full',
@@ -53,7 +53,7 @@ class InferenceEngineConstants(object):
     }
 
     NONGRACE_NOTEHEAD_CLSNAMES = {
-        'notehead-full',
+        'noteheadFull',
         'notehead-empty',
     }
 

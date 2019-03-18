@@ -997,7 +997,7 @@ class OnsetsInferenceEngine(object):
             else:
                 beat = [2]
 
-        elif notehead.clsname == 'notehead-full':
+        elif notehead.clsname == 'noteheadFull':
             if len(stems) == 0:
                 self.__warning_or_error('Full notehead {0} has no stem!'.format(notehead.uid))
 
@@ -1205,7 +1205,7 @@ class OnsetsInferenceEngine(object):
             InferenceEngineConstants.FLAGS_AND_BEAMS)
 
         if len(flags_and_beams) == 0:
-            if notehead.clsname == 'notehead-full':
+            if notehead.clsname == 'noteheadFull':
                 return [1]
             elif notehead.clsname == 'notehead-empty':
                 return [2]
@@ -2221,7 +2221,7 @@ class OnsetsInferenceEngine(object):
         g = NotationGraph(cropobjects=cropobjects)
 
         def _get_tie_notes(_tie, graph):
-            notes = graph.parents(_tie, classes=['notehead-full', 'notehead-empty'])
+            notes = graph.parents(_tie, classes=['noteheadFull', 'notehead-empty'])
             if len(notes) == 0:
                 raise NotationGraphError('No notes from tie {0}'.format(_tie.uid))
             if len(notes) == 1:

@@ -9,7 +9,7 @@
 
 notehead-* grace-notehead-* | sharp flat natural double_sharp double_flat ledger_line stem
 notehead-* grace-notehead-* | duration-dot
-notehead-full grace-notehead-full | *_flag beam
+noteheadFull grace-notehead-full | *_flag beam
 
 notehead-* grace-notehead-* | staccato-dot other-dot tenuto accent strong_accent
 notehead-* grace-notehead-* | curved-line_(tie-or-slur) slur tie hairpin-cresc. hairpin-decr.
@@ -18,12 +18,12 @@ notehead-* grace-notehead-* | trill_"wobble" trill arpeggio_"wobble" glissando f
 notehead-* grace-notehead-* | tuple
 notehead-* grace-notehead-* | instrument_specific
 
-notehead-full | grace-notehead-full grace-notehead-empty
+noteheadFull | grace-notehead-full grace-notehead-empty
 notehead-empty | grace-notehead-full grace-notehead-empty
 
 # Aggregate cardinalities
 
-notehead-full{1,} |
+noteheadFull{1,} |
 grace-notehead-full{1,} |
 
 | grace-notehead-*{1,}

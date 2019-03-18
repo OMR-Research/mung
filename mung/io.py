@@ -120,7 +120,7 @@ Individual elements of a ``<CropObject>``
   ``<CropObjectList>`` (which generally corresponds to one XML file
   of CropObjects -- one document namespace).
 * ``<MLClassName>`` is the name of the object's class (such as
-  ``notehead-full``, ``beam``, ``numeral_3``, etc.).
+  ``noteheadFull``, ``beam``, ``numeral_3``, etc.).
 * ``<Top>`` is the vertical coordinate of the upper left corner of the object's
   bounding box.
 * ``<Left>`` is the horizontal coordinate of the upper left corner of

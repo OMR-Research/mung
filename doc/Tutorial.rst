@@ -59,7 +59,7 @@ Extracting notes
         
         notes = []
         for c in cropobjects:
-            if (c.clsname == 'notehead-full') or (c.clsname == 'notehead-empty'):
+            if (c.clsname == 'noteheadFull') or (c.clsname == 'notehead-empty'):
                 _has_stem = False
                 _has_beam_or_flag = False            
                 stem_obj = None
@@ -79,7 +79,7 @@ Extracting notes
                     if len(stem_obj.inlinks) == 1:
                         notes.append((c, stem_obj))
         
-        quarter_notes = [(n, s) for n, s in notes if n.clsname == 'notehead-full']
+        quarter_notes = [(n, s) for n, s in notes if n.clsname == 'noteheadFull']
         half_notes = [(n, s) for n, s in notes if n.clsname == 'notehead-empty']
         return quarter_notes, half_notes
     

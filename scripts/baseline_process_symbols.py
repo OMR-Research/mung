@@ -193,7 +193,7 @@ class DependencyGrammar(object):
 
     The relationship of noteheads to ledger lines is generally ``m:n``::
 
-      ``notehead-full | ledger_line``
+      ``noteheadFull | ledger_line``
 
     A time signature may consist of multiple numerals, but only one
     other symbol::
@@ -272,11 +272,11 @@ class DependencyGrammar(object):
     >>> l = 'notehead-*{,2} | stem'
     >>> rules, inlink_cards, outlink_cards, _, _ = g.parse_dependency_grammar_line(l)
     >>> rules
-    [('notehead-full', 'stem'), ('notehead-empty', 'stem')]
+    [('noteheadFull', 'stem'), ('notehead-empty', 'stem')]
     >>> outlink_cards['notehead-empty']
     {'stem': (0, 2)}
     >>> inlink_cards['stem']
-    {'notehead-full': (0, 10000), 'notehead-empty': (0, 10000)}
+    {'noteheadFull': (0, 10000), 'notehead-empty': (0, 10000)}
 
     A key signature can have any number of sharps, flats, or naturals,
     but if a given symbol is part of a key signature, it can only be part of one.
@@ -899,13 +899,13 @@ class PairwiseClassificationParser(object):
         _cdict = {c.objid: c for c in cropobjects}
 
         # Collect stems per notehead
-        notehead_objids = set([c.objid for c in cropobjects if c.clsname == 'notehead-full'])
+        notehead_objids = set([c.objid for c in cropobjects if c.clsname == 'noteheadFull'])
         stem_objids = set([c.objid for c in cropobjects if c.clsname == 'stem'])
 
         noteheads_with_stem_objids = set()
         stems_with_notehead_objids = set()
         for f, t in edges:
-            if _cdict[f].clsname == 'notehead-full':
+            if _cdict[f].clsname == 'noteheadFull':
                 if _cdict[t].clsname == 'stem':
                     noteheads_with_stem_objids.add(f)
                     stems_with_notehead_objids.add(t)

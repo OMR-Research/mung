@@ -3,7 +3,7 @@
 <CropObjects>
 <CropObject>
 	<Id>0</Id>
-	<MLClassName>notehead-full</MLClassName>
+	<MLClassName>noteheadFull</MLClassName>
 	<X>215</X>
 	<Y>101</Y>
 	<Width>12</Width>
@@ -13,7 +13,7 @@
 </CropObject>
 <CropObject>
 	<Id>1</Id>
-	<MLClassName>notehead-full</MLClassName>
+	<MLClassName>noteheadFull</MLClassName>
 	<X>280</X>
 	<Y>98</Y>
 	<Width>15</Width>
@@ -171,7 +171,7 @@
 </CropObject>
 <CropObject>
 	<Id>17</Id>
-	<MLClassName>notehead-full</MLClassName>
+	<MLClassName>noteheadFull</MLClassName>
 	<X>331</X>
 	<Y>84</Y>
 	<Width>10</Width>
@@ -181,7 +181,7 @@
 </CropObject>
 <CropObject>
 	<Id>18</Id>
-	<MLClassName>notehead-full</MLClassName>
+	<MLClassName>noteheadFull</MLClassName>
 	<X>374</X>
 	<Y>79</Y>
 	<Width>11</Width>
@@ -261,7 +261,7 @@
 </CropObject>
 <CropObject>
 	<Id>26</Id>
-	<MLClassName>notehead-full</MLClassName>
+	<MLClassName>noteheadFull</MLClassName>
 	<X>323</X>
 	<Y>221</Y>
 	<Width>12</Width>
