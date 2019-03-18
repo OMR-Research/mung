@@ -10,6 +10,5 @@ midi2audio>=0.1.1
 future
 
 # Libraries to integrating code-coverage reporting
-python-coveralls
 codecov
 coverage>=4.4
