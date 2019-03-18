@@ -19,25 +19,25 @@ class NodeTest(unittest.TestCase):
 
     def test_overlaps(self):
         # Arrange
-        crop_object = Node(0, 'test', 10, 100, height=20, width=10)
+        node = Node(0, 'test', 10, 100, height=20, width=10)
 
         # Act and Assert
-        self.assertEqual(crop_object.bounding_box, (10, 100, 30, 110))
+        self.assertEqual(node.bounding_box, (10, 100, 30, 110))
 
-        self.assertTrue(crop_object.overlaps((10, 100, 30, 110)))  # Exact match
+        self.assertTrue(node.overlaps((10, 100, 30, 110)))  # Exact match
 
-        self.assertFalse(crop_object.overlaps((0, 100, 8, 110)))  # Row mismatch
-        self.assertFalse(crop_object.overlaps((10, 0, 30, 89)))  # Column mismatch
-        self.assertFalse(crop_object.overlaps((0, 0, 8, 89)))  # Total mismatch
+        self.assertFalse(node.overlaps((0, 100, 8, 110)))  # Row mismatch
+        self.assertFalse(node.overlaps((10, 0, 30, 89)))  # Column mismatch
+        self.assertFalse(node.overlaps((0, 0, 8, 89)))  # Total mismatch
 
-        self.assertTrue(crop_object.overlaps((9, 99, 31, 111)))  # Encompasses Node
-        self.assertTrue(crop_object.overlaps((11, 101, 29, 109)))  # Within Node
-        self.assertTrue(crop_object.overlaps((9, 101, 31, 109)))  # Encompass horz., within vert.
-        self.assertTrue(crop_object.overlaps((11, 99, 29, 111)))  # Encompasses vert., within horz.
-        self.assertTrue(crop_object.overlaps((11, 101, 31, 111)))  # Corner within: top left
-        self.assertTrue(crop_object.overlaps((11, 99, 31, 109)))  # Corner within: top right
-        self.assertTrue(crop_object.overlaps((9, 101, 29, 111)))  # Corner within: bottom left
-        self.assertTrue(crop_object.overlaps((9, 99, 29, 109)))  # Corner within: bottom right
+        self.assertTrue(node.overlaps((9, 99, 31, 111)))  # Encompasses Node
+        self.assertTrue(node.overlaps((11, 101, 29, 109)))  # Within Node
+        self.assertTrue(node.overlaps((9, 101, 31, 109)))  # Encompass horz., within vert.
+        self.assertTrue(node.overlaps((11, 99, 29, 111)))  # Encompasses vert., within horz.
+        self.assertTrue(node.overlaps((11, 101, 31, 111)))  # Corner within: top left
+        self.assertTrue(node.overlaps((11, 99, 31, 109)))  # Corner within: top right
+        self.assertTrue(node.overlaps((9, 101, 29, 111)))  # Corner within: bottom left
+        self.assertTrue(node.overlaps((9, 99, 29, 109)))  # Corner within: bottom right
 
 
 if __name__ == '__main__':
