@@ -512,7 +512,8 @@ def validate_cropobjects_graph_structure(cropobjects):
     return is_valid
 
 
-def validate_document_graph_structure(cropobjects):
+def validate_document_graph_structure(nodes):
+    # type: (List[Node]) -> bool
     """Check that the graph defined by the ``inlinks`` and ``outlinks``
     in the given list of CropObjects is valid: no relationships
     leading from or to objects with non-existent ``node_id``s.
@@ -520,20 +521,20 @@ def validate_document_graph_structure(cropobjects):
     Checks that all the CropObjects come from one document. (Raises
     a ``ValueError`` otherwise.)
 
-    :param cropobjects: A list of :class:`CropObject` instances.
+    :param nodes: A list of :class:`Node` instances.
 
     :returns: ``True`` if graph is valid, ``False`` otherwise.
     """
-    docs = [c.doc for c in cropobjects]
+    docs = [node.doc for node in nodes]
     if len(set(docs)) != 1:
         raise ValueError('Got CropObjects from multiple documents!')
 
     is_valid = True
-    objids = frozenset([c.objid for c in cropobjects])
-    for c in cropobjects:
+    node_ids = frozenset([node.node_id for node in nodes])
+    for c in nodes:
         inlinks = c.inlinks
         for i in inlinks:
-            if i not in objids:
+            if i not in node_ids:
                 logging.warning('Invalid graph structure in CropObjectList:'
                                 ' object {0} has inlink from non-existent'
                                 ' object {1}'.format(c, i))
@@ -541,7 +542,7 @@ def validate_document_graph_structure(cropobjects):
 
         outlinks = c.outlinks
         for o in outlinks:
-            if o not in objids:
+            if o not in node_ids:
                 logging.warning('Invalid graph structure in CropObjectList:'
                                 ' object {0} has outlink to non-existent'
                                 ' object {1}'.format(c, o))
@@ -635,7 +636,7 @@ def parse_node_classes(filename):
     node_classes_xml = tree.getroot()
     node_classes = []
     for node_class_xml in node_classes_xml:
-        node_class = NodeClass(id=int(node_class_xml.findall('Id')[0].text),
+        node_class = NodeClass(class_id=int(node_class_xml.findall('Id')[0].text),
                                name=node_class_xml.findall('Name')[0].text,
                                group_name=node_class_xml.findall('GroupName')[0].text,
                                color=node_class_xml.findall('Color')[0].text)

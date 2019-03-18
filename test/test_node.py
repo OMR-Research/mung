@@ -1,5 +1,7 @@
+import os
 import unittest
 
+from mung.io import parse_cropobject_list, export_cropobject_list
 from mung.node import Node
 
 
@@ -38,6 +40,23 @@ class NodeTest(unittest.TestCase):
         self.assertTrue(node.overlaps((11, 99, 31, 109)))  # Corner within: top right
         self.assertTrue(node.overlaps((9, 101, 29, 111)))  # Corner within: bottom left
         self.assertTrue(node.overlaps((9, 99, 29, 109)))  # Corner within: bottom right
+
+    def test_parse_node_list(self):
+        test_data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test', 'test_data',
+                                     'cropobjects_xy_vs_topleft')
+        clfile = os.path.join(test_data_dir, '01_basic_topleft.xml')
+        cropobjects = parse_cropobject_list(clfile)
+        self.assertEqual(len(cropobjects), 48)
+
+        clfile_xy = os.path.join(test_data_dir, '01_basic_xy.xml')
+        cropobjects_xy = parse_cropobject_list(clfile_xy)
+        self.assertEqual(len(cropobjects_xy), 48)
+        self.assertEqual(len(cropobjects), len(cropobjects_xy))
+
+        export_xy = export_cropobject_list(cropobjects_xy)
+        with open(clfile) as hdl:
+            raw_data_topleft = '\n'.join([l.rstrip() for l in hdl])
+        self.assertEqual(raw_data_topleft, export_xy)
 
 
 if __name__ == '__main__':

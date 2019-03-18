@@ -233,7 +233,7 @@ class DependencyGrammar(object):
     >>> from mung.io import parse_node_classes
     >>> fpath = os.path.dirname(os.path.dirname(__file__)) + '/test/test_data/mff-muscima-classes-annot.deprules'
     >>> mlpath = os.path.dirname(os.path.dirname(__file__)) + '/test/test_data/mff-muscima-classes-annot.xml'
-    >>> mlclass_dict = {m.node_id: m for m in parse_node_classes(mlpath)}
+    >>> mlclass_dict = {node_class.class_id: node_class for node_class in parse_node_classes(mlpath)}
     >>> g = DependencyGrammar(grammar_filename=fpath, mlclasses=mlclass_dict)
     >>> len(g.rules)
     551

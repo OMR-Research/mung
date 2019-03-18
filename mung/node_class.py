@@ -63,8 +63,8 @@ class NodeClass(object):
     functionality beyond simply existing and writing itself
     out in the appropriate XML format.
     """
-    def __init__(self, id, name, group_name, color):
-        self.id = id
+    def __init__(self, class_id, name, group_name, color):
+        self.class_id = class_id
         self.name = name
         self.group_name = group_name
         # Parse the string into a RGB spec.
@@ -75,7 +75,7 @@ class NodeClass(object):
     def __str__(self):
         lines = []
         lines.append('<NodeClass>')
-        lines.append('    <Id>{0}</Id>'.format(self.id))
+        lines.append('    <Id>{0}</Id>'.format(self.class_id))
         lines.append('    <Name>{0}</Name>'.format(self.name))
         lines.append('    <GroupName>{0}</GroupName>'.format(self.group_name))
         lines.append('    <Color>{0}</Color>'.format(rgb2hex(self.color)))
