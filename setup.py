@@ -8,7 +8,7 @@ import logging
 import os
 import sys
 
-import muscima
+import mung
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -42,10 +42,10 @@ def get_long_description():
 
 setup(
     name='mung',
-    version=muscima.__version__,
+    version=mung.__version__,
     url='https://mung.readthedocs.io',
     license='MIT Software License',
-    author='Jan Hajič jr.',
+    author='Jan Hajič jr. and Alexander Pacha',
     install_requires=['numpy>=1.11.1',
                       'lxml>=3.6.4'],
     author_email='hajicj@ufal.mff.cuni.cz',
