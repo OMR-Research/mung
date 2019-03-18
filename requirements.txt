@@ -1,6 +1,6 @@
 numpy>=1.11.1
 lxml>=3.6.4
-pytest
+pytest>= 3.6
 pytest-cov
 scikit-image
 scikit-learn
