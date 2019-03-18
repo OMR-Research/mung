@@ -125,11 +125,11 @@ class DependencyGrammar(object):
 
     The basic role of the dependency grammar is to provide the list of rules:
 
-    >>> from mung.io import parse_cropobject_class_list
+    >>> from mung.io import parse_node_classes
     >>> fpath = os.path.dirname(os.path.dirname(__file__)) + u'/test/test_data/mff-muscima-classes-annot.deprules'
-    >>> mlpath = os.path.dirname(os.path.dirname(__file__)) + u'/test/test_data/mff-muscima-classes-annot.xml'
-    >>> mlclass_dict = {m.name for m in parse_cropobject_class_list(mlpath)}
-    >>> g = DependencyGrammar(grammar_filename=fpath, alphabet=mlclass_dict)
+    >>> node_classes_path = os.path.dirname(os.path.dirname(__file__)) + u'/test/test_data/mff-muscima-classes-annot.xml'
+    >>> node_classes_dict = {m.name for m in parse_node_classes(node_classes_path)}
+    >>> g = DependencyGrammar(grammar_filename=fpath, alphabet=node_classes_dict)
     >>> len(g.rules)
     578
 

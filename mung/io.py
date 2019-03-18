@@ -257,6 +257,8 @@ import logging
 import os
 
 import collections
+from typing import List
+
 from lxml import etree
 
 from mung.node import Node
@@ -624,15 +626,15 @@ def export_cropobject_list(cropobjects, docname=None, dataset_name=None):
 ##############################################################################
 # Parsing NodeClass lists, mostly for grammars.
 
-def parse_cropobject_class_list(filename):
-    """From a xml file with a MLClassList as the top element,
-    extract the list of :class:`NodeClass` objects. Use
-    this
+def parse_node_classes(filename):
+    # type: (str) -> List[NodeClass]
+    """ Extract the list of :class:`NodeClass` objects from
+        an xml file with a NodeClasses as the top element and NodeClass children.
     """
     tree = etree.parse(filename)
-    root = tree.getroot()
+    node_classes_xml = tree.getroot()
     node_classes = []
-    for node_class_xml in root.iter('NodeClasses'):
+    for node_class_xml in node_classes_xml:
         node_class = NodeClass(id=int(node_class_xml.findall('Id')[0].text),
                                name=node_class_xml.findall('Name')[0].text,
                                group_name=node_class_xml.findall('GroupName')[0].text,

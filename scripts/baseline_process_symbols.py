@@ -25,7 +25,7 @@ from mung.graph import find_misdirected_ledger_line_edges
 from mung.inference.inference import OnsetsInferenceEngine, MIDIBuilder
 from mung.inference.inference import PitchInferenceEngine
 from mung.inference.constants import _CONST
-from mung.io import parse_cropobject_class_list, parse_cropobject_list, export_cropobject_list
+from mung.io import parse_node_classes, parse_cropobject_list, export_cropobject_list
 from mung.node import cropobject_distance, bbox_intersection, cropobjects_merge_multiple, link_cropobjects
 from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, build_staffspace_cropobjects, add_staff_relationships
 
@@ -230,10 +230,10 @@ class DependencyGrammar(object):
 
     The basic role of the dependency grammar is to provide the list of rules:
 
-    >>> from mung.io import parse_cropobject_class_list
+    >>> from mung.io import parse_node_classes
     >>> fpath = os.path.dirname(os.path.dirname(__file__)) + '/test/test_data/mff-muscima-classes-annot.deprules'
     >>> mlpath = os.path.dirname(os.path.dirname(__file__)) + '/test/test_data/mff-muscima-classes-annot.xml'
-    >>> mlclass_dict = {m.id: m for m in parse_cropobject_class_list(mlpath)}
+    >>> mlclass_dict = {m.id: m for m in parse_node_classes(mlpath)}
     >>> g = DependencyGrammar(grammar_filename=fpath, mlclasses=mlclass_dict)
     >>> len(g.rules)
     578
@@ -1316,7 +1316,7 @@ def main(args):
     with open(args.parser) as hdl:
         classifier = pickle.load(hdl)
 
-    mlclass_list = parse_cropobject_class_list(args.mlclasses)
+    mlclass_list = parse_node_classes(args.mlclasses)
     mlclasses = {m.clsid: m for m in mlclass_list}
 
     grammar = DependencyGrammar(grammar_filename=args.grammar,
