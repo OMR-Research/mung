@@ -12,3 +12,4 @@ future
 # Libraries to integrating code-coverage reporting
 python-coveralls
 codecov
+coverage>=4.4
