@@ -20,6 +20,8 @@ install:
   # List installed packages for debuggin purposes
   - pip list
 
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install typing; fi
+
 script:
   - pytest --cov=muscima test/
   # Run the doc-tests only with Python 3, because in Python 2, it reports strings as u'...' instead of '...' and causes a failure
