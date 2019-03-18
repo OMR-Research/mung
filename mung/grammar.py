@@ -180,7 +180,7 @@ class DependencyGrammar(object):
     **Grammar file formats**
 
     The alphabet is stored by means of a ``CropObjectClassList`` XML file with
-    :class:`CropObjectClass` elements, as described in the :mod:`mung.io` module.
+    :class:`NodeClass` elements, as described in the :mod:`mung.io` module.
 
     The rules are stored in *rule files*, with the suffix ``.deprules``.
 

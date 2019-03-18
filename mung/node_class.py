@@ -3,8 +3,8 @@
 **NOTE: This file should become obsolete. The list of classes will be
 implemented as a sub-JSON from SMuFL.**
 
-This module implements the :class:`CropObjectClass`, which
-represents one possible :class:`CropObject` class, such as
+This module implements the :class:`NodeClass`, which
+represents one possible :class:`Node` class, such as
 a notehead or a time signature. Aside from defining the "vocabulary"
 of available object classes for annotation, it also contains
 some information about how objects of the given class should
@@ -13,16 +13,16 @@ related object classes together in menus, implementing a sensible
 color scheme, etc.). There is nothing interesting about this class,
 we pulled it into the ``mung`` package because the object
 grammar (i.e. which relationships are allowed and which are not)
-depends on having CropObjectClass object as its "vocabulary",
+depends on having NodeClass object as its "vocabulary",
 and you will probably want to manipulate the data somehow based
 on the objects' relationships (like reassembling notes from notation
 primitives: notehead plus stem plus flags...), and the grammar
 file is a reference for doing that.
 
-CropObjectClass is a plain old data class, nothing interesting
+NodeClass is a plain old data class, nothing interesting
 about it. The only catch is that colors for rendering
 in MUSCIMarker are kept as a ``#RRGGBB`` string in the XML
-file, but represented in the ``CropObjectClass.color`` attribute
+file, but represented in the ``NodeClass.color`` attribute
 as a triplet of floats between 0 (``00``) and 255 (``ff``).
 
 
@@ -31,17 +31,17 @@ XML representation.
 
 **XML example**
 
-This is what a single CropObjectClass element might look like::
+This is what a single NodeClass element might look like::
 
-    <CropObjectClass>
+    <NodeClass>
         <Id>1</Id>
         <Name>notehead-empty</Name>
         <GroupName>note-primitive/notehead-empty</GroupName>
         <Color>#FF7566</Color>
-        </CropObjectClass>
+    </NodeClass>
 
 See e.g. ``test/test_data/mff-muscima-classes-annot.xml``,
-which is incidentally the real CropObjectClass list used
+which is incidentally the real NodeClass list used
 for annotating MUSCIMA++.
 
 """
@@ -55,31 +55,31 @@ __author__ = "Jan Hajic jr."
 
 #######################################################################
 
-class CropObjectClass(object):
+class NodeClass(object):
     """Information about the annotation class. We're using it
-    mostly to get the color of rendered CropObjects.
+    mostly to get the color of rendered Node.
 
-    CropObjectClass is a Plain Old Data class, there is no other
+    NodeClass is a Plain Old Data class, there is no other
     functionality beyond simply existing and writing itself
     out in the appropriate XML format.
     """
-    def __init__(self, clsid, name, group_name, color):
-        self.clsid = clsid
+    def __init__(self, id, name, group_name, color):
+        self.id = id
         self.name = name
         self.group_name = group_name
         # Parse the string into a RGB spec.
         r, g, b = hex2rgb(color)
-        logging.debug('CropObjectClass {0}: color {1}'.format(name, (r, g, b)))
+        logging.debug('NodeClass {0}: color {1}'.format(name, (r, g, b)))
         self.color = (r, g, b)
 
     def __str__(self):
         lines = []
-        lines.append('<CropObjectClass>')
-        lines.append('\t<Id>{0}</Id>'.format(self.clsid))
-        lines.append('\t<Name>{0}</Name>'.format(self.name))
-        lines.append('\t<GroupName>{0}</GroupName>'.format(self.group_name))
-        lines.append('\t<Color>{0}</Color>'.format(rgb2hex(self.color)))
-        lines.append('\t</CropObjectClass>')
+        lines.append('<NodeClass>')
+        lines.append('    <Id>{0}</Id>'.format(self.id))
+        lines.append('    <Name>{0}</Name>'.format(self.name))
+        lines.append('    <GroupName>{0}</GroupName>'.format(self.group_name))
+        lines.append('    <Color>{0}</Color>'.format(rgb2hex(self.color)))
+        lines.append('</NodeClass>')
         return '\n'.join(lines)
 
 #######################################################################

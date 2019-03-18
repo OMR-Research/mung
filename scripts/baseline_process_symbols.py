@@ -233,7 +233,7 @@ class DependencyGrammar(object):
     >>> from mung.io import parse_cropobject_class_list
     >>> fpath = os.path.dirname(os.path.dirname(__file__)) + '/test/test_data/mff-muscima-classes-annot.deprules'
     >>> mlpath = os.path.dirname(os.path.dirname(__file__)) + '/test/test_data/mff-muscima-classes-annot.xml'
-    >>> mlclass_dict = {m.clsid: m for m in parse_cropobject_class_list(mlpath)}
+    >>> mlclass_dict = {m.id: m for m in parse_cropobject_class_list(mlpath)}
     >>> g = DependencyGrammar(grammar_filename=fpath, mlclasses=mlclass_dict)
     >>> len(g.rules)
     578
@@ -1273,7 +1273,7 @@ def build_argument_parser():
                              ' file.')
 
     parser.add_argument('--mlclasses', action='store', required=True,
-                        help='Read the CropObjectClass list from this XML.')
+                        help='Read the NodeClass list from this XML.')
     parser.add_argument('--grammar', action='store', required=True,
                         help='Read the grammar file that specifies the allowed edge node'
                              ' class pairs.')

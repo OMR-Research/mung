@@ -69,8 +69,8 @@ class MLClassGenerator(object):
         self.ctr = 0
 
         self.joiner = u'\n\t\t\t'
-        self.header = u'\t\t<CropObjectClass>'
-        self.footer = u'</CropObjectClass>'
+        self.header = u'\t\t<NodeClass>'
+        self.footer = u'</NodeClass>'
 
         self.default_color = u'#FF6060'
 

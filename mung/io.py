@@ -9,7 +9,7 @@ These are grouped into ``<CropObjectList>`` elements, which are
 the top-level elements in the ``*.xml`` dataset files.
 
 The list of object classes used in the dataset is also stored as XML,
-in ``<CropObjectClass>`` elements (within a ``<CropObjectClassList>``
+in ``<NodeClass>`` elements (within a ``<CropObjectClassList>``
 element).
 
 CropObject
@@ -206,33 +206,33 @@ a compression ratio approximately ``n_cols / 5``.
 explains the `CROPOBJECT_MASK_ORDER='C'` hack in `set_mask()`.)
 
 
-CropObjectClass
+NodeClass
 ---------------
 
-This is what a single CropObjectClass element might look like::
+This is what a single NodeClass element might look like::
 
-    <CropObjectClass>
+    <NodeClass>
         <Id>1</Id>
         <Name>notehead-empty</Name>
         <GroupName>note-primitive/notehead-empty</GroupName>
         <Color>#FF7566</Color>
-        </CropObjectClass>
+        </NodeClass>
 
 See e.g. ``test/test_data/mff-muscima-classes-annot.xml``,
-which is incidentally the real CropObjectClass list used
+which is incidentally the real NodeClass list used
 for annotating MUSCIMA++.
 
-Similarly to a ``<CropObjectList>``, the ``<CropObjectClass>``
+Similarly to a ``<CropObjectList>``, the ``<NodeClass>``
 elements are organized inside a ``<CropObjectClassList>``::
 
    <CropObjectClassList>
       <CropObjectClasses>
-        <CropObjectClass> ... </CropObjectClass>
-        <CropObjectClass> ... </CropObjectClass>
+        <NodeClass> ... </NodeClass>
+        <NodeClass> ... </NodeClass>
       </CropObjectClasses>
     </CropObjectClassesList>
 
-The :class:`CropObjectClass` represents one possible :class:`CropObject`
+The :class:`NodeClass` represents one possible :class:`CropObject`
 symbol class, such as a notehead or a time signature. Aside from defining
 the "vocabulary" of available object classes for annotation, it also contains
 some information about how objects of the given class should
@@ -241,7 +241,7 @@ related object classes together in menus, implementing a sensible
 color scheme, etc.). There is nothing interesting about this class,
 we pulled it into the ``mung`` package because the object
 grammar (i.e. which relationships are allowed and which are not)
-depends on having CropObjectClass object as its "vocabulary",
+depends on having NodeClass object as its "vocabulary",
 and you will probably want to manipulate the data somehow based
 on the objects' relationships (like reassembling notes from notation
 primitives: notehead plus stem plus flags...), and the grammar
@@ -260,7 +260,7 @@ import collections
 from lxml import etree
 
 from mung.node import Node
-from mung.cropobject_class import CropObjectClass
+from mung.node_class import NodeClass
 
 __version__ = "1.0"
 __author__ = "Jan Hajic jr."
@@ -350,7 +350,7 @@ def parse_cropobject_list(filename):
             # No: leave it to the CropObject class default UID mechanism.
 
         # Dealing with clsname transition: there shoud be no more
-        # CropObjectLists without a clsname. The clsid has been
+        # CropObjectLists without a clsname. The id has been
         # removed from CropObject specification, anyway.
         # clsname=None
         # _has_clsname = False
@@ -622,23 +622,23 @@ def export_cropobject_list(cropobjects, docname=None, dataset_name=None):
 
 
 ##############################################################################
-# Parsing CropObjectClass lists, mostly for grammars.
+# Parsing NodeClass lists, mostly for grammars.
 
 def parse_cropobject_class_list(filename):
     """From a xml file with a MLClassList as the top element,
-    extract the list of :class:`CropObjectClass` objects. Use
+    extract the list of :class:`NodeClass` objects. Use
     this
     """
     tree = etree.parse(filename)
     root = tree.getroot()
-    cropobject_class_list = []
-    for mlclass in root.iter('CropObjectClass'):
-        cls = CropObjectClass(clsid=int(mlclass.findall('Id')[0].text),
-                              name=mlclass.findall('Name')[0].text,
-                              group_name=mlclass.findall('GroupName')[0].text,
-                              color=mlclass.findall('Color')[0].text)
-        cropobject_class_list.append(cls)
-    return cropobject_class_list
+    node_classes = []
+    for node_class_xml in root.iter('NodeClasses'):
+        node_class = NodeClass(id=int(node_class_xml.findall('Id')[0].text),
+                               name=node_class_xml.findall('Name')[0].text,
+                               group_name=node_class_xml.findall('GroupName')[0].text,
+                               color=node_class_xml.findall('Color')[0].text)
+        node_classes.append(node_class)
+    return node_classes
 
 
 def export_cropobject_class_list(cropobject_classes):
