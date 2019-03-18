@@ -143,7 +143,7 @@ def add_staff_relationships(cropobjects,
     #  - per staffline and staffspace: its index (top to bottom) within the staff
     _ss_sl_idx_wrt_staff = {}
     # Reverse indexes:
-    # If I know which staff (by objid) and which index of staffline/staffspace,
+    # If I know which staff (by node_id) and which index of staffline/staffspace,
     # I want to retrieve the given staffline/staffspace Node:
     _staff_and_idx2ss = collections.defaultdict(dict)
     _staff_and_idx2sl = collections.defaultdict(dict)

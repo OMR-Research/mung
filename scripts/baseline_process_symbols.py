@@ -233,7 +233,7 @@ class DependencyGrammar(object):
     >>> from mung.io import parse_node_classes
     >>> fpath = os.path.dirname(os.path.dirname(__file__)) + '/test/test_data/mff-muscima-classes-annot.deprules'
     >>> mlpath = os.path.dirname(os.path.dirname(__file__)) + '/test/test_data/mff-muscima-classes-annot.xml'
-    >>> mlclass_dict = {m.id: m for m in parse_node_classes(mlpath)}
+    >>> mlclass_dict = {m.node_id: m for m in parse_node_classes(mlpath)}
     >>> g = DependencyGrammar(grammar_filename=fpath, mlclasses=mlclass_dict)
     >>> len(g.rules)
     551
@@ -752,7 +752,7 @@ class PairwiseClfFeatureExtractor(object):
         """Extract a feature vector from the given pair of CropObjects.
         Does *NOT* convert the class names to integers.
 
-        Features: bbox(c_to) - bbox(c_from), clsname(c_from), clsname(c_to)
+        Features: bbox(c_to) - bbox(c_from), class_name(c_from), class_name(c_to)
         Target: 1 if there is a link from u to v
 
         Returns a dict that works as input to ``self.vectorizer``.
@@ -787,7 +787,7 @@ class PairwiseClfFeatureExtractor(object):
         """Extract a feature vector from the given pair of CropObjects.
         Does *NOT* convert the class names to integers.
 
-        Features: bbox(c_to) - bbox(c_from), clsname(c_from), clsname(c_to)
+        Features: bbox(c_to) - bbox(c_from), class_name(c_from), class_name(c_to)
         Target: 1 if there is a link from u to v
 
         Returns a tuple.
@@ -961,7 +961,7 @@ class PairwiseClassificationParser(object):
 
 
 def do_parse(cropobjects, parser):
-    # names = [c.clsname for c in cropobjects]
+    # names = [c.class_name for c in cropobjects]
     non_staff_cropobjects = [c for c in cropobjects
                              if c.clsname not in \
                              _CONST.STAFF_CROPOBJECT_CLSNAMES]

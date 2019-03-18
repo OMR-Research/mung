@@ -133,20 +133,20 @@ Individual elements of a ``<CropObject>``
   the mask is not given, the object is understood to occupy the entire
   bounding box. For the representation, see Implementation notes
   below.
-* ``<Inlinks>``: whitespace-separate ``objid`` list, representing CropObjects
+* ``<Inlinks>``: whitespace-separate ``node_id`` list, representing CropObjects
   **from** which a relationship leads to this CropObject. (Relationships are
   directed edges, forming a directed graph of CropObjects.) The objids are
-  valid in the same scope as the CropObject's ``objid``: don't mix
+  valid in the same scope as the CropObject's ``node_id``: don't mix
   CropObjects from multiple scopes (e.g., multiple CropObjectLists)!
   If you are using CropObjects from multiple CropObjectLists at the same
-  time, make sure to check against the ``uid``s.
-* ``<Outlinks>``: whitespace-separate ``objid`` list, representing CropObjects
+  time, make sure to check against the ``unique_id``s.
+* ``<Outlinks>``: whitespace-separate ``node_id`` list, representing CropObjects
   **to** which a relationship leads to this CropObject. (Relationships are
   directed edges, forming a directed graph of CropObjects.) The objids are
-  valid in the same scope as the CropObject's ``objid``: don't mix
+  valid in the same scope as the CropObject's ``node_id``: don't mix
   CropObjects from multiple scopes (e.g., multiple CropObjectLists)!
   If you are using CropObjects from multiple CropObjectLists at the same
-  time, make sure to check against the ``uid``s.
+  time, make sure to check against the ``unique_id``s.
 * ``<Data>``: a list of ``<DataItem>`` elements. The elements have
   two attributes: ``key``, and ``type``. The ``key`` is what the item
   should be called in the ``data`` dict of the loaded CropObject.
@@ -331,18 +331,18 @@ def parse_cropobject_list(filename):
         # Parsing one CropObject
         logging.debug('Parsing CropObject {0}'.format(i))
 
-        # The problem with changing objid: it is often used as
+        # The problem with changing node_id: it is often used as
         # an integer in MUSCIMarker...
         objid = int(float(cropobject.findall('Id')[0].text))
 
-        # ...So: we introduce UniqueId (uid). But there needs
+        # ...So: we introduce UniqueId (unique_id). But there needs
         # to be some transition, to deal with files that don't
         # have it.
         try:
             try:
                 # This is ugly, but the xml: namespace is not in the
                 # cropobject.nsmap dict...
-                uid = cropobject.attrib['{http://www.w3.org/XML/1998/namespace}id']
+                uid = cropobject.attrib['{http://www.w3.org/XML/1998/namespace}node_id']
             except KeyError:
                 # Fallback
                 uid = cropobject.findall('UniqueId')[0].text
@@ -351,17 +351,17 @@ def parse_cropobject_list(filename):
             # Generate a default UID at this level?
             # No: leave it to the CropObject class default UID mechanism.
 
-        # Dealing with clsname transition: there shoud be no more
-        # CropObjectLists without a clsname. The id has been
+        # Dealing with class_name transition: there shoud be no more
+        # CropObjectLists without a class_name. The node_id has been
         # removed from CropObject specification, anyway.
-        # clsname=None
+        # class_name=None
         # _has_clsname = False
         if len(cropobject.findall('MLClassName')) > 0:
             clsname = cropobject.findall('MLClassName')[0].text
         elif len(cropobject.findall('ClassName')) > 0:
             clsname = cropobject.findall('ClassName')[0].text
         else:
-            raise ValueError('CropObject {0}: no clsname provided.'.format(objid))
+            raise ValueError('CropObject {0}: no class_name provided.'.format(objid))
 
         #################################
         # Top left corner position
@@ -449,9 +449,9 @@ def parse_cropobject_list(filename):
 
         #################################
         # Create the object.
-        obj = Node(objid=objid,
-                   uid=uid,
-                   clsname=clsname,
+        obj = Node(node_id=objid,
+                   unique_id=uid,
+                   class_name=clsname,
                    top=top,
                    left=left,
                    width=width,
@@ -471,7 +471,7 @@ def parse_cropobject_list(filename):
             mask = obj.decode_mask(cropobject.findall('Mask')[0].text,
                                    shape=(obj.height, obj.width))
         obj.set_mask(mask)
-        # logging.debug('Created CropObject with ID {0}'.format(obj.objid))
+        # logging.debug('Created CropObject with ID {0}'.format(obj.node_id))
 
         cropobject_list.append(obj)
 
@@ -487,7 +487,7 @@ def parse_cropobject_list(filename):
 def validate_cropobjects_graph_structure(cropobjects):
     """Check that the graph defined by the ``inlinks`` and ``outlinks``
     in the given list of CropObjects is valid: no relationships
-    leading from or to objects with non-existent ``objid``s.
+    leading from or to objects with non-existent ``node_id``s.
 
     Can deal with ``cropobjects`` coming from a combination
     of documents, through the CropObject ``doc`` property.
@@ -515,7 +515,7 @@ def validate_cropobjects_graph_structure(cropobjects):
 def validate_document_graph_structure(cropobjects):
     """Check that the graph defined by the ``inlinks`` and ``outlinks``
     in the given list of CropObjects is valid: no relationships
-    leading from or to objects with non-existent ``objid``s.
+    leading from or to objects with non-existent ``node_id``s.
 
     Checks that all the CropObjects come from one document. (Raises
     a ``ValueError`` otherwise.)
@@ -561,7 +561,7 @@ def export_cropobject_graph(cropobjects, validate=True):
         if the graph defined by the CropObjects is
         invalid.
 
-    :returns: A list of ``(from, to)`` objid pairs
+    :returns: A list of ``(from, to)`` node_id pairs
         that represent edges in the CropObject graph.
     """
     if validate:

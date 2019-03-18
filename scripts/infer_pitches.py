@@ -80,11 +80,6 @@ def main(args):
     logging.info('Running pitch inference.')
     pitches, pitch_names = pitch_inference_engine.infer_pitches(cropobjects,
                                                                 with_names=True)
-    # durations = inference_engine.durations_beats
-
-    # Logging
-    #pitch_names = {objid: midi2pitch_name(midi_code)
-    #               for objid, midi_code in pitches.items()}
 
     # Export
     logging.info('Adding pitch information to <Data> attributes.')
@@ -92,13 +87,6 @@ def main(args):
         if c.objid in pitches:
             midi_pitch_code = pitches[c.objid]
             pitch_step, pitch_octave = pitch_names[c.objid]
-            # beats = durations[c.objid]
-            # if len(beats) > 1:
-            #     logging.warn('Notehead {0}: multiple possible beats: {1}'
-            #                  ''.format(c.uid, beats))
-            #     b = beats[0]
-            # else:
-            #     b = beats[0]
             if c.data is None:
                 c.data = dict()
             c.data['midi_pitch_code'] = midi_pitch_code

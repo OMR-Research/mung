@@ -168,7 +168,7 @@ class PitchInferenceEngineState(object):
             new_base_pitch_step = 0
             new_base_pitch_octave = 4
         else:
-            raise ValueError('Unrecognized clef clsname: {0}'
+            raise ValueError('Unrecognized clef class_name: {0}'
                              ''.format(clef.clsname))
 
         # Shift the key and inline accidental deltas
@@ -458,12 +458,12 @@ class PitchInferenceEngine(object):
         * Recompute key deltas
 
         :param with_names: If set, will return also a dict of
-            objid --> pitch names (e.g., {123: 'F#3'}).
+            node_id --> pitch names (e.g., {123: 'F#3'}).
 
-        :returns: A dict of ``objid`` to MIDI pitch code, with
+        :returns: A dict of ``node_id`` to MIDI pitch code, with
             an entry for each (pitched) notehead. If ``with_names``
-            is given, returns a tuple with the objid --> MIDI
-            and objid --> pitch name dicts.
+            is given, returns a tuple with the node_id --> MIDI
+            and node_id --> pitch name dicts.
 
         """
         self._cdict = {c.objid: c for c in cropobjects}
@@ -494,7 +494,7 @@ class PitchInferenceEngine(object):
         self.pitches_per_staff[staff.objid] = {}
         self.pitch_names_per_staff[staff.objid] = {}
 
-        # self.durations_beats_per_staff[staff.objid] = {}
+        # self.durations_beats_per_staff[staff.node_id] = {}
 
         self.pitch_state.reset()
         self.pitch_state.init_base_pitch()
@@ -529,8 +529,8 @@ class PitchInferenceEngine(object):
                     logging.info('{0}'.format(self.pitch_state))
 
                 # b = self.beats(q)
-                # self.durations_beats[q.objid] = b
-                # self.durations_beats_per_staff[staff.objid][q.objid] = b
+                # self.durations_beats[q.node_id] = b
+                # self.durations_beats_per_staff[staff.node_id][q.node_id] = b
 
         return self.pitches_per_staff[staff.objid]
 
@@ -581,8 +581,8 @@ class PitchInferenceEngine(object):
         delta = self.staffline_delta(notehead)
 
         # ### DEBUG
-        # if notehead.objid == 200:
-        #     logging.info('Notehead {0}: delta {1}'.format(notehead.uid, delta))
+        # if notehead.node_id == 200:
+        #     logging.info('Notehead {0}: delta {1}'.format(notehead.unique_id, delta))
         #     logging.info('\tdelta_step: {0}'.format(delta % 7))
         #     logging.info('\tdelta_step pitch sum: {0}'
         #                  ''.format(sum(self.pitch_state._current_delta_steps[:(delta % 7)+1])))
@@ -745,9 +745,9 @@ class PitchInferenceEngine(object):
                 delta *= -1
 
             ### DEBUG
-            # if notehead.objid in [178]:
-            #     logging.info('Notehead {0}: bbox {1}'.format(notehead.objid, notehead.bounding_box))
-            #     logging.info('Closest LL objid: {0}'.format(closest_ll.objid))
+            # if notehead.node_id in [178]:
+            #     logging.info('Notehead {0}: bbox {1}'.format(notehead.node_id, notehead.bounding_box))
+            #     logging.info('Closest LL node_id: {0}'.format(closest_ll.node_id))
             #     logging.info('no. of LLs: {0}'.format(n_lls))
             #     logging.info('Is above staff: {0}'.format(is_above_staff))
             #     logging.info('On ledger line: {0}'.format(_on_ledger_line))
@@ -916,7 +916,7 @@ class OnsetsInferenceEngine(object):
     def durations(self, cropobjects, ignore_modifiers=False):
         """Returns a dict that contains the durations (in beats)
         of all CropObjects that should be associated with a duration.
-        The dict keys are ``objid``.
+        The dict keys are ``node_id``.
 
         :param ignore_modifiers: If set, will ignore duration dots,
             tuples, and other potential duration modifiers when computing
@@ -1004,7 +1004,7 @@ class OnsetsInferenceEngine(object):
             beat = [0.5**len(flags_and_beams)]
 
         else:
-            raise ValueError('Notehead {0}: unknown clsname {1}'
+            raise ValueError('Notehead {0}: unknown class_name {1}'
                              ''.format(notehead.uid, notehead.clsname))
 
         if not ignore_modifiers:
@@ -1300,22 +1300,22 @@ class OnsetsInferenceEngine(object):
         # ...systems:
         systems = group_staffs_into_systems(cropobjects,
                                             use_fallback_measure_separators=True)
-        # _cdict = {c.objid: c for c in cropobjects}
+        # _cdict = {c.node_id: c for c in cropobjects}
         # staff_groups = [c for c in cropobjects
-        #                 if c.clsname == 'staff_grouping']
+        #                 if c.class_name == 'staff_grouping']
         #
         # if len(staff_groups) != 0:
-        #     staffs_per_group = {c.objid: [_cdict[i] for i in c.outlinks
-        #                                   if _cdict[i].clsname == 'staff']
+        #     staffs_per_group = {c.node_id: [_cdict[i] for i in c.outlinks
+        #                                   if _cdict[i].class_name == 'staff']
         #                         for c in staff_groups}
         #     # Build hierarchy of staff_grouping based on inclusion.
         #     outer_staff_groups = []
         #     for sg in staff_groups:
-        #         sg_staffs = staffs_per_group[sg.objid]
+        #         sg_staffs = staffs_per_group[sg.node_id]
         #         is_outer = True
         #         for other_sg in staff_groups:
-        #             if sg.objid == other_sg.objid: continue
-        #             other_sg_staffs = staffs_per_group[other_sg.objid]
+        #             if sg.node_id == other_sg.node_id: continue
+        #             other_sg_staffs = staffs_per_group[other_sg.node_id]
         #             if len([s for s in sg_staffs
         #                     if s not in other_sg_staffs]) == 0:
         #                 is_outer = False
@@ -1324,12 +1324,12 @@ class OnsetsInferenceEngine(object):
         #     #
         #     # outer_staff_groups = [c for c in staff_groups
         #     #                       if len([_cdict[i] for i in c.inlinks
-        #     #                               if _cdict[i].clsname == 'staff_group']) == 0]
+        #     #                               if _cdict[i].class_name == 'staff_group']) == 0]
         #     systems = [[c for c in cropobjects
-        #                 if (c.clsname == 'staff') and (c.objid in sg.outlinks)]
+        #                 if (c.class_name == 'staff') and (c.node_id in sg.outlinks)]
         #                for sg in outer_staff_groups]
         # else:
-        #     systems = [[c] for c in cropobjects if c.clsname == 'staff']
+        #     systems = [[c] for c in cropobjects if c.class_name == 'staff']
 
         if len(systems) == 1:
             logging.info('Single-system score, no staff chaining needed.')
@@ -1635,7 +1635,7 @@ class OnsetsInferenceEngine(object):
                                              onset=None)
                          for i in range(len(ordered_msep_nodes) - 2)]
         #: A list of PrecedenceGraph nodes. These don't really need any Node
-        #  or objid, they are just introducing through their duration the offsets
+        #  or node_id, they are just introducing through their duration the offsets
         #  between measure separators (mseps have legit 0 duration, so that they
         #  do not move the notes in their note descendants).
         #  The list is already ordered.
@@ -1778,7 +1778,7 @@ class OnsetsInferenceEngine(object):
 
         staff_and_measure_to_objs_map = collections.defaultdict(
                                             collections.defaultdict(list))
-        #: Per staff (indexed by objid) and measure (by order no.), keeps a list of
+        #: Per staff (indexed by node_id) and measure (by order no.), keeps a list of
         #  CropObjects from that staff that fall within that measure.
 
         # Iterate over objects left to right, shift measure if next object
@@ -1827,7 +1827,7 @@ class OnsetsInferenceEngine(object):
         return [root_msep]
 
     def measure_precedence_graph(self, cropobjects):
-        """Indexed by staff objid and measure number, holds the precedence graph
+        """Indexed by staff node_id and measure number, holds the precedence graph
         for the given measure in the given staff as a list of PrecedenceGraphNode
         objects that correspond to the source nodes of the precedence subgraph.
         These nodes then get connected to their leftwards measure separator node.
@@ -2082,7 +2082,7 @@ class OnsetsInferenceEngine(object):
 
         The onsets are measured in beats.
 
-        :returns: A objid --> onset dict for all notehead-type
+        :returns: A node_id --> onset dict for all notehead-type
             CropObjects.
         """
         # We first find the precedence graph. (This is the hard

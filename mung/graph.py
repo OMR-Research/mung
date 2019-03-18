@@ -37,7 +37,7 @@ class NotationGraph(object):
 
     def __to_objid(self, cropobject_or_objid):
         if isinstance(cropobject_or_objid, Node):
-            objid = cropobject_or_objid.objid
+            objid = cropobject_or_objid.node_id
         else:
             objid = cropobject_or_objid
         return objid
@@ -156,7 +156,7 @@ class NotationGraph(object):
             return False
 
     def __getitem__(self, objid):
-        """Returns a Node based on its objid."""
+        """Returns a Node based on its node_id."""
         return self._cdict[objid]
 
     def is_stem_direction_above(self, notehead, stem):
@@ -191,13 +191,6 @@ class NotationGraph(object):
         A horizontally intersecting subset of the mask of the other symbol
         is used to determine its vertical bounds relevant to the given object.
         """
-        # if other not in self.children(notehead, [other.clsname]):
-        #     raise NotationGraphUnsupportedError('Resolving other direction:'
-        #                                         ' assumes other {0} child of'
-        #                                         ' notehead {1}.'
-        #                                         ''.format(other.uid,
-        #                                                   notehead.uid))
-
         if notehead.right <= other.left:
             # No horizontal overlap, notehead to the left
             beam_submask = other.mask[:, :1]
@@ -246,10 +239,10 @@ class NotationGraph(object):
 
     def remove_edge(self, fr, to):
         if fr not in self._cdict:
-            raise ValueError('Cannot remove edge from objid {0}: not in graph!'
+            raise ValueError('Cannot remove edge from node_id {0}: not in graph!'
                              ''.format(fr))
         if to not in self._cdict:
-            raise ValueError('Cannot remove edge to objid {0}: not in graph!'
+            raise ValueError('Cannot remove edge to node_id {0}: not in graph!'
                              ''.format(to))
 
         # print('removing edge {0}'.format((fr, to)))
@@ -264,13 +257,9 @@ class NotationGraph(object):
 
     def remove_edges_for_vertex(self, objid):
         if objid not in self._cdict:
-            raise ValueError('Cannot remove vertex with objid {0}: not in graph!'
+            raise ValueError('Cannot remove vertex with node_id {0}: not in graph!'
                              ''.format(objid))
         c = self._cdict[objid]
-
-        # print('Removing edges for vertex: {0}.'.format(objid))
-        # print('\tInlinks: {0}'.format(c.inlinks))
-        # print('\tOutlinks: {0}'.format(c.outlinks))
 
         # Remove from inlinks and outlinks:
         for o in copy.deepcopy(c.outlinks):
@@ -370,10 +359,10 @@ class NotationGraph(object):
         """Add an edge between the MuNGOs with objids ``fr --> to``.
         If the edge is already in the graph, warns and does nothing."""
         if fr not in self._cdict:
-            raise NotationGraphError('Cannot remove edge from objid {0}: not in graph!'
+            raise NotationGraphError('Cannot remove edge from node_id {0}: not in graph!'
                                      ''.format(fr))
         if to not in self._cdict:
-            raise NotationGraphError('Cannot remove edge to objid {0}: not in graph!'
+            raise NotationGraphError('Cannot remove edge to node_id {0}: not in graph!'
                                      ''.format(to))
 
         if to in self._cdict[fr].outlinks:
@@ -485,10 +474,7 @@ def group_staffs_into_systems(cropobjects,
                         is_outer = False
             if is_outer:
                 outer_staff_groups.append(sg)
-        #
-        # outer_staff_groups = [c for c in staff_groups
-        #                       if len([_cdict[i] for i in c.inlinks
-        #                               if _cdict[i].clsname == 'staff_group']) == 0]
+
         systems = [[c for c in cropobjects
                     if (c.clsname == 'staff') and (c.objid in sg.outlinks)]
                    for sg in outer_staff_groups]

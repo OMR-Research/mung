@@ -140,7 +140,7 @@ def main(args):
 
     # Merge the Node lists into one.
     # This is done so that the resulting object graph can be manipulated
-    # at once, without objid clashes.
+    # at once, without node_id clashes.
     cropobjects = merge_cropobject_lists(*cropobject_lists)
 
     edges = export_cropobject_graph(cropobjects)

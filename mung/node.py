@@ -11,6 +11,7 @@ from builtins import object
 import copy
 import itertools
 import logging
+from typing import List, Any
 
 import numpy
 
@@ -19,8 +20,9 @@ from mung.utils import compute_connected_components
 __version__ = "1.0"
 __author__ = "Jan Hajic jr."
 
-
 CROPOBJECT_MASK_ORDER = 'C'
+
+
 #: The Node mask uses this numpy ordering when flattening the data.
 
 ##############################################################################
@@ -32,11 +34,11 @@ class Node(object):
     The Node represents one instance of an annotation. It implements
     the following attributes:
 
-    * ``objid``: the unique number of the given annotation instance in the set
+    * ``node_id``: the unique number of the given annotation instance in the set
       of annotations encoded in the containing `CropObjectList`.
-    * ``uid``: the global unique identifier of the annotation instance. String.
-      See :meth:`Node.parse_uid` method for format details.
-    * ``clsname``: the name of the label that was given to the annotation
+    * ``unique_id``: the global unique identifier of the annotation instance. String.
+      See :meth:`Node.parse_unique_id` method for format details.
+    * ``class_name``: the name of the label that was given to the annotation
       (this is the human-readable string such as ``notehead-full``).
     * ``top``: the vertical dimension (row) of the upper left corner pixel.
     * ``left``: the horizontal dimension (column) of the upper left corner pixel.
@@ -56,7 +58,7 @@ class Node(object):
       generated from the optional ``<Data>`` element of a Node.
 
     Constructing a simple Node that consists of the "b"-like flat music
-    notation symbol (never mind the ``uid`` for now):
+    notation symbol (never mind the ``unique_id`` for now):
 
     >>> top = 10
     >>> left = 15
@@ -72,26 +74,26 @@ class Node(object):
     ...                     [1, 0, 1, 1],
     ...                     [1, 1, 1, 0],
     ...                     [0, 1, 0, 0]])
-    >>> clsname = 'flat'
-    >>> uid = 'MUSCIMA++_1.0___mung.node.Node.doctest___0'
-    >>> c = Node(objid=0, clsname=clsname,
+    >>> class_name = 'flat'
+    >>> unique_id = 'MUSCIMA++_1.0___mung.node.Node.doctest___0'
+    >>> node = Node(node_id=0, class_name=class_name,
     ...                top=top, left=left, height=height, width=width,
     ...                inlinks=[], outlinks=[],
     ...                mask=mask,
-    ...                uid=uid)
+    ...                unique_id=unique_id)
 
     CropObjects can also form graphs, using the following attributes:
 
     * ``outlinks``: Outgoing edges. A list of integers; it is assumed they are
-      valid ``objid`` within the same global/doc namespace.
+      valid ``node_id`` within the same global/doc namespace.
     * ``inlinks``: Incoming edges. A list of integers; it is assumed they are
-      valid ``objid`` within the same global/doc namespace.
+      valid ``node_id`` within the same global/doc namespace.
 
     So far, Node graphs do not support multiple relationship types.
 
     **Unique identification**
 
-    The ``uid`` serves to identify the Node uniquely,
+    The ``unique_id`` serves to identify the Node uniquely,
     at least within the MUSCIMA dataset system. (We anticipate further
     versions of the dataset, and need to plan for that.)
 
@@ -106,12 +108,12 @@ class Node(object):
       under which the CropObjectList containing the given Node
       is stored.
     * The **within-document identification**, which is identical
-      to the ``objid``.
+      to the ``node_id``.
 
     These three components are joined together into one string by
     a delimiter: ``___``
 
-    The full ``uid`` of a Node then might look like this::
+    The full ``unique_id`` of a Node then might look like this::
 
       MUSCIMA-pp_1.0___CVC-MUSCIMA_W-35_N-08_D-ideal___611
 
@@ -122,28 +124,28 @@ class Node(object):
     might not exactly correspond to each other...) The dataset and document
     names are available through appropriate instance attributes:
 
-    >>> c.doc
+    >>> node.doc
     'mung.node.Node.doctest'
-    >>> c.dataset
+    >>> node.dataset
     'MUSCIMA++_1.0'
 
-    If you supply no ``uid`` at initialization time, a default UID will
+    If you supply no ``unique_id`` at initialization time, a default UID will
     be used:
 
-    >>> c.default_uid
+    >>> node.default_unique_id
     'MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___default-document___0'
 
     (Don't abuse the default, though! It's intended just for transitioning
     documents without UIDs to those that have them.)
 
-    On the other hand, the ``objid`` is a field intended to uniquely identify
+    On the other hand, the ``node_id`` is a field intended to uniquely identify
     a Node within the scope of one Node list (one annotation
     document).
 
     .. caution::
 
         The scope of unique identification within MUSCIMA++ is only within
-        a ``<CropObjectList>``. Don't use ``objid`` to mix CropObjects from
+        a ``<CropObjectList>``. Don't use ``node_id`` to mix CropObjects from
         multiple files!
 
     **CropObjects and images**
@@ -163,16 +165,16 @@ class Node(object):
 
     To recover the area corresponding to a Node `c`, use:
 
-    >>> if c.mask is not None: crop = img[c.top:c.bottom, c.left:c.right] * c.mask  #doctest: +SKIP
-    >>> if c.mask is None: crop = img[c.top:c.bottom, c.left:c.right]               #doctest: +SKIP
+    >>> if node.mask is not None: crop = img[node.top:node.bottom, node.left:node.right] * node.mask  #doctest: +SKIP
+    >>> if node.mask is None: crop = img[node.top:node.bottom, node.left:node.right]               #doctest: +SKIP
 
     Because this is clunky, we have implemented the following to get the crop:
 
-    >>> crop = c.project_to(img)    #doctest: +SKIP
+    >>> crop = node.project_to(img)    #doctest: +SKIP
 
     And to get the Node projected onto the entire image:
 
-    >>> crop = c.project_on(img)    #doctest: +SKIP
+    >>> crop = node.project_on(img)    #doctest: +SKIP
 
     Above, note the multiplicative role of the mask: while we typically would
     expect the mask to be binary, in principle, this is not strictly necessary.
@@ -196,7 +198,7 @@ class Node(object):
     **Disambiguating class names**
 
     Since the class names are present
-    through the ``clsname`` attribute (``<MLClassName>`` element),
+    through the ``class_name`` attribute (``<MLClassName>`` element),
     matching the list is no longer necessary for general understanding
     of the file. The MLClassList file serves as a disambiguation tool:
     there may be multiple annotation projects that use the same names
@@ -209,7 +211,7 @@ class Node(object):
         In MUSCIMarker, the MLClassList is currently necessary to define
         how CropObjects are displayed: their color. (All noteheads are red,
         all barlines are green, etc.) The other function, matching names
-        to ``clsid``, has been superseeded by the ``clsname`` Node
+        to ``clsid``, has been superseeded by the ``class_name`` Node
         attribute.
 
     **Merging CropObjects**
@@ -218,9 +220,9 @@ class Node(object):
 
     * Compute the new object's bounding box: ``croobjects_merge_bbox()``
     * Compute the new object's mask: ``cropobjects_merge_mask()``
-    * Determine the clsid and objid of the new object.
+    * Determine the clsid and node_id of the new object.
 
-    Since objid and clsid of merges may depend on external settings
+    Since node_id and clsid of merges may depend on external settings
     and generally cannot be reliably determined from the merged
     objects themselves (e.g. the merge of a notehead and a stem
     should be a new note symbol), you need to supply them externally.
@@ -247,17 +249,16 @@ class Node(object):
     (Also, the numpy array needs to be made C-contiguous for that, which
     explains the ``order='C'`` hack in ``set_mask()``.)
     """
-    def __init__(self, objid, clsname, top, left, width, height,
+
+    def __init__(self, node_id, class_name, top, left, width, height,
                  outlinks=None, inlinks=None,
                  mask=None,
-                 uid=None,
+                 unique_id=None,
                  data=None):
-        # logging.debug('Initializing Node with objid {0}, uid {5}, x={1},'
-        #              ' y={2}, h={3}, w={4}'
-        #               ''.format(objid, top, left, height, width, uid))
-        self.objid = objid
+        # type: (int, str, int, int, int, int, List[int], List[int], numpy.ndarray, str, Any) -> Node
+        self.node_id = node_id
 
-        self.clsname = clsname
+        self.class_name = class_name
         self.x = top
         self.y = left
         self.width = width
@@ -278,13 +279,11 @@ class Node(object):
             outlinks = []
         self.outlinks = outlinks
 
-        # Deal with the UID
-        if uid is None:
-            uid = self.default_uid
-        self.set_uid(uid)
+        if unique_id is None:
+            unique_id = self.default_unique_id
+        self.set_unique_id(unique_id)
 
         self.is_selected = False
-        #logging.debug('...done!')
 
         if data is None:
             data = dict()
@@ -295,57 +294,61 @@ class Node(object):
     # anticipated dataset versions.
 
     UID_DELIMITER = '___'
-    #: Delimits the Node UID fields (global, document namespaces, objid)
+    #: Delimits the Node UID fields (global, document namespaces, node_id)
 
     UID_DEFAULT_DATASET_NAMESPACE = 'MUSCIMA_DEFAULT_DATASET_PLACEHOLDER'
     #: Default dataset name for CropObjects.
 
     UID_DEFAULT_DOCUMENT_NAMESPACE = 'default-document'
+
     #: Default document name for CropObjects.
 
     @property
-    def default_uid(self):
-        """Constructs the default ``uid`` that the Node would
+    def default_unique_id(self):
+        # type: () -> str
+        """Constructs the default ``unique_id`` that the Node would
         have, unless one was supplied at initialization.
 
-        >>> c.default_uid   # doctest: +SKIP
+        >>> node.default_unique_id   # doctest: +SKIP
         'MUSCIMA_DEFAULT_DATASET_PLACEHOLDER___default-document___0'
         """
         return self.UID_DELIMITER.join([self.UID_DEFAULT_DATASET_NAMESPACE,
                                         self.UID_DEFAULT_DOCUMENT_NAMESPACE,
-                                        str(self.objid)])
+                                        str(self.node_id)])
 
-    def parse_uid(self):
+    def parse_unique_id(self):
+        # type: () -> (str, str, int)
         """Parse the unique identifier of the Node. This
         breaks down the UID into the global namespace, document
         namespace (ie. CropObjectList name -- usually per image),
         and the numeric ID of the Node within one CropObjectList.
-        This numeric ID should always match the ``objid``, which
+        This numeric ID should always match the ``node_id``, which
         acts as the "technical" identifier, since it is known to be
         an integer and therefore usable for e.g. indexing within
         the MUSCIMarker annotation app.
 
         See :meth:`_parse_uid` for format & test. Compared
-        to :meth:`_parse_uid`, this method checks the parsed ``num``
-        in the ``uid`` against this Node's ``objid``,
+        to :meth:`_parse_uid`, this method checks the parsed ``node_id``
+        in the ``unique_id`` against this Node's ``node_id``,
         to verify that the UID is really valid for this object.
 
         The delimiter is expected to be ``___``
         (kept as ``Node.UID_DELIMITER``)
         """
-        gn, dn, num = self._parse_uid(self.uid)
-        # Dealing with missing uid
-        if num is None:
-            num = self.objid
+        global_namespace, document_namespace, node_id = self._parse_uid(self.unique_id)
+        # Dealing with missing unique_id
+        if node_id is None:
+            node_id = self.node_id
 
-        if num != self.objid:
+        if node_id != self.node_id:
             raise ValueError('Got Node with different numeric ID'
-                             ' in UID and technical objid. UID record:'
-                             ' {0}, objid: {1}'.format(num, self.objid))
-        return gn, dn, num
+                             ' in UID and technical node_id. UID record:'
+                             ' {0}, node_id: {1}'.format(node_id, self.node_id))
+        return global_namespace, document_namespace, node_id
 
     @staticmethod
     def _parse_uid(uid):
+        # type: (str) -> (str,str,int)
         """Parse the unique identifier of the Node. This
         breaks down the UID into the global namespace, document
         namespace (ie. CropObjectList name -- usually per image),
@@ -357,52 +360,52 @@ class Node(object):
         >>> Node._parse_uid('MUSCIMA++_1.0___CVC-MUSCIMA_W-05_N-19_D-ideal___424')
         ('MUSCIMA++_1.0', 'CVC-MUSCIMA_W-05_N-19_D-ideal', 424)
 
-        :returns: ``global_namespace, document_namespace, objid`` triplet.
-            The namespaces are strings, ``objid`` is an integer. If ``uid``
-            is ``None``, returns ``None`` as ``objid`` and expects it
+        :returns: ``global_namespace, document_namespace, node_id`` triplet.
+            The namespaces are strings, ``node_id`` is an integer. If ``unique_id``
+            is ``None``, returns ``None`` as ``node_id`` and expects it
             to be filled in from the caller Node instance.
         """
         if uid is None:
-            global_name = Node.UID_DEFAULT_DATASET_NAMESPACE
-            document_name = Node.UID_DEFAULT_DOCUMENT_NAMESPACE
-            numid = None
+            global_namespace = Node.UID_DEFAULT_DATASET_NAMESPACE
+            document_namespace = Node.UID_DEFAULT_DOCUMENT_NAMESPACE
+            node_id = None
         else:
-            global_name, document_name, numid_str = uid.split(Node.UID_DELIMITER)
-            numid = int(numid_str)
-        return global_name, document_name, numid
+            global_namespace, document_namespace, node_id_string = uid.split(Node.UID_DELIMITER)
+            node_id = int(node_id_string)
+        return global_namespace, document_namespace, node_id
 
     @staticmethod
-    def build_uid(global_name, document_name, numid):
-        return Node.UID_DELIMITER.join([str(global_name),
-                                        str(document_name),
-                                        str(numid)])
+    def build_unique_id(global_namespace, document_namespace, node_id):
+        return Node.UID_DELIMITER.join([str(global_namespace),
+                                        str(document_namespace),
+                                        str(node_id)])
 
-    def set_uid(self, uid):
-        """Assigns the given ``uid`` to the Node. This is the way
-        to do it, do not assign directly to ``cropobject.uid``! You need
+    def set_unique_id(self, unique_id):
+        """Assigns the given ``unique_id`` to the Node. This is the way
+        to do it, do not assign directly to ``cropobject.unique_id``! You need
         to update other things (and perform integrity checks) when changing
         the unique ID! See :class:`Node` class documentation for
-        information on how ``uid`` attributes work.
+        information on how ``unique_id`` attributes work.
 
         Do **NOT** use this function, unless you know what you are doing!
         You could mess up the integrity of your copy of the dataset, and
         you'd have to download it again...
         """
-        self.uid = uid
+        self.unique_id = unique_id
         self._dataset_namespace, self._document_namespace, self._instance = \
-            self.parse_uid()
+            self.parse_unique_id()
 
     def set_doc(self, docname):
         new_uid = self.UID_DELIMITER.join([self._dataset_namespace,
                                            docname,
                                            str(self._instance)])
-        self.set_uid(new_uid)
+        self.set_unique_id(new_uid)
 
     def set_dataset(self, dataset_name):
         new_uid = self.UID_DELIMITER.join([dataset_name,
                                            self._document_namespace,
                                            str(self._instance)])
-        self.set_uid(new_uid)
+        self.set_unique_id(new_uid)
 
     def set_mask(self, mask):
         """Sets the Node's mask to the given array. Performs
@@ -414,7 +417,7 @@ class Node(object):
             t, l, b, r = self.bbox_to_integer_bounds(self.top,
                                                      self.left,
                                                      self.bottom,
-                                                     self.right)#.count()
+                                                     self.right)  # .count()
             if mask.shape != (b - t, r - l):
                 raise ValueError('Mask shape {0} does not correspond'
                                  ' to integer shape {1} of Node.'
@@ -425,21 +428,23 @@ class Node(object):
 
             self.mask = mask.astype('uint8')
 
-    def set_objid(self, objid):
-        """Changes the objid and updates the UID with it.
+    def set_node_id(self, node_id):
+        # type: (int) -> None
+        """Changes the node_id and updates the UID with it.
         Do NOT use this unless you know what you're doing;
-        changing the objid should be (1) checked against objid
+        changing the node_id should be (1) checked against node_id
         conflics within the doc, (2) reflected in the outlinks
         and inlinks.
         """
-        self.objid = objid
-        self._sync_objid_to_uid()
+        self.node_id = node_id
+        self._sync_node_id_to_unique_id()
 
-    def _sync_objid_to_uid(self):
-        """Resets the UID number to reflect the objid."""
-        g_name, doc_name, num = self._parse_uid(self.uid)
-        new_uid = self.build_uid(g_name, doc_name, self.objid)
-        self.set_uid(new_uid)
+    def _sync_node_id_to_unique_id(self):
+        # type: () -> None
+        """Resets the UID number to reflect the node_id."""
+        global_name, document_name, node_id = self._parse_uid(self.unique_id)
+        unique_id = self.build_unique_id(global_name, document_name, self.node_id)
+        self.set_unique_id(unique_id)
 
     @property
     def dataset(self):
@@ -459,7 +464,7 @@ class Node(object):
         ``outlinks`` use the numeric ``objids``, which point to
         CropObjects within the same document.
 
-        ``objid`` of each Node has to be unique within a document.
+        ``node_id`` of each Node has to be unique within a document.
         """
         # The ``_document_namespace`` is set during initialization.
         return self._document_namespace
@@ -472,7 +477,7 @@ class Node(object):
     @property
     def bottom(self):
         """Row coordinate 1 beyond bottom right corner, so that indexing
-        in the form ``img[c.top:c.bottom]`` is possible."""
+        in the form ``img[node.top:node.bottom]`` is possible."""
         return self.x + self.height
 
     @property
@@ -483,7 +488,7 @@ class Node(object):
     @property
     def right(self):
         """Column coordinate 1 beyond bottom right corner, so that indexing
-        in the form ``img[:, c.left:c.right]`` is possible."""
+        in the form ``img[:, node.left:node.right]`` is possible."""
         return self.y + self.width
 
     @property
@@ -515,11 +520,11 @@ class Node(object):
 
     @property
     def outlink_uids(self):
-        return [self.build_uid(self.dataset, self.doc, o) for o in self.outlinks]
+        return [self.build_unique_id(self.dataset, self.doc, o) for o in self.outlinks]
 
     @property
     def inlink_uids(self):
-        return [self.build_uid(self.dataset, self.doc, i) for i in self.inlinks]
+        return [self.build_unique_id(self.dataset, self.doc, i) for i in self.inlinks]
 
     @staticmethod
     def bbox_to_integer_bounds(ftop, fleft, fbottom, fright):
@@ -603,8 +608,8 @@ class Node(object):
         :param img: A three-channel image (3-D numpy array,
             with the last dimension being 3)."""
         color = numpy.array(rgb)
-        logging.debug('Rendering object {0}, clsname {1}, t/b/l/r: {2}'
-                      ''.format(self.objid, self.clsname,
+        logging.debug('Rendering object {0}, class_name {1}, t/b/l/r: {2}'
+                      ''.format(self.node_id, self.class_name,
                                 (self.top, self.bottom, self.left, self.right)))
         # logging.debug('Shape: {0}'.format((self.height, self.width, 3)))
         mask = numpy.ones((self.height, self.width, 3)) * color
@@ -620,32 +625,32 @@ class Node(object):
     def overlaps(self, bounding_box_or_cropobject):
         """Check whether this Node overlaps the given bounding box or Node.
 
-        >>> c = Node(0, 'test', 10, 100, height=20, width=10)
-        >>> c.bounding_box
+        >>> node = Node(0, 'test', 10, 100, height=20, width=10)
+        >>> node.bounding_box
         (10, 100, 30, 110)
-        >>> c.overlaps((10, 100, 30, 110))  # Exact match
+        >>> node.overlaps((10, 100, 30, 110))  # Exact match
         True
-        >>> c.overlaps((0, 100, 8, 110))    # Row mismatch
+        >>> node.overlaps((0, 100, 8, 110))    # Row mismatch
         False
-        >>> c.overlaps((10, 0, 30, 89))     # Column mismatch
+        >>> node.overlaps((10, 0, 30, 89))     # Column mismatch
         False
-        >>> c.overlaps((0, 0, 8, 89))       # Total mismatch
+        >>> node.overlaps((0, 0, 8, 89))       # Total mismatch
         False
-        >>> c.overlaps((9, 99, 31, 111))    # Encompasses Node
+        >>> node.overlaps((9, 99, 31, 111))    # Encompasses Node
         True
-        >>> c.overlaps((11, 101, 29, 109))
+        >>> node.overlaps((11, 101, 29, 109))
         True
-        >>> c.overlaps((9, 101, 31, 109))   # Encompass horz., within vert.
+        >>> node.overlaps((9, 101, 31, 109))   # Encompass horz., within vert.
         True
-        >>> c.overlaps((11, 99, 29, 111))   # Encompasses vert., within horz.
+        >>> node.overlaps((11, 99, 29, 111))   # Encompasses vert., within horz.
         True
-        >>> c.overlaps((11, 101, 31, 111))  # Corner within: top left
+        >>> node.overlaps((11, 101, 31, 111))  # Corner within: top left
         True
-        >>> c.overlaps((11, 99, 31, 109))   # Corner within: top right
+        >>> node.overlaps((11, 99, 31, 109))   # Corner within: top right
         True
-        >>> c.overlaps((9, 101, 29, 111))   # Corner within: bottom left
+        >>> node.overlaps((9, 101, 29, 111))   # Corner within: bottom left
         True
-        >>> c.overlaps((9, 99, 29, 109))    # Corner within: bottom right
+        >>> node.overlaps((9, 99, 29, 109))    # Corner within: bottom right
         True
 
         """
@@ -680,20 +685,20 @@ class Node(object):
         is the CropObject's upNodeorner), that intersects the given bounding box.
         If the intersection is empty, returns None.
 
-        >>> c = Node(0, 'test', 10, 100, height=20, width=10)
-        >>> c.bounding_box
+        >>> node = Node(0, 'test', 10, 100, height=20, width=10)
+        >>> node.bounding_box
         (10, 100, 30, 110)
         >>> other_bbox = 20, 100, 40, 105
-        >>> c.bbox_intersection(other_bbox)
+        >>> node.bbox_intersection(other_bbox)
         (10, 0, 20, 5)
         >>> containing_bbox = 4, 55, 44, 115
-        >>> c.bbox_intersection(containing_bbox)
+        >>> node.bbox_intersection(containing_bbox)
         (0, 0, 20, 10)
         >>> contained_bbox = 12, 102, 22, 108
-        >>> c.bbox_intersection(contained_bbox)
+        >>> node.bbox_intersection(contained_bbox)
         (2, 2, 12, 8)
         >>> non_overlapping_bbox = 0, 0, 3, 3
-        >>> c.bbox_intersection(non_overlapping_bbox) is None
+        >>> node.bbox_intersection(non_overlapping_bbox) is None
         True
 
         """
@@ -723,13 +728,13 @@ class Node(object):
 
         >>> mask = numpy.zeros((20, 10))
         >>> mask[5:15, 3:8] = 1
-        >>> c = Node(0, 'test', 10, 100, width=10, height=20, mask=mask)
-        >>> c.bounding_box
+        >>> node = Node(0, 'test', 10, 100, width=10, height=20, mask=mask)
+        >>> node.bounding_box
         (10, 100, 30, 110)
-        >>> c.crop_to_mask()
-        >>> c.bounding_box
+        >>> node.crop_to_mask()
+        >>> node.bounding_box
         (15, 103, 25, 108)
-        >>> c.height, c.width
+        >>> node.height, node.width
         (10, 5)
 
         Assumes integer bounds, which is ensured during CropObject initNode.
@@ -745,31 +750,31 @@ class Node(object):
         # How many rows/columns to trim from top, bottom, etc.
         trim_top = -1
         for i in range(self.mask.shape[0]):
-            if self.mask[i,:].sum() != 0:
+            if self.mask[i, :].sum() != 0:
                 trim_top = i
                 break
 
         trim_left = -1
         for j in range(self.mask.shape[1]):
-            if self.mask[:,j].sum() != 0:
+            if self.mask[:, j].sum() != 0:
                 trim_left = j
                 break
 
         trim_bottom = -1
         for k in range(self.mask.shape[0]):
-            if self.mask[-(k+1),:].sum() != 0:
+            if self.mask[-(k + 1), :].sum() != 0:
                 trim_bottom = k
                 break
 
         trim_right = -1
         for l in range(self.mask.shape[1]):
-            if self.mask[:,-(l+1)].sum() != 0:
+            if self.mask[:, -(l + 1)].sum() != 0:
                 trim_right = l
                 break
 
         logging.debug('Cropobject.crop: Trimming top={0}, left={1},'
-                     'bottom={2}, right={3}'
-                     ''.format(trim_top, trim_left, trim_bottom, trim_right))
+                      'bottom={2}, right={3}'
+                      ''.format(trim_top, trim_left, trim_bottom, trim_right))
 
         # new bounding box relative to the current bounding box -- used to trim
         # the mask
@@ -781,7 +786,7 @@ class Node(object):
         new_mask = self.mask[rel_t:rel_b, rel_l:rel_r] * 1
 
         logging.debug('Cropobject.crop: Old mask shape {0}, new mask shape {1}'
-                     ''.format(self.mask.shape, new_mask.shape))
+                      ''.format(self.mask.shape, new_mask.shape))
 
         # new bounding box, relative to image -- used to compute the CropObject's position and size
         abs_t = self.top + trim_top
@@ -800,10 +805,10 @@ class Node(object):
         """Format the CropObject as string representation. See the documentation
         of :module:`mung.io` for details."""
         lines = []
-        lines.append('<CropObject xml:id="{}">'.format(self.uid))
-        lines.append('\t<Id>{0}</Id>'.format(self.objid))
-        # lines.append('\t<UniqueId>{0}</UniqueId>'.format(self.uid))
-        lines.append('\t<ClassName>{0}</ClassName>'.format(self.clsname))
+        lines.append('<CropObject xml:node_id="{}">'.format(self.unique_id))
+        lines.append('\t<Id>{0}</Id>'.format(self.node_id))
+        # lines.append('\t<UniqueId>{0}</UniqueId>'.format(self.unique_id))
+        lines.append('\t<ClassName>{0}</ClassName>'.format(self.class_name))
         lines.append('\t<Top>{0}</Top>'.format(self.top))
         lines.append('\t<Left>{0}</Left>'.format(self.left))
         lines.append('\t<Width>{0}</Width>'.format(self.width))
@@ -854,8 +859,10 @@ class Node(object):
             elif isinstance(v, list):
                 vtype = 'list[str]'
                 if len(v) > 0:
-                    if isinstance(v[0], int): vtype='list[int]'
-                    elif isinstance(v[0], float): vtype='list[float]'
+                    if isinstance(v[0], int):
+                        vtype = 'list[int]'
+                    elif isinstance(v[0], float):
+                        vtype = 'list[float]'
                 vval = ' '.join([str(vv) for vv in v])
 
             line = '\t\t<DataItem key="{0}" type="{1}">{2}</DataItem>' \
@@ -955,9 +962,6 @@ Nodereshaping).
             logging.info('CropObject.decoNode Cannot decode mask values:\n{0}'.format(mask_string))
             raise
         mask = numpy.array(values).reshape(shape)
-        #s = base64.decodestring(mask_string)
-        #mask = numpy.frombuffer(s)
-        #logging.info('CropObject.decoNode shape={0}\nmask={1}'.format(mask.shape, mask))
         return mask
 
     @staticmethod
@@ -987,7 +991,7 @@ Nodereshaping).
         Works only if the document spaces for both CropObjects
         are the same. (Otherwise changes nothing.)
 
-        The ``clsname`` of the ``other`` is ignored.
+        The ``class_name`` of the ``other`` is ignored.
         """
         if self.doc != other.doc:
             logging.warning('Trying to join CropObject from'
@@ -1014,8 +1018,8 @@ Nodereshaping).
         opl = other.left - nl
 
         # Paste the masks into these places
-        new_mask[spt:spt+self.height, spl:spl+self.width] += self.mask
-        new_mask[opt:opt+other.height, opl:opl+other.width] += other.mask
+        new_mask[spt:spt + self.height, spl:spl + self.width] += self.mask
+        new_mask[opt:opt + other.height, opl:opl + other.width] += other.mask
 
         # Normalize mask value
         new_mask[new_mask != 0] = 1
@@ -1029,10 +1033,10 @@ Nodereshaping).
 
         # Add inlinks and outlinks (check for multiple and self-reference)
         for o in other.outlinks:
-            if (o not in self.outlinks) and (o != self.objid):
+            if (o not in self.outlinks) and (o != self.node_id):
                 self.outlinks.append(o)
         for i in other.inlinks:
-            if (i not in self.inlinks) and (i != self.objid):
+            if (i not in self.inlinks) and (i != self.node_id):
                 self.inlinks.append(i)
 
     def get_outlink_objects(self, cropobjects):
@@ -1110,7 +1114,7 @@ def split_cropobject_on_connected_components(c, next_objid):
     is only one connected component, the object is returned unchanged
     in a list of length 1.)
 
-    An ``objid`` must be provided at which to start numbering the newly
+    An ``node_id`` must be provided at which to start numbering the newly
     created CropObjects.
 
     The ``data`` attribute is also retained.
@@ -1171,13 +1175,13 @@ def cropobjects_merge(fr, to, clsname, objid):
 
     m_doc = fr.doc
     m_dataset = fr.dataset
-    m_uid = Node.build_uid(m_dataset, m_doc, objid)
+    m_uid = Node.build_unique_id(m_dataset, m_doc, objid)
 
     output = Node(objid, clsname,
                   top=mt, left=ml, height=mh, width=mw,
                   mask=mmask,
                   inlinks=m_inlinks, outlinks=m_outlinks,
-                  uid=m_uid)
+                  unique_id=m_uid)
     return output
 
 
@@ -1192,13 +1196,13 @@ def cropobjects_merge_multiple(cropobjects, clsname, objid):
 
     m_doc = cropobjects[0].doc
     m_dataset = cropobjects[0].dataset
-    m_uid = Node.build_uid(m_dataset, m_doc, objid)
+    m_uid = Node.build_unique_id(m_dataset, m_doc, objid)
 
     output = Node(objid, clsname,
                   top=mt, left=ml, height=mh, width=mw,
                   mask=m_mask,
                   inlinks=m_inlinks, outlinks=m_outlinks,
-                  uid=m_uid)
+                  unique_id=m_uid)
     return output
 
 
@@ -1228,8 +1232,8 @@ def cropobjects_merge_mask(cropobjects, intersection=False):
     >>> c1 = Node(0, 'name', 10, 10, 4, 1, mask=numpy.ones((1, 4), dtype='uint8'))
     >>> c2 = Node(1, 'name', 11, 10, 6, 1, mask=numpy.ones((1, 6), dtype='uint8'))
     >>> c3 = Node(2, 'name', 9, 14,  2, 4, mask=numpy.ones((4, 2), dtype='uint8'))
-    >>> c = [c1, c2, c3]
-    >>> m1 = cropobjects_merge_mask(c)
+    >>> nodes = [c1, c2, c3]
+    >>> m1 = cropobjects_merge_mask(nodes)
     >>> m1.shape
     (4, 6)
     >>> print(m1)
@@ -1267,12 +1271,8 @@ def cropobjects_merge_mask(cropobjects, intersection=False):
     h = b - t
     w = r - l
     output_mask = numpy.zeros((h, w), dtype=cropobjects[0].mask.dtype)
-    #logging.warn('Output mask shape: {0}'.format(output_mask.shape))
     for c in cropobjects:
-        #logging.debug('C. shape: {0}'.format(c.bounding_box))
-        #logging.debug('TLBR: {0}'.format((t, l, b, r)))
         ct, cl, cb, cr = c.top - t, c.left - l, h - (b - c.bottom), w - (r - c.right)
-        #logging.debug('Mask shape: {0}, curr. shape: {1}'.format(c.mask.shape, (cb - ct, cr - cl)))
         output_mask[ct:cb, cl:cr] += c.mask
 
     if intersection:
@@ -1314,7 +1314,7 @@ def merge_cropobject_lists(*cropobject_lists):
     into one (e.g., if your annotators worked on different "layers"
     of data, and you want to merge these annotations).
 
-    This just means shifting the ``objid`` (and thus inlinks
+    This just means shifting the ``node_id`` (and thus inlinks
     and outlinks). It is assumed the lists pertain to the same
     image. Uses deepcopy to avoid exposing the original lists
     to modification through the merged list.
@@ -1322,7 +1322,7 @@ def merge_cropobject_lists(*cropobject_lists):
     .. warning::
 
         If you are ever exporting the merged list, make sure to
-        set the ``uid`` for the outputs correctly, if you want
+        set the ``unique_id`` for the outputs correctly, if you want
         to create a new document.
 
     .. warning::
@@ -1340,10 +1340,10 @@ def merge_cropobject_lists(*cropobject_lists):
         for c in clist:
             new_c = copy.deepcopy(c)
             # UID handling
-            collection, doc, _ = new_c.parse_uid()
-            new_uid = new_c.build_uid(collection, doc, c.objid + s)
+            collection, doc, _ = new_c.parse_unique_id()
+            new_uid = new_c.build_unique_id(collection, doc, c.objid + s)
             new_objid = c.objid + s
-            new_c.set_uid(new_uid)
+            new_c.set_unique_id(new_uid)
             new_c.objid = new_objid
 
             # Graph handling
@@ -1380,10 +1380,10 @@ def link_cropobjects(fr, to, check_docname=True):
                             ''.format(fr.doc, to.doc))
 
     if (to.objid not in fr.outlinks) and (fr.objid in to.inlinks):
-            logging.warning('Malformed object graph in document {0}:'
-                            ' Relationship {1} --> {2} already exists as inlink,'
-                            ' but not as outlink!.'
-                            ''.format(fr.doc, fr.objid, to.objid))
+        logging.warning('Malformed object graph in document {0}:'
+                        ' Relationship {1} --> {2} already exists as inlink,'
+                        ' but not as outlink!.'
+                        ''.format(fr.doc, fr.objid, to.objid))
     fr.outlinks.append(to.objid)
     to.inlinks.append(fr.objid)
 
@@ -1457,8 +1457,8 @@ def cropobject_distance(c, d):
     separately, and the euclidean norm is computed from them."""
     if c.doc != d.doc:
         logging.warning('Cannot compute distances between CropObjects'
-                         ' from different documents! ({0} vs. {1})'
-                         ''.format(c.doc, d.doc))
+                        ' from different documents! ({0} vs. {1})'
+                        ''.format(c.doc, d.doc))
 
     c_t, c_l, c_b, c_r = c.bounding_box
     d_t, d_l, d_b, d_r = d.bounding_box
@@ -1517,7 +1517,6 @@ def cropobject_mask_rpf(cropobject_gt, cropobject_pred):
                                                 cropobject_pred],
                                                intersection=False)
 
-
     gt_pasted_mask = mask_intersection * 1
     t, l, b, r = cropobjects_merge_bbox([cropobject_gt, cropobject_pred])
     h, w = b - t, r - l
@@ -1527,7 +1526,7 @@ def cropobject_mask_rpf(cropobject_gt, cropobject_pred):
                      w - (r - cropobject_gt.right)
     gt_pasted_mask[ct:cb, cl:cr] += cropobject_gt.mask
     gt_pasted_mask[gt_pasted_mask != 0] = 1
-    
+
     pred_pasted_mask = mask_intersection * 1
     t, l, b, r = cropobjects_merge_bbox([cropobject_pred, cropobject_pred])
     h, w = b - t, r - l

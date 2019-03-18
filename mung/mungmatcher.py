@@ -32,13 +32,13 @@ class MungMatcher(object):
 
         :param g2: The second NotationGraph.
 
-        :return: A dict of ``(n1.objid, n2.objid) --> weight``.
+        :return: A dict of ``(n1.node_id, n2.node_id) --> weight``.
         """
         # Starts from noteheads with onset/pitch/duration.
         noteheads_1 = self.collect_fully_defined_noteheads(g1)
         noteheads_2 = self.collect_fully_defined_noteheads(g2)
 
-        # Matching data structure: dict with objid tuples as keys, weights as values.
+        # Matching data structure: dict with node_id tuples as keys, weights as values.
         # Currently, weights will only be 1 (zero weights are not in the dict).
         initial_matching = self.match_fully_defined_noteheads(noteheads_1, noteheads_2)
         _matched_prev = copy.deepcopy(set(initial_matching.keys()))
@@ -153,7 +153,7 @@ class MungMatcher(object):
         :param vs2: A list of CropObjects.
 
         :return: A matching of these two Node lists. The matching
-            is a dict of ``(n1.objid, n2.objid) --> weight``.
+            is a dict of ``(n1.node_id, n2.node_id) --> weight``.
         """
         # logging.warning('Compatibilityre sets: {0}, {1}. Matching is currently very stupid!'
         #                 ''.format(vs1, vs2))
@@ -168,14 +168,6 @@ class MungMatcher(object):
             vs1_by_class = [c for c in vs1 if c.clsname == _clsname]
             vs2_by_class = [c for c in vs2 if c.clsname == _clsname]
 
-            ### DEBUG
-            # for v1 in vs1_by_class:
-            #     if v1.objid in _suspicious_objids:
-            #         print('Suspicious objid in the following compatible set:'
-            #               ' class {0}, objids_1 = {1}, objids_2 = {2}'
-            #               ''.format(_clsname,
-            #                         [c.objid for c in sorted(vs1_by_class, key=lambda x: x.top)],
-            #                         [c.objid for c in sorted(vs2_by_class, key=lambda x: x.top)]))
 
             for v1, v2 in zip(sorted(vs1_by_class, key=lambda x: x.top),
                               sorted(vs2_by_class, key=lambda y: y.top)):
@@ -186,7 +178,7 @@ class MungMatcher(object):
         """Computes connectivity signatures for vertices in ``g`` to the given
         ``anchors``.
 
-        :returns: Connectivity signature dict: ``v.objid --> (inlinks_tuple, outlinks_tuple)``
+        :returns: Connectivity signature dict: ``v.node_id --> (inlinks_tuple, outlinks_tuple)``
         """
         output = dict()
         _anchor_set = set(anchors)
@@ -220,7 +212,7 @@ class MungMatcher(object):
         """Matches two lists of fully defined noteheads. Only matches those
         that exactly share pitch, duration, and onset.
 
-        :returns: A matching: dict of ``(n1.objid, n2.objid) --> weight``.
+        :returns: A matching: dict of ``(n1.node_id, n2.node_id) --> weight``.
         """
         output = {}
         if (len(noteheads_1) == 0) or (len(noteheads_2) == 0):
@@ -239,7 +231,7 @@ class MungMatcher(object):
             # Make ns2 pointer catch up with the current note
             while onset_1 > n2.data['onset_beats']:
                 # print('onset 1 ({0}) is behind onset 2 ({1}): n1={2}, n2={3}'
-                #       ''.format(onset_1, n2.data['onset_beats'], n1.objid, n2.objid))
+                #       ''.format(onset_1, n2.data['onset_beats'], n1.node_id, n2.node_id))
                 j += 1
                 if j >= len(ns2):
                     # We will not match anything anymore: noteheads_2 are exhausted.
@@ -249,16 +241,16 @@ class MungMatcher(object):
             if onset_1 == n2.data['onset_beats']:
                 if self._notehead_signature(n1) == self._notehead_signature(n2):
                     # print('matched signature: {0} in noteheads n1={1}, n2={2}'
-                    #       ''.format(self._notehead_signature(n1), n1.objid, n2.objid))
+                    #       ''.format(self._notehead_signature(n1), n1.node_id, n2.node_id))
                     output[(n1.objid, n2.objid)] = 1.0
                     j += 1
                     continue
                 # else:
-                #     pass# print('matched onset, but not signature: n1={0}, n2={1}'.format(onset_1, n1.objid, n2.objid))
+                #     pass# print('matched onset, but not signature: n1={0}, n2={1}'.format(onset_1, n1.node_id, n2.node_id))
 
             elif onset_1 < n2.data['onset_beats']:
                 # print('onset 1 ({0}) is ahead of onset 2 ({1}): n1={2}, n2={3}'
-                #       ''.format(onset_1, n2.data['onset_beats'], n1.objid, n2.objid))
+                #       ''.format(onset_1, n2.data['onset_beats'], n1.node_id, n2.node_id))
                 continue
 
         return output
