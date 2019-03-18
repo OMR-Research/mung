@@ -236,7 +236,7 @@ class DependencyGrammar(object):
     >>> mlclass_dict = {m.id: m for m in parse_node_classes(mlpath)}
     >>> g = DependencyGrammar(grammar_filename=fpath, mlclasses=mlclass_dict)
     >>> len(g.rules)
-    578
+    551
 
     Grammar I/O
     -----------
@@ -269,7 +269,7 @@ class DependencyGrammar(object):
 
     The wildcards are expanded at the level of a line.
 
-    >>> l = 'notehead-*{,2} | stem'
+    >>> l = 'notehead*{,2} | stem'
     >>> rules, inlink_cards, outlink_cards, _, _ = g.parse_dependency_grammar_line(l)
     >>> rules
     [('noteheadFull', 'stem'), ('notehead-empty', 'stem')]

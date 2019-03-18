@@ -26,7 +26,7 @@ class NodeClassTest(unittest.TestCase):
         expected_number_of_classes = 158
 
         # Act
-        node_classes = parse_node_classes("test_data/mff-muscima-classes-annot.xml")
+        node_classes = parse_node_classes("test/test_data/mff-muscima-classes-annot.xml")
 
         # Assert
         self.assertEqual(len(node_classes), expected_number_of_classes)

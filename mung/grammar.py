@@ -131,7 +131,7 @@ class DependencyGrammar(object):
     >>> node_classes_dict = {m.name for m in parse_node_classes(node_classes_path)}
     >>> g = DependencyGrammar(grammar_filename=fpath, alphabet=node_classes_dict)
     >>> len(g.rules)
-    578
+    551
 
     The grammar can validate against these rules. The workhorse of this
     functionality is the ``find_invalid_in_graph()`` method, which finds
@@ -158,11 +158,11 @@ class DependencyGrammar(object):
     as the corresponding inlink of ``3`` and outlink of ``0``:
 
     >>> wrong_vertices
-    [3, 0]
+    [3, 0, 1]
     >>> wrong_inlinks
-    [(0, 3)]
+    [(0, 1), (0, 3)]
     >>> wrong_outlinks
-    [(0, 3)]
+    [(0, 1), (0, 3)]
 
     (Note that both the inlinks and outlinks are recorded in a ``(from, to)``
     format.)
@@ -206,7 +206,7 @@ class DependencyGrammar(object):
 
     The wildcards are expanded at the level of a line.
 
-    >>> l = 'notehead-*{,2} | stem'
+    >>> l = 'notehead*{,2} | stem'
     >>> rules, inlink_cards, outlink_cards, _, _ = g.parse_dependency_grammar_line(l)
     >>> rules
     [('notehead-empty', 'stem'), ('noteheadFull', 'stem')]
