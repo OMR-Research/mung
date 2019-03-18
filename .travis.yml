@@ -28,4 +28,4 @@ script:
   - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pytest --cov-report xml --cov --doctest-modules --ignore setup.py; fi
 
 after_success:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; codecov; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then codecov; fi
