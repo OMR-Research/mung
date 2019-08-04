@@ -12,8 +12,8 @@ class NodeTest(unittest.TestCase):
         expected2 = (44, 18, 56, 93)
 
         # Act
-        actual = Node.bbox_to_integer_bounds(44.2, 18.9, 55.1, 92.99)
-        actual2 = Node.bbox_to_integer_bounds(44, 18, 56, 92.99)
+        actual = Node.round_bounding_box_to_integer(44.2, 18.9, 55.1, 92.99)
+        actual2 = Node.round_bounding_box_to_integer(44, 18, 56, 92.99)
 
         # Assert
         self.assertEqual(actual, expected)

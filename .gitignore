@@ -333,3 +333,4 @@ doc/_build
 scripts/import_cropobjects.sh
 scripts/recode_cropobjects.py
 scripts/__init__.py
+/.pytest_cache/

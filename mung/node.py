@@ -3,6 +3,8 @@
 the basic unit of annotation. See the :class:`Node` documentation."""
 from __future__ import print_function, unicode_literals, division
 
+from math import ceil
+
 from builtins import zip
 from builtins import map
 from builtins import str
@@ -17,13 +19,6 @@ import numpy
 
 from mung.utils import compute_connected_components
 
-__version__ = "1.0"
-__author__ = "Jan Hajic jr."
-
-CROPOBJECT_MASK_ORDER = 'C'
-
-
-#: The Node mask uses this numpy ordering when flattening the data.
 
 ##############################################################################
 
@@ -35,7 +30,7 @@ class Node(object):
     the following attributes:
 
     * ``node_id``: the unique number of the given annotation instance in the set
-      of annotations encoded in the containing `CropObjectList`.
+      of annotations encoded in the containing `NodeList`.
     * ``unique_id``: the global unique identifier of the annotation instance. String.
       See :meth:`Node.parse_unique_id` method for format details.
     * ``class_name``: the name of the label that was given to the annotation
@@ -75,14 +70,14 @@ class Node(object):
     ...                     [1, 1, 1, 0],
     ...                     [0, 1, 0, 0]])
     >>> class_name = 'flat'
-    >>> unique_id = 'MUSCIMA++_1.0___mung.node.Node.doctest___0'
+    >>> unique_id = 'MUSCIMA++_2.0___mung.node.Node.doctest___0'
     >>> node = Node(node_id=0, class_name=class_name,
     ...                top=top, left=left, height=height, width=width,
     ...                inlinks=[], outlinks=[],
     ...                mask=mask,
     ...                unique_id=unique_id)
 
-    CropObjects can also form graphs, using the following attributes:
+    Nodes can also form graphs, using the following attributes:
 
     * ``outlinks``: Outgoing edges. A list of integers; it is assumed they are
       valid ``node_id`` within the same global/doc namespace.
@@ -115,7 +110,7 @@ class Node(object):
 
     The full ``unique_id`` of a Node then might look like this::
 
-      MUSCIMA-pp_1.0___CVC-MUSCIMA_W-35_N-08_D-ideal___611
+      MUSCIMA-pp_2.0___CVC-MUSCIMA_W-35_N-08_D-ideal___611
 
     You will need to use UIDs whenever you are combining CropObjects
     from different documents, and/or datasets. (If you are really combining
@@ -127,7 +122,7 @@ class Node(object):
     >>> node.doc
     'mung.node.Node.doctest'
     >>> node.dataset
-    'MUSCIMA++_1.0'
+    'MUSCIMA++_2.0'
 
     If you supply no ``unique_id`` at initialization time, a default UID will
     be used:
@@ -145,19 +140,18 @@ class Node(object):
     .. caution::
 
         The scope of unique identification within MUSCIMA++ is only within
-        a ``<CropObjectList>``. Don't use ``node_id`` to mix CropObjects from
-        multiple files!
+        a ``<Nodes>``. Don't use ``node_id`` to mix Nodes from multiple files!
 
-    **CropObjects and images**
+    **Nodes and images**
 
-    CropObjects and images are not tightly bound. This is because the same
+    Nodes and images are not tightly bound. This is because the same
     object can apply to multiple images: in the case of the CVC-MUSCIMA dataset,
-    for example, the same CropObjects are present both in the full image
-    and in the staff-less image. The limitation here is that CropObjects
+    for example, the same Nodes are present both in the full image
+    and in the staff-less image. The limitation here is that Nodes
     are based on exact pixels, so in order to retain validity, the images
     must correspond to each other exactly, as "layers".
 
-    Because CropObjects do not correspond to any given image, there is
+    Because Nodes do not correspond to any given image, there is
     no facility in the data format to link them to a specific one. You have to
     take care of matching Node annotations to the right images by yourself.
 
@@ -198,23 +192,23 @@ class Node(object):
     **Disambiguating class names**
 
     Since the class names are present
-    through the ``class_name`` attribute (``<MLClassName>`` element),
+    through the ``class_name`` attribute (``<ClassName>`` element),
     matching the list is no longer necessary for general understanding
-    of the file. The MLClassList file serves as a disambiguation tool:
+    of the file. The NodeClasses file serves as a disambiguation tool:
     there may be multiple annotation projects that use the same names
     but maybe define them differently and use different guidelines,
-    and their respective MLClassLists allow you to interpret the symbol
+    and their respective NodeClasses allow you to interpret the symbol
     names correctly, in light of the corresponding set of definitions.
 
     .. note::
 
-        In MUSCIMarker, the MLClassList is currently necessary to define
-        how CropObjects are displayed: their color. (All noteheads are red,
+        In MUSCIMarker, the NodeClasses is currently necessary to define
+        how Nodes are displayed: their color. (All noteheads are red,
         all barlines are green, etc.) The other function, matching names
         to ``clsid``, has been superseeded by the ``class_name`` Node
         attribute.
 
-    **Merging CropObjects**
+    **Merging Nodes**
 
     To merge a list of CropObjects into a new one, you need to:
 
@@ -250,14 +244,19 @@ class Node(object):
     explains the ``order='C'`` hack in ``set_mask()``.)
     """
 
-    def __init__(self, node_id, class_name, top, left, width, height,
-                 outlinks=None, inlinks=None,
+    def __init__(self, node_id,
+                 class_name,
+                 top,
+                 left,
+                 width,
+                 height,
+                 outlinks=None,
+                 inlinks=None,
                  mask=None,
                  unique_id=None,
                  data=None):
         # type: (int, str, int, int, int, int, List[int], List[int], numpy.ndarray, str, Any) -> Node
         self.node_id = node_id
-
         self.class_name = class_name
         self.x = top
         self.y = left
@@ -414,10 +413,10 @@ class Node(object):
             self.mask = None
         else:
             # Check dimension
-            t, l, b, r = self.bbox_to_integer_bounds(self.top,
-                                                     self.left,
-                                                     self.bottom,
-                                                     self.right)  # .count()
+            t, l, b, r = self.round_bounding_box_to_integer(self.top,
+                                                            self.left,
+                                                            self.bottom,
+                                                            self.right)  # .count()
             if mask.shape != (b - t, r - l):
                 raise ValueError('Mask shape {0} does not correspond'
                                  ' to integer shape {1} of Node.'
@@ -527,7 +526,8 @@ class Node(object):
         return [self.build_unique_id(self.dataset, self.doc, i) for i in self.inlinks]
 
     @staticmethod
-    def bbox_to_integer_bounds(ftop, fleft, fbottom, fright):
+    def round_bounding_box_to_integer(top, left, bottom, right):
+        # type: (float,float,float,float) -> (int,int,int,int)
         """Rounds off the Node bounds to the nearest integer
         so that no area is lost (e.g. bottom and right bounds are
         rounded up, top and left bounds are rounded down).
@@ -535,33 +535,13 @@ class Node(object):
         Returns the rounded-off integers (top, left, bottom, right)
         as integers.
 
-        >>> Node.bbox_to_integer_bounds(44.2, 18.9, 55.1, 92.99)
+        >>> Node.round_bounding_box_to_integer(44.2, 18.9, 55.1, 92.99)
         (44, 18, 56, 93)
-        >>> Node.bbox_to_integer_bounds(44, 18, 56, 92.99)
+        >>> Node.round_bounding_box_to_integer(44, 18, 56, 92.99)
         (44, 18, 56, 93)
 
         """
-        logging.debug('bbox_to_integer_bounds: inputs {0}'.format((ftop, fleft, fbottom, fright)))
-
-        top = ftop - (ftop % 1.0)
-        left = fleft - (fleft % 1.0)
-        bottom = fbottom - (fbottom % 1.0)
-        if fbottom % 1.0 != 0:
-            bottom += 1.0
-        right = fright - (fright % 1.0)
-        if fright % 1.0 != 0:
-            right += 1.0
-
-        if top != ftop:
-            logging.debug('bbox_to_integer_bounds: rounded top by {0}'.format(top - ftop))
-        if left != fleft:
-            logging.debug('bbox_to_integer_bounds: rounded left by {0}'.format(left - fleft))
-        if bottom != fbottom:
-            logging.debug('bbox_to_integer_bounds: rounded bottom by {0}'.format(bottom - fbottom))
-        if right != fright:
-            logging.debug('bbox_to_integer_bounds: rounded right by {0}'.format(right - fright))
-
-        return int(top), int(left), int(bottom), int(right)
+        return int(top), int(left), int(ceil(bottom)), int(ceil(right))
 
     def to_integer_bounds(self):
         """Ensures that the Node has an integer position and size.
@@ -569,7 +549,7 @@ class Node(object):
         whenever you do not need sub-pixel resolution...)
         """
         bbox = self.bounding_box
-        t, l, b, r = self.bbox_to_integer_bounds(*bbox)
+        t, l, b, r = self.round_bounding_box_to_integer(*bbox)
         height = b - t
         width = r - l
 
@@ -831,14 +811,14 @@ class Node(object):
         lines.append('</CropObject>')
         return '\n'.join(lines)
 
-    def encode_mask(self, mask, compress=False, mode='rle'):
+    def encode_mask(self, mask, mode='rle'):
         """Encode a binary array ``mask`` as a string, compliant
         with the CropObject formNodecation in :mod:`mung.io`.
         """
         if mode == 'rle':
-            return self.encode_mask_rle(mask, compress=compress)
+            return self.encode_mask_rle(mask)
         elif mode == 'bitmap':
-            return self.encode_mask_bitmap(mask, compress=compress)
+            return self.encode_mask_bitmap(mask)
 
     def encode_data(self, data):
         if self.data is None:
@@ -883,7 +863,7 @@ class Node(object):
         return '\n'.join(lines)
 
     @staticmethod
-    def encode_mask_bitmap(mask, compress=False):
+    def encode_mask_bitmap(mask):
         """Encodes the mask array in a compact form. Returns 'None' if mask
         is None. If the mask is not None, uses the following algorithm:
 
@@ -897,12 +877,12 @@ Nodereshaping).
             return 'None'
         # By default works in row-major order.
         # So we can just prescribe 'C' without losing data.
-        mask_flat = mask.flatten(order=CROPOBJECT_MASK_ORDER)
+        mask_flat = mask.flatten(order='C')
         output = ' '.join(list(map(str, mask_flat)))
         return output
 
     @staticmethod
-    def encode_mask_rle(mask, compress=False):
+    def encode_mask_rle(mask):
         """Encodes the mask array in Run-Length Encoding. Instead of
         having the bitmap ``0 0 1 1 1 0 0 0 1 1``, the RLE encodes
         the mask as ``0:2 1:3 0:3 1:2``. This is much more compact.
@@ -910,11 +890,10 @@ Nodereshaping).
         Currently, the rows of the mask are not treated in any special
         way. The mask just gets flattened and then encoded.
 
-        Implementation:
         """
         if mask is None:
             return 'None'
-        mask_flat = mask.flatten(order=CROPOBJECT_MASK_ORDER)
+        mask_flat = mask.flatten(order='C')
 
         output_strings = []
         current_run_type = 0
