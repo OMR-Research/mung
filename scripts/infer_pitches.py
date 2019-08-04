@@ -28,7 +28,7 @@ import os
 import time
 
 from mung.inference.inference import PitchInferenceEngine, OnsetsInferenceEngine,  MIDIBuilder
-from mung.io import parse_cropobject_list, export_cropobject_list
+from mung.io import read_nodes_from_file, export_cropobject_list
 
 
 def build_argument_parser():
@@ -64,7 +64,7 @@ def main(args):
     if not os.path.isfile(args.annot):
         raise ValueError('Annotation file {0} not found!'
                          ''.format(args.annot))
-    cropobjects = parse_cropobject_list(args.annot)
+    cropobjects = read_nodes_from_file(args.annot)
 
     pitch_inference_engine = PitchInferenceEngine()
     time_inference_engine = OnsetsInferenceEngine(cropobjects=cropobjects)

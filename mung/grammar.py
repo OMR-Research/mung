@@ -19,7 +19,7 @@ to the specification.
 
 
 .. TODO::
-    create image:: ../doc/_static/grammar_explainer.png
+    create image:: ../document/_static/grammar_explainer.png
 
 """
 import codecs

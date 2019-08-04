@@ -20,7 +20,7 @@ from mung.graph import find_misdirected_ledger_line_edges
 from mung.inference.inference import OnsetsInferenceEngine, MIDIBuilder
 from mung.inference.inference import PitchInferenceEngine
 from mung.inference.constants import _CONST
-from mung.io import parse_node_classes, parse_cropobject_list, export_cropobject_list
+from mung.io import parse_node_classes, read_nodes_from_file, export_cropobject_list
 from mung.node import cropobject_distance, bbox_intersection, cropobjects_merge_multiple, link_cropobjects
 from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, build_staffspace_cropobjects, add_staff_relationships
 
@@ -747,7 +747,7 @@ class PairwiseClfFeatureExtractor(object):
         Returns a dict that works as input to ``self.vectorizer``.
         """
         target = 0
-        if c_from.doc == c_to.doc:
+        if c_from.document == c_to.document:
             if c_to.objid in c_from.outlinks:
                 target = 1
         features = (c_to.top - c_from.top,
@@ -782,7 +782,7 @@ class PairwiseClfFeatureExtractor(object):
         Returns a tuple.
         """
         target = 0
-        if c_from.doc == c_to.doc:
+        if c_from.document == c_to.document:
             if c_to.objid in c_from.outlinks:
                 target = 1
         distance = cropobject_distance(c_from, c_to)
@@ -830,7 +830,7 @@ class PairwiseClassificationParser(object):
         # Ensure the same docname for all cropobjects,
         # since we later compute their distances.
         # The correct docname gets set on export anyway.
-        default_doc = cropobjects[0].doc
+        default_doc = cropobjects[0].document
         for c in cropobjects:
             c.set_doc(default_doc)
 
@@ -1317,7 +1317,7 @@ def main(args):
 
     #################################################################
     logging.info('Load graph')
-    cropobjects = parse_cropobject_list(args.input_mung)
+    cropobjects = read_nodes_from_file(args.input_mung)
 
     logging.info('Filter very small')
     very_small_cropobjects = find_very_small_cropobjects(cropobjects,

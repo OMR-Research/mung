@@ -26,7 +26,7 @@ import time
 
 import operator
 
-from mung.io import parse_cropobject_list, export_cropobject_graph
+from mung.io import read_nodes_from_file, export_cropobject_graph
 from mung.node import merge_cropobject_lists
 
 
@@ -120,7 +120,7 @@ def main(args):
     cropobject_lists = []
     _n_parsed_cropobjects = 0
     for i, f in enumerate(args.input):
-        cs = parse_cropobject_list(f)
+        cs = read_nodes_from_file(f)
         cropobject_lists.append(cs)
 
         # Logging progress

@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from mung.io import parse_cropobject_list, export_cropobject_list
+from mung.io import read_nodes_from_file, export_cropobject_list
 from mung.node import Node
 
 
@@ -41,23 +41,19 @@ class NodeTest(unittest.TestCase):
         self.assertTrue(node.overlaps((9, 101, 29, 111)))  # Corner within: bottom left
         self.assertTrue(node.overlaps((9, 99, 29, 109)))  # Corner within: bottom right
 
-    def test_parse_node_list(self):
-        test_data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test', 'test_data',
-                                     'cropobjects_xy_vs_topleft')
-        clfile = os.path.join(test_data_dir, '01_basic_topleft.xml')
-        cropobjects = parse_cropobject_list(clfile)
+    def test_read_nodes_from_file(self):
+        test_data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test', 'test_data')
+        clfile = os.path.join(test_data_dir, '01_basic.xml')
+        cropobjects = read_nodes_from_file(clfile)
         self.assertEqual(len(cropobjects), 48)
 
-        clfile_xy = os.path.join(test_data_dir, '01_basic_xy.xml')
-        cropobjects_xy = parse_cropobject_list(clfile_xy)
-        self.assertEqual(len(cropobjects_xy), 48)
-        self.assertEqual(len(cropobjects), len(cropobjects_xy))
-
-        export_xy = export_cropobject_list(cropobjects_xy)
-        with open(clfile) as hdl:
-            raw_data_topleft = '\n'.join([l.rstrip() for l in hdl])
-        self.assertEqual(raw_data_topleft, export_xy)
-
+    def test_read_nodes_from_file_with_data(self):
+        test_data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test', 'test_data')
+        file = os.path.join(test_data_dir, '01_basic_binary.xml')
+        nodes = read_nodes_from_file(file)
+        self.assertEqual("G", nodes[0].data['pitch_step'])
+        self.assertEqual(79, nodes[0].data['midi_pitch_code'])
+        self.assertEqual([8,17], nodes[0].data['precedence_outlinks'])
 
 if __name__ == '__main__':
     unittest.main()

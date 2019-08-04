@@ -16,7 +16,7 @@ from skimage.filters import gaussian
 import matplotlib.pyplot as plt
 
 from mung.dataset import CVC_MUSCIMA
-from mung.io import parse_cropobject_list, export_cropobject_list
+from mung.io import read_nodes_from_file, export_cropobject_list
 from mung.node import Node
 from mung.utils import connected_components2bboxes, compute_connected_components
 
@@ -100,7 +100,7 @@ def build_argument_parser():
     parser.add_argument('-a', '--annot', action='store', # required=True,
                         help='The annotation file for which the staffline and staff'
                              ' CropObjects should be added. If not supplied, default'
-                             ' doc/collection names will be used and cropobjects will'
+                             ' document/collection names will be used and cropobjects will'
                              ' be numberd from 0 in the output.')
     parser.add_argument('-e', '--export', action='store',
                         help='A filename to which the output CropObjectList'
@@ -250,29 +250,28 @@ def main(args):
     if not args.annot:
         cropobjects = []
         next_objid = 0
-        dataset_namespace = 'FCNOMR'
-        docname = os.path.splitext(os.path.basename(args.staff_imfile))[0]
+        dataset = 'FCNOMR'
+        document = os.path.splitext(os.path.basename(args.staff_imfile))[0]
     else:
         if not os.path.isfile(args.annot):
             raise ValueError('Annotation file {0} does not exist!'.format(args.annot))
 
         logging.info('Creating cropobjects...')
-        cropobjects = parse_cropobject_list(args.annot)
+        cropobjects = read_nodes_from_file(args.annot)
         logging.info('Non-staffline cropobjects: {0}'.format(len(cropobjects)))
         next_objid = max([c.objid for c in cropobjects]) + 1
-        dataset_namespace = cropobjects[0].dataset
-        docname = cropobjects[0].doc
+        dataset = cropobjects[0].dataset
+        document = cropobjects[0].document
 
     #  - Create the staffline CropObjects
     staffline_cropobjects = []
     for sl_bb, sl_m in zip(staffline_bboxes, staffline_masks):
-        uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
         t, l, b, r = sl_bb
         c = Node(node_id=next_objid,
                  class_name=STAFFLINE_CLSNAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=sl_m,
-                 unique_id=uid)
+                 dataset=dataset, document=document)
         staffline_cropobjects.append(c)
         next_objid += 1
 
@@ -281,13 +280,12 @@ def main(args):
         #  - Create the staff CropObjects
         staff_cropobjects = []
         for s_bb, s_m in zip(staff_bboxes, staff_masks):
-            uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
             t, l, b, r = s_bb
             c = Node(node_id=next_objid,
                      class_name=STAFF_CLSNAME,
                      top=t, left=l, height=b - t, width=r - l,
                      mask=s_m,
-                     unique_id=uid)
+                     dataset=dataset, document=document)
             staff_cropobjects.append(c)
             next_objid += 1
 
@@ -357,10 +355,10 @@ def main(args):
                 # that intersect with the staffspace bounding box, in terms
                 # of the staffline bounding box.
                 s1_t, s1_l, s1_b, s1_r = 0, dl1, \
-                                         s1.height, s1.width - dr1
+                                         s1.__height, s1.__width - dr1
                 s1_h, s1_w = s1_b - s1_t, s1_r - s1_l
-                s2_t, s2_l, s2_b, s2_r = canvas.shape[0] - s2.height, dl2, \
-                                         canvas.shape[0], s2.width - dr2
+                s2_t, s2_l, s2_b, s2_r = canvas.shape[0] - s2.__height, dl2, \
+                                         canvas.shape[0], s2.__width - dr2
                 s2_h, s2_w = s2_b - s2_t, s2_r - s2_l
 
                 logging.debug(s1_t, s1_l, s1_b, s1_r, (s1_h, s1_w))
@@ -368,22 +366,20 @@ def main(args):
                 # We now take the intersection of s1_below and s2_above.
                 # If there is empty space in the middle, we fill it in.
                 staffspace_mask = numpy.ones(canvas.shape)
-                staffspace_mask[s1_t:s1_b, :] -= (1 - s1_below[:, dl1:s1.width-dr1])
-                staffspace_mask[s2_t:s2_b, :] -= (1 - s2_above[:, dl2:s2.width-dr2])
+                staffspace_mask[s1_t:s1_b, :] -= (1 - s1_below[:, dl1:s1.__width - dr1])
+                staffspace_mask[s2_t:s2_b, :] -= (1 - s2_above[:, dl2:s2.__width - dr2])
 
                 ss_top = s1.top
                 ss_bottom = s2.bottom
                 ss_left = l
                 ss_right = r
 
-                uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
-
                 staffspace = Node(next_objid, STAFFSPACE_CLSNAME,
                                   top=ss_top, left=ss_left,
                                   height=ss_bottom - ss_top,
                                   width=ss_right - ss_left,
                                   mask=staffspace_mask,
-                                  unique_id=uid)
+                                  dataset=dataset, document=document)
 
                 staffspace.inlinks.append(staff.node_id)
                 staff.outlinks.append(staffspace.node_id)
@@ -406,21 +402,20 @@ def main(args):
 
             uss_top = max(0, tss.top - max(tss_heights))
             uss_left = tss.left
-            uss_width = tss.width
+            uss_width = tss.__width
             # We use 1.5, so that large noteheads
             # do not "hang out" of the staffspace.
-            uss_height = int(tss.height / 1.2)
+            uss_height = int(tss.__height / 1.2)
             # Shift because of height downscaling:
-            uss_top += tss.height - uss_height
+            uss_top += tss.__height - uss_height
             uss_mask = tss.mask[:uss_height, :] * 1
 
-            uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
             staffspace = Node(next_objid, STAFFSPACE_CLSNAME,
                               top=uss_top, left=uss_left,
                               height=uss_height,
                               width=uss_width,
                               mask=uss_mask,
-                              unique_id=uid)
+                              dataset=dataset, document=document)
             current_staffspace_cropobjects.append(staffspace)
             staff.outlinks.append(staffspace.node_id)
             staffspace.inlinks.append(staff.node_id)
@@ -434,17 +429,16 @@ def main(args):
 
             lss_top = bss.bottom # + max(bsl_heights)
             lss_left = bss.left
-            lss_width = bss.width
-            lss_height = int(bss.height / 1.2)
+            lss_width = bss.__width
+            lss_height = int(bss.__height / 1.2)
             lss_mask = bss.mask[:lss_height, :] * 1
 
-            uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
             staffspace = Node(next_objid, STAFFSPACE_CLSNAME,
                               top=lss_top, left=lss_left,
                               height=lss_height,
                               width=lss_width,
                               mask=lss_mask,
-                              unique_id=uid)
+                              dataset=dataset, document=document)
             current_staffspace_cropobjects.append(staffspace)
             staff.outlinks.append(staffspace.node_id)
             staffspace.inlinks.append(staff.node_id)

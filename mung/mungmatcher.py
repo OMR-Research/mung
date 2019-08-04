@@ -257,7 +257,7 @@ def show_matching(g1, g2, matching):
 if __name__ == '__main__':
 
     import os
-    from mung.io import parse_cropobject_list
+    from mung.io import read_nodes_from_file
     from mung.graph import NotationGraph
     test_data_root = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                   '..', 'test',
@@ -270,8 +270,8 @@ if __name__ == '__main__':
     names = ['minifull.xml',
              'mini2full.xml']
 
-    gt = NotationGraph(parse_cropobject_list(os.path.join(test_data_root, names[0])))
-    wc = NotationGraph(parse_cropobject_list(os.path.join(test_data_root, names[1])))
+    gt = NotationGraph(read_nodes_from_file(os.path.join(test_data_root, names[0])))
+    wc = NotationGraph(read_nodes_from_file(os.path.join(test_data_root, names[1])))
 
     matcher = MungMatcher()
 

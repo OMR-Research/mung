@@ -17,10 +17,10 @@ CropObject
 
 To read a CropObject list file (in this case, a test data file):
 
-    >>> from mung.io import parse_cropobject_list
+    >>> from mung.io import read_nodes_from_file
     >>> import os
     >>> file = os.path.join(os.path.dirname(__file__), '../test/test_data/01_basic.xml')
-    >>> cropobjects = parse_cropobject_list(file)
+    >>> nodes = read_nodes_from_file(file)
 
 The ``CropObject`` string representation is a XML object::
 
@@ -260,14 +260,8 @@ from lxml import etree
 from mung.node import Node
 from mung.node_class import NodeClass
 
-__version__ = "1.0"
-__author__ = "Jan Hajic jr."
 
-
-##############################################################################
-
-
-def parse_cropobject_list(filename):
+def read_nodes_from_file(filename: str) -> List[Node]:
     """From a xml file with a CropObjectList as the top element, parse
     a list of CropObjects. (See ``CropObject`` class documentation
     for a description of the XMl format.)
@@ -275,44 +269,20 @@ def parse_cropobject_list(filename):
     Let's test whether the parsing function works:
 
     >>> test_data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-    ...                              'test', 'test_data',
-    ...                              'cropobjects_xy_vs_topleft')
-    >>> clfile = os.path.join(test_data_dir, '01_basic_topleft.xml')
-    >>> cropobjects = parse_cropobject_list(clfile)
-    >>> len(cropobjects)
+    ...                              'test', 'test_data')
+    >>> file = os.path.join(test_data_dir, '01_basic.xml')
+    >>> nodes = read_nodes_from_file(file)
+    >>> len(nodes)
     48
-
-    This parsing function can deal with the old-style CropObject XML
-    that uses ``<Y>`` and ``<X>`` to index the top left corner:
-
-    >>> clfile_xy = os.path.join(test_data_dir, '01_basic_xy.xml')
-    >>> cropobjects_xy = parse_cropobject_list(clfile_xy)
-    >>> len(cropobjects_xy)
-    48
-    >>> len(cropobjects) == len(cropobjects_xy)
-    True
-
-    However, the CropObjects export themselves back only with ``<Top>``
-    and ``<Left>``.
-
-    >>> export_xy = export_cropobject_list(cropobjects_xy)
-    >>> with open(clfile) as hdl:
-    ...     raw_data_topleft = '\\n'.join([l.rstrip() for l in hdl])
-    >>> raw_data_topleft == export_xy
-    True
-
-    Note that what is Y in the data gets translated to cropobj.x (vertical),
-    what is X gets translated to cropobj.y (horizontal).
 
     Let's also test the ``data`` attribute:
-
-    >>> clfile_data = os.path.join(test_data_dir, '..', '01_basic_binary.xml')
-    >>> cropobjects = parse_cropobject_list(clfile_data)
-    >>> cropobjects[0].data['pitch_step']
+    >>> file_with_data = os.path.join(test_data_dir, '01_basic_binary.xml')
+    >>> nodes = read_nodes_from_file(file_with_data)
+    >>> nodes[0].data['pitch_step']
     'G'
-    >>> cropobjects[0].data['midi_pitch_code']
+    >>> nodes[0].data['midi_pitch_code']
     79
-    >>> cropobjects[0].data['precedence_outlinks']
+    >>> nodes[0].data['precedence_outlinks']
     [8, 17]
 
     :returns: A list of ``CropObject``s.
@@ -320,100 +290,41 @@ def parse_cropobject_list(filename):
     tree = etree.parse(filename)
     root = tree.getroot()
     logging.debug('XML parsed.')
-    cropobject_list = []
+    nodes = []
 
-    for i, cropobject in enumerate(root.iter('CropObject')):
+    for i, node in enumerate(root.iter('CropObject')):
         ######################################################
-        # Parsing one CropObject
-        logging.debug('Parsing CropObject {0}'.format(i))
+        logging.debug('Parsing Node {0}'.format(i))
 
-        # The problem with changing node_id: it is often used as
-        # an integer in MUSCIMarker...
-        objid = int(float(cropobject.findall('Id')[0].text))
-
-        # ...So: we introduce UniqueId (unique_id). But there needs
-        # to be some transition, to deal with files that don't
-        # have it.
-        try:
-            try:
-                # This is ugly, but the xml: namespace is not in the
-                # cropobject.nsmap dict...
-                uid = cropobject.attrib['{http://www.w3.org/XML/1998/namespace}node_id']
-            except KeyError:
-                # Fallback
-                uid = cropobject.findall('UniqueId')[0].text
-        except:
-            uid = None
-            # Generate a default UID at this level?
-            # No: leave it to the CropObject class default UID mechanism.
-
-        # Dealing with class_name transition: there shoud be no more
-        # CropObjectLists without a class_name. The node_id has been
-        # removed from CropObject specification, anyway.
-        # class_name=None
-        # _has_clsname = False
-        if len(cropobject.findall('MLClassName')) > 0:
-            clsname = cropobject.findall('MLClassName')[0].text
-        elif len(cropobject.findall('ClassName')) > 0:
-            clsname = cropobject.findall('ClassName')[0].text
+        node_id = int(float(node.findall('Id')[0].text))
+        if len(node.findall('ClassName')) > 0:
+            class_name = node.findall('ClassName')[0].text
         else:
-            raise ValueError('CropObject {0}: no class_name provided.'.format(objid))
+            raise ValueError('Node {0}: no class_name provided.'.format(node_id))
 
-        #################################
-        # Top left corner position
-
-        # Helper functions for TopLeft/XY transition
-        def _uses_xy(cropobject):
-            xs = cropobject.findall('Y')
-            ys = cropobject.findall('X')
-            return (len(xs) > 0) and (len(ys) > 0)
-
-        def _uses_topleft(cropobject):
-            xs = cropobject.findall('Top')
-            ys = cropobject.findall('Left')
-            return (len(xs) > 0) and (len(ys) > 0)
-
-        if _uses_xy(cropobject):
-            ###########################################
-            # DANGER! DANGER! DANGER! DANGER! DANGER! #
-            #                                         #
-            #      NOTE THE SWAP OF COORDINATES!      #
-            #                                         #
-            ###########################################
-            top = float(cropobject.findall('Y')[0].text)
-            left = float(cropobject.findall('X')[0].text)
-        elif _uses_topleft(cropobject):
-            top = float(cropobject.findall('Top')[0].text)
-            left = float(cropobject.findall('Left')[0].text)
-        else:
-            raise KeyError('Cropobject {0} has neither Top/Left, nor Y/Y'
-                           ' position information!'.format(objid))
-
-        #################################
-        # Shape
-        width = float(cropobject.findall('Width')[0].text)
-        height = float(cropobject.findall('Height')[0].text)
+        top = int(node.findall('Top')[0].text)
+        left = int(node.findall('Left')[0].text)
+        width = int(node.findall('Width')[0].text)
+        height = int(node.findall('Height')[0].text)
 
         #################################
         # Parsing the graph structure (Can deal with missing Inlinks/Outlinks)
         inlinks = []
-        i_s = cropobject.findall('Inlinks')
+        i_s = node.findall('Inlinks')
         if len(i_s) > 0:
-            i_s_text = cropobject.findall('Inlinks')[0].text
+            i_s_text = node.findall('Inlinks')[0].text
             if i_s_text is not None:  # Zero-length links
                 inlinks = list(map(int, i_s_text.split(' ')))
 
         outlinks = []
-        o_s = cropobject.findall('Outlinks')
+        o_s = node.findall('Outlinks')
         if len(o_s) > 0:
-            o_s_text = cropobject.findall('Outlinks')[0].text
+            o_s_text = node.findall('Outlinks')[0].text
             if o_s_text is not None:
                 outlinks = list(map(int, o_s_text.split(' ')))
 
-
         #################################
-        # Decode the data.
-        data = cropobject.findall('Data')
+        data = node.findall('Data')
         data_dict = None
         if len(data) > 0:
             data = data[0]
@@ -423,7 +334,7 @@ def parse_cropobject_list(filename):
                 value_type = data_item.get('type')
                 value = data_item.text
 
-                #logging.debug('Creating data entry: key={0}, type={1},'
+                # logging.debug('Creating data entry: key={0}, type={1},'
                 #              ' value={2}'.format(key, value_type, value))
 
                 if value_type == 'int':
@@ -445,58 +356,57 @@ def parse_cropobject_list(filename):
 
         #################################
         # Create the object.
-        obj = Node(node_id=objid,
-                   unique_id=uid,
-                   class_name=clsname,
+        obj = Node(node_id=node_id,
+                   class_name=class_name,
                    top=top,
                    left=left,
                    width=width,
                    height=height,
                    inlinks=inlinks,
                    outlinks=outlinks,
+                   dataset="DATASET_PLACEHOLDER", #TODO: Replace this with loading the actual values
+                   document="DOCUMENT_PLACEHOLDER", #TODO: Replace this with loading the actual values
                    data=data_dict)
 
         #################################
         # Add mask.
-        # We do this only after the CropObject has been created,
+        # We do this only after the Node has been created,
         # to make sure that the width & height used to reshape
-        # the flattened mask reflects what is in the CropObject.
+        # the flattened mask reflects what is in the Node.
         mask = None
-        m = cropobject.findall('Mask')
+        m = node.findall('Mask')
         if len(m) > 0:
-            mask = obj.decode_mask(cropobject.findall('Mask')[0].text,
+            mask = obj.decode_mask(node.findall('Mask')[0].text,
                                    shape=(obj.height, obj.width))
         obj.set_mask(mask)
-        # logging.debug('Created CropObject with ID {0}'.format(obj.node_id))
+        nodes.append(obj)
 
-        cropobject_list.append(obj)
+    logging.debug('Nodes loaded.')
 
-    logging.debug('CropObjectList loaded.')
-
-    if not validate_cropobjects_graph_structure(cropobject_list):
+    if not validate_nodes_graph_structure(nodes):
         raise ValueError('Invalid CropObject graph structure! Check warnings'
                          ' in log for the individual errors.')
 
-    return cropobject_list
+    return nodes
 
 
-def validate_cropobjects_graph_structure(cropobjects):
+def validate_nodes_graph_structure(cropobjects):
     """Check that the graph defined by the ``inlinks`` and ``outlinks``
     in the given list of CropObjects is valid: no relationships
     leading from or to objects with non-existent ``node_id``s.
 
     Can deal with ``cropobjects`` coming from a combination
-    of documents, through the CropObject ``doc`` property.
+    of documents, through the CropObject ``document`` property.
     Warns about documents which are found inconsistent.
 
     :param cropobjects: A list of :class:`CropObject` instances.
 
     :returns: ``True`` if graph is valid, ``False`` otherwise.
     """
-    # Split into lists by doc
+    # Split into lists by document
     cropobjects_by_doc = collections.defaultdict(list)
     for c in cropobjects:
-        cropobjects_by_doc[c.doc].append(c)
+        cropobjects_by_doc[c.document].append(c)
 
     is_valid = True
     for doc, doc_cropobjects in list(cropobjects_by_doc.items()):
@@ -521,7 +431,7 @@ def validate_document_graph_structure(nodes):
 
     :returns: ``True`` if graph is valid, ``False`` otherwise.
     """
-    docs = [node.doc for node in nodes]
+    docs = [node.document for node in nodes]
     if len(set(docs)) != 1:
         raise ValueError('Got CropObjects from multiple documents!')
 
@@ -562,7 +472,7 @@ def export_cropobject_graph(cropobjects, validate=True):
         that represent edges in the CropObject graph.
     """
     if validate:
-        validate_cropobjects_graph_structure(cropobjects)
+        validate_nodes_graph_structure(cropobjects)
 
     edges = []
     for c in cropobjects:

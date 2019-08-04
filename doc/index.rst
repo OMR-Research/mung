@@ -68,9 +68,9 @@ ipython if you don't use it!) and parse the data::
 
   ipython
   >>> import os
-  >>> from muscima.io import parse_cropobject_list
+  >>> from muscima.io import read_nodes_from_file
   >>> cropobject_fnames = [os.path.join('data', 'cropobjects', f) for f in os.listdir('data/cropobjects')]
-  >>> docs = [parse_cropobject_list(f) for f in cropobject_fnames]
+  >>> docs = [read_nodes_from_file(f) for f in cropobject_fnames]
   >>> len(docs)
   140
 

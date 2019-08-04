@@ -84,19 +84,18 @@ def merge_staffline_segments(cropobjects, margin=10):
 
     # Create the CropObjects.
     next_objid = max([c.objid for c in cropobjects]) + 1
-    dataset_namespace = cropobjects[0].dataset
-    docname = cropobjects[0].doc
+    dataset = cropobjects[0].dataset
+    document = cropobjects[0].document
 
     #  - Create the staffline CropObjects
     staffline_cropobjects = []
     for sl_bb, sl_m in zip(staffline_bboxes, staffline_masks):
-        uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
         t, l, b, r = sl_bb
         c = Node(node_id=next_objid,
                  class_name=_CONST.STAFFLINE_CLSNAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=sl_m,
-                 unique_id=uid)
+                 dataset=dataset, document=document)
         staffline_cropobjects.append(c)
         next_objid += 1
 
@@ -308,18 +307,17 @@ def build_staff_cropobjects(cropobjects):
 
     logging.info('Creating staff CropObjects')
     next_objid = max([c.objid for c in cropobjects]) + 1
-    dataset_namespace = cropobjects[0].dataset
-    docname = cropobjects[0].doc
+    dataset = cropobjects[0].dataset
+    document = cropobjects[0].document
 
     staff_cropobjects = []
     for s_bb, s_m in zip(staff_bboxes, staff_masks):
-        uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
         t, l, b, r = s_bb
         c = Node(node_id=next_objid,
                  class_name=_CONST.STAFF_CLSNAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=s_m,
-                 unique_id=uid)
+                 dataset=dataset, document=document)
         staff_cropobjects.append(c)
         next_objid += 1
 
@@ -351,8 +349,8 @@ def build_staffspace_cropobjects(cropobjects):
     :return: A list of staffspace CropObjects.
     """
     next_objid = max([c.objid for c in cropobjects]) + 1
-    dataset_namespace = cropobjects[0].dataset
-    docname = cropobjects[0].doc
+    dataset = cropobjects[0].dataset
+    document = cropobjects[0].document
 
     staff_cropobjects = [c for c in cropobjects
                          if c.clsname == _CONST.STAFF_CLSNAME
@@ -440,14 +438,12 @@ def build_staffspace_cropobjects(cropobjects):
             ss_left = l
             ss_right = r
 
-            uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
-
             staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
                               top=ss_top, left=ss_left,
                               height=ss_bottom - ss_top,
                               width=ss_right - ss_left,
                               mask=staffspace_mask,
-                              unique_id=uid)
+                              dataset=dataset, document=document)
 
             staffspace.inlinks.append(staff.objid)
             staff.outlinks.append(staffspace.node_id)
@@ -471,21 +467,20 @@ def build_staffspace_cropobjects(cropobjects):
 
         uss_top = max(0, tss.top - max(tss_heights))
         uss_left = tss.left
-        uss_width = tss.width
+        uss_width = tss.__width
         # We use 1.5, so that large noteheads
         # do not "hang out" of the staffspace.
-        uss_height = int(tss.height / 1.2)
+        uss_height = int(tss.__height / 1.2)
         # Shift because of height downscaling:
-        uss_top += tss.height - uss_height
+        uss_top += tss.__height - uss_height
         uss_mask = tss.mask[:uss_height, :] * 1
 
-        uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
         staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
                           top=uss_top, left=uss_left,
                           height=uss_height,
                           width=uss_width,
                           mask=uss_mask,
-                          unique_id=uid)
+                          dataset=dataset, document=document)
         current_staffspace_cropobjects.append(staffspace)
         staff.outlinks.append(staffspace.node_id)
         staffspace.inlinks.append(staff.objid)
@@ -499,17 +494,16 @@ def build_staffspace_cropobjects(cropobjects):
 
         lss_top = bss.bottom  # + max(bsl_heights)
         lss_left = bss.left
-        lss_width = bss.width
-        lss_height = int(bss.height / 1.2)
+        lss_width = bss.__width
+        lss_height = int(bss.__height / 1.2)
         lss_mask = bss.mask[:lss_height, :] * 1
 
-        uid = Node.build_unique_id(dataset_namespace, docname, next_objid)
         staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
                           top=lss_top, left=lss_left,
                           height=lss_height,
                           width=lss_width,
                           mask=lss_mask,
-                          unique_id=uid)
+                          dataset=dataset, document=document)
         current_staffspace_cropobjects.append(staffspace)
         staff.outlinks.append(staffspace.node_id)
         staffspace.inlinks.append(staff.objid)
@@ -617,7 +611,7 @@ def add_staff_relationships(cropobjects,
         for c in cs:
             closest_staff = min([s for s in staffs],
                                 key=lambda x: ((x.bottom + x.top) / 2. - (
-                                            c.bottom + c.top) / 2.) ** 2)
+                                        c.bottom + c.top) / 2.) ** 2)
             link_cropobjects(c, closest_staff, check_docname=False)
 
     ##########################################################################

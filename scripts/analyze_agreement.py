@@ -48,7 +48,7 @@ import time
 
 import numpy
 
-from mung.io import parse_cropobject_list
+from mung.io import read_nodes_from_file
 
 
 def bbox_intersection(origin, intersect):
@@ -322,8 +322,8 @@ def main(args):
     # Rule: if two objects don't share a pixel, they cannot be considered related.
     # Object classes do not factor into this so far.
 
-    truth = parse_cropobject_list(args.true)
-    prediction = parse_cropobject_list(args.prediction)
+    truth = read_nodes_from_file(args.true)
+    prediction = read_nodes_from_file(args.prediction)
 
     _parse_time = time.clock()
     logging.info('Parsing {0} true and {1} prediction cropobjects took {2:.2f} s'

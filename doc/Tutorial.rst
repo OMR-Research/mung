@@ -12,13 +12,13 @@ dataset. Let's load it.
 .. code:: python
 
     import os
-    from muscima.io import parse_cropobject_list
+    from muscima.io import read_nodes_from_file
     
     # Change this to reflect wherever your MUSCIMA++ data lives
     CROPOBJECT_DIR = os.path.join(os.environ['HOME'], 'data/MUSCIMA++/v0.9/data/cropobjects')
     
     cropobject_fnames = [os.path.join(CROPOBJECT_DIR, f) for f in os.listdir(CROPOBJECT_DIR)]
-    docs = [parse_cropobject_list(f) for f in cropobject_fnames]
+    docs = [read_nodes_from_file(f) for f in cropobject_fnames]
 
 Let's do something straightforward: symbol classification.
 

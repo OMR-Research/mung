@@ -36,7 +36,7 @@ import time
 import matplotlib.pyplot as plt
 import operator
 
-from mung.io import parse_cropobject_list
+from mung.io import read_nodes_from_file
 
 
 def freqdict(l, sort=True):
@@ -196,11 +196,11 @@ def annotations_from_package(package):
 
 
 def count_cropobjects(annot_file):
-    return len(parse_cropobject_list(annot_file))
+    return len(read_nodes_from_file(annot_file))
 
 
 def count_cropobjects_and_relationships(annot_file):
-    cropobjects = parse_cropobject_list(annot_file)
+    cropobjects = read_nodes_from_file(annot_file)
     n_inlinks = 0
     for c in cropobjects:
         if c.inlinks is not None:

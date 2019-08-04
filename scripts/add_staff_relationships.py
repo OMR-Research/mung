@@ -19,7 +19,7 @@ import pprint
 import time
 
 from mung.inference.constants import InferenceEngineConstants as _CONST
-from mung.io import parse_cropobject_list, export_cropobject_list
+from mung.io import read_nodes_from_file, export_cropobject_list
 from mung.node import link_cropobjects
 
 ON_STAFFLINE_RATIO_TRHESHOLD = 0.15
@@ -370,7 +370,7 @@ def main(args):
     if not os.path.isfile(args.annot):
         raise ValueError('Annotation file {0} not found!'
                          ''.format(args.annot))
-    cropobjects = parse_cropobject_list(args.annot)
+    cropobjects = read_nodes_from_file(args.annot)
 
     output_cropobjects = add_staff_relationships(
         cropobjects,
