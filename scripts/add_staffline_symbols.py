@@ -335,8 +335,8 @@ def main(args):
                 # of the top staffline is above the bottom of the bottom
                 # staffline. This may not hold in very weird situations,
                 # but it's good for now.
-                logging.debug(s1.bounding_box, s1.mask.shape)
-                logging.debug(s2.bounding_box, s2.mask.shape)
+                logging.debug(s1.bounding_box, s1.__mask.shape)
+                logging.debug(s2.bounding_box, s2.__mask.shape)
                 logging.debug(canvas.shape)
                 logging.debug('l={0}, dl1={1}, dl2={2}, r={3}, dr1={4}, dr2={5}'
                               ''.format(l, dl1, dl2, r, dr1, dr2))
@@ -396,9 +396,9 @@ def main(args):
 
             # Upper staffspace
             tsl = sorted_stafflines[0]
-            tsl_heights = tsl.mask.sum(axis=0)
+            tsl_heights = tsl.__mask.sum(axis=0)
             tss = current_staffspace_cropobjects[0]
-            tss_heights = tss.mask.sum(axis=0)
+            tss_heights = tss.__mask.sum(axis=0)
 
             uss_top = max(0, tss.top - max(tss_heights))
             uss_left = tss.left
@@ -408,7 +408,7 @@ def main(args):
             uss_height = int(tss.__height / 1.2)
             # Shift because of height downscaling:
             uss_top += tss.__height - uss_height
-            uss_mask = tss.mask[:uss_height, :] * 1
+            uss_mask = tss.__mask[:uss_height, :] * 1
 
             staffspace = Node(next_objid, STAFFSPACE_CLSNAME,
                               top=uss_top, left=uss_left,
@@ -423,15 +423,15 @@ def main(args):
 
             # Lower staffspace
             bss = current_staffspace_cropobjects[-1]
-            bss_heights = bss.mask.sum(axis=0)
+            bss_heights = bss.__mask.sum(axis=0)
             bsl = sorted_stafflines[-1]
-            bsl_heights = bsl.mask.sum(axis=0)
+            bsl_heights = bsl.__mask.sum(axis=0)
 
             lss_top = bss.bottom # + max(bsl_heights)
             lss_left = bss.left
             lss_width = bss.__width
             lss_height = int(bss.__height / 1.2)
-            lss_mask = bss.mask[:lss_height, :] * 1
+            lss_mask = bss.__mask[:lss_height, :] * 1
 
             staffspace = Node(next_objid, STAFFSPACE_CLSNAME,
                               top=lss_top, left=lss_left,

@@ -7,7 +7,7 @@ from math import ceil
 import copy
 import itertools
 import logging
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Any
 
 import numpy
 
@@ -234,8 +234,8 @@ class Node(object):
                  dataset: str = None,
                  document: str = None,
                  data=None):
-        self.node_id = node_id
-        self.class_name = class_name
+        self.__node_id = node_id
+        self.__class_name = class_name
         self.__top = top
         self.__left = left
         self.__width = width
@@ -243,7 +243,8 @@ class Node(object):
 
         # The mask presupposes integer bounds.
         # Applied relative to Node bounds, not the whole image.
-        self.to_integer_bounds()
+        self.__to_integer_bounds()
+        self.__mask = None
         self.set_mask(mask)
 
         if inlinks is None:
@@ -305,54 +306,20 @@ class Node(object):
             node_id = int(node_id_string)
         return global_namespace, document_namespace, node_id
 
-    def set_mask(self, mask):
-        """Sets the Node's mask to the given array. Performs
-        some compatibilty checks: size, dtype (converts to ``uint8``)."""
-        if mask is None:
-            self.mask = None
-        else:
-            # Check dimension
-            t, l, b, r = self.round_bounding_box_to_integer(self.top,
-                                                            self.left,
-                                                            self.bottom,
-                                                            self.right)  # .count()
-            if mask.shape != (b - t, r - l):
-                raise ValueError('Mask shape {0} does not correspond'
-                                 ' to integer shape {1} of Node.'
-                                 ''.format(mask.shape, (b - t, r - l)))
-            if str(mask.dtype) != 'uint8':
-                logging.debug('Node.set_mask(): Supplied non-integer mask'
-                              ' with dtype={0}'.format(mask.dtype))
+    @property
+    def node_id(self) -> int:
+        return self.__node_id
 
-            self.mask = mask.astype('uint8')
-
-    def set_node_id(self, node_id):
-        # type: (int) -> None
-        """Changes the node_id and updates the UID with it.
-        Do NOT use this unless you know what you're doing;
-        changing the node_id should be (1) checked against node_id
-        conflics within the document, (2) reflected in the outlinks
-        and inlinks.
-        """
-        self.node_id = node_id
+    @property
+    def class_name(self) -> str:
+        return self.__class_name
 
     @property
     def dataset(self) -> str:
-        """ The dataset, this Node belongs to """
         return self.__dataset
 
     @property
     def document(self) -> str:
-        """ The document, this Node belongs to.
-
-        This is important when working with Nodes
-        from multiple documents, especially for properly
-        constructing Node graphs, because ``inlinks`` and
-        ``outlinks`` use the numeric ``node_id``s, which point to
-        Nodes within the same document.
-
-        ``node_id`` of each Node has to be unique within a document.
-        """
         return self.__document
 
     @property
@@ -405,9 +372,34 @@ class Node(object):
         horizontal_center = self.left + self.width // 2
         return int(vertical_center), int(horizontal_center)
 
+    @property
+    def mask(self) -> numpy.ndarray:
+        return self.__mask
+
+    def set_mask(self, mask: numpy.ndarray):
+        """Sets the Node's mask to the given array. Performs
+        some compatibility checks: size, dtype (converts to ``uint8``)."""
+        if mask is None:
+            self.__mask = None
+        else:
+            # Check dimension
+            t, l, b, r = self.round_bounding_box_to_integer(self.top,
+                                                            self.left,
+                                                            self.bottom,
+                                                            self.right)
+            if mask.shape != (b - t, r - l):
+                raise ValueError('Mask shape {0} does not correspond'
+                                 ' to integer shape {1} of Node.'
+                                 ''.format(mask.shape, (b - t, r - l)))
+            if str(mask.dtype) != 'uint8':
+                logging.debug('Node.set_mask(): Supplied non-integer mask'
+                              ' with dtype={0}'.format(mask.dtype))
+
+            self.__mask = mask.astype('uint8')
+
     @staticmethod
-    def round_bounding_box_to_integer(top, left, bottom, right):
-        # type: (float,float,float,float) -> (int,int,int,int)
+    def round_bounding_box_to_integer(top: float, left: float, bottom: float, right: float) \
+            -> (int, int, int, int):
         """Rounds off the Node bounds to the nearest integer
         so that no area is lost (e.g. bottom and right bounds are
         rounded up, top and left bounds are rounded down).
@@ -423,21 +415,6 @@ class Node(object):
         """
         return int(top), int(left), int(ceil(bottom)), int(ceil(right))
 
-    def to_integer_bounds(self):
-        """Ensures that the Node has an integer position and size.
-        (This is important whenever you want to use a mask, and reasonable
-        whenever you do not need sub-pixel resolution...)
-        """
-        bbox = self.bounding_box
-        t, l, b, r = self.round_bounding_box_to_integer(*bbox)
-        height = b - t
-        width = r - l
-
-        self.__top = t
-        self.__left = l
-        self.__height = height
-        self.__width = width
-
     def project_to(self, img):
         """This function returns the *crop* of the input image
         corresponding to the Node (incl. masking).
@@ -445,8 +422,8 @@ class Node(object):
         # Make a copy! We don't want to modify the original image by the mask.
         # Copy forced by the "* 1" part.
         crop = img[self.top:self.bottom, self.left:self.right] * 1
-        if self.mask is not None:
-            crop *= self.mask
+        if self.__mask is not None:
+            crop *= self.__mask
         return crop
 
     def project_on(self, img):
@@ -461,7 +438,8 @@ class Node(object):
         output[self.top:self.bottom, self.left:self.right] = crop
         return output
 
-    def render(self, img, alpha=0.3, rgb=(1.0, 0.0, 0.0)):
+    def render(self, img: numpy.ndarray, alpha: float = 0.3,
+               rgb: Tuple[float, float, float] = (1.0, 0.0, 0.0)) -> numpy.ndarray:
         """Renders itself upon the given image as a rectangle
         of the given color and transparency. Might help visualization.
 
@@ -482,7 +460,7 @@ class Node(object):
         img[self.top:self.bottom, self.left:self.right] = mix
         return img
 
-    def overlaps(self, bounding_box_or_cropobject):
+    def overlaps(self, bounding_box_or_node: Union[Tuple[int, int, int, int], Any]) -> bool:
         """Check whether this Node overlaps the given bounding box or Node.
 
         >>> node = Node(0, 'test', 10, 100, height=20, width=10)
@@ -514,11 +492,11 @@ class Node(object):
         True
 
         """
-        if isinstance(bounding_box_or_cropobject, Node):
-            t, l, b, r = bounding_box_or_cropobject.bounding_box
+        if isinstance(bounding_box_or_node, Node):
+            t, l, b, r = bounding_box_or_node.bounding_box
         else:
-            t, l, b, r = bounding_box_or_cropobject
-        # Does it overlap vertically? Includes situations where the CropObject is inside the bounding box.
+            t, l, b, r = bounding_box_or_node
+        # Does it overlap vertically? Includes situations where the Node is inside the bounding box.
         # Note that the bottom is +1 (fencepost), so the checks bottom vs. top need to be "less than",
         # not leq. If one object's top would be equal to the other's bottom, they would be touching,
         # not overlapping.
@@ -527,22 +505,22 @@ class Node(object):
                 return True
         return False
 
-    def contains(self, bounding_box_or_cropobject):
-        """Check if this CropObject entiNodeins the other bounding
-        box (or, the other cropobject's bounding box)."""
-        if isinstance(bounding_box_or_cropobject, Node):
-            t, l, b, r = bounding_box_or_cropobject.bounding_box
+    def contains(self, bounding_box_or_node: Union[Tuple[int, int, int, int], Any]) -> bool:
+        """Check if this Node entirely contains the other bounding
+        box (or, the other node's bounding box)."""
+        if isinstance(bounding_box_or_node, Node):
+            t, l, b, r = bounding_box_or_node.bounding_box
         else:
-            t, l, b, r = bounding_box_or_cropobject
+            t, l, b, r = bounding_box_or_node
 
         if self.top <= t <= b <= self.bottom:
             if self.left <= l <= r <= self.right:
                 return True
         return False
 
-    def bbox_intersection(self, bounding_box):
-        """Returns the sub-bounding box of this CropObject, relNodets size (so: 0,0
-        is the CropObject's upNodeorner), that intersects the given bounding box.
+    def bbox_intersection(self, bounding_box: Tuple[int, int, int, int]) -> \
+            Union[None, Tuple[int, int, int, int]]:
+        """Returns the sub-bounding box of this Node intersecting with the given bounding box.
         If the intersection is empty, returns None.
 
         >>> node = Node(0, 'test', 10, 100, height=20, width=10)
@@ -599,10 +577,10 @@ class Node(object):
 
         Assumes integer bounds, which is ensured during CropObject initNode.
         """
-        if self.mask is None:
+        if self.__mask is None:
             return
 
-        mask_is_empty = self.mask.sum() == 0
+        mask_is_empty = self.__mask.sum() == 0
         if mask_is_empty:
             return
 
@@ -610,26 +588,26 @@ class Node(object):
 
         # How many rows/columns to trim from top, bottom, etc.
         trim_top = -1
-        for i in range(self.mask.shape[0]):
-            if self.mask[i, :].sum() != 0:
+        for i in range(self.__mask.shape[0]):
+            if self.__mask[i, :].sum() != 0:
                 trim_top = i
                 break
 
         trim_left = -1
-        for j in range(self.mask.shape[1]):
-            if self.mask[:, j].sum() != 0:
+        for j in range(self.__mask.shape[1]):
+            if self.__mask[:, j].sum() != 0:
                 trim_left = j
                 break
 
         trim_bottom = -1
-        for k in range(self.mask.shape[0]):
-            if self.mask[-(k + 1), :].sum() != 0:
+        for k in range(self.__mask.shape[0]):
+            if self.__mask[-(k + 1), :].sum() != 0:
                 trim_bottom = k
                 break
 
         trim_right = -1
-        for l in range(self.mask.shape[1]):
-            if self.mask[:, -(l + 1)].sum() != 0:
+        for l in range(self.__mask.shape[1]):
+            if self.__mask[:, -(l + 1)].sum() != 0:
                 trim_right = l
                 break
 
@@ -644,10 +622,10 @@ class Node(object):
         rel_b = self.__height - trim_bottom
         rel_r = self.__width - trim_right
 
-        new_mask = self.mask[rel_t:rel_b, rel_l:rel_r] * 1
+        new_mask = self.__mask[rel_t:rel_b, rel_l:rel_r] * 1
 
         logging.debug('Cropobject.crop: Old mask shape {0}, new mask shape {1}'
-                      ''.format(self.mask.shape, new_mask.shape))
+                      ''.format(self.__mask.shape, new_mask.shape))
 
         # new bounding box, relative to image -- used to compute the CropObject's position and size
         abs_t = self.top + trim_top
@@ -675,7 +653,7 @@ class Node(object):
         lines.append('\t<Width>{0}</Width>'.format(self.__width))
         lines.append('\t<Height>{0}</Height>'.format(self.__height))
 
-        mask_string = self.encode_mask(self.mask)
+        mask_string = self.encode_mask()
         lines.append('\t<Mask>{0}</Mask>'.format(mask_string))
 
         if len(self.inlinks) > 0:
@@ -685,23 +663,23 @@ class Node(object):
             outlinks_string = ' '.join(list(map(str, self.outlinks)))
             lines.append('\t<Outlinks>{0}</Outlinks>'.format(outlinks_string))
 
-        data_string = self.encode_data(self.data)
+        data_string = self.encode_data()
         if data_string is not None:
             lines.append('\t<Data>\n{0}\n\t</Data>'.format(data_string))
 
         lines.append('</Node>')
         return '\n'.join(lines)
 
-    def encode_mask(self, mask, mode='rle'):
+    def encode_mask(self, mode: str = 'rle') -> str:
         """Encode a binary array ``mask`` as a string, compliant
         with the CropObject formNodecation in :mod:`mung.io`.
         """
         if mode == 'rle':
-            return self.encode_mask_rle(mask)
+            return self.encode_mask_rle(self.mask)
         elif mode == 'bitmap':
-            return self.encode_mask_bitmap(mask)
+            return self.encode_mask_bitmap(self.mask)
 
-    def encode_data(self, data):
+    def encode_data(self) -> Union[None, str]:
         if self.data is None:
             return None
         if len(self.data) == 0:
@@ -744,14 +722,12 @@ class Node(object):
         return '\n'.join(lines)
 
     @staticmethod
-    def encode_mask_bitmap(mask):
+    def encode_mask_bitmap(mask: numpy.ndarray) -> str:
         """Encodes the mask array in a compact form. Returns 'None' if mask
         is None. If the mask is not None, uses the following algorithm:
 
-        * Flatten the mask (then use width and height of CropObject for
-Nodereshaping).
+        * Flatten the mask (then use width and height of Node for reshaping).
         * Record as string, with whitespace separator
-        * Compress string using gz2 (if compress=True) NOT IMPLEMENTED
         * Return resulting string
         """
         if mask is None:
@@ -763,7 +739,7 @@ Nodereshaping).
         return output
 
     @staticmethod
-    def encode_mask_rle(mask):
+    def encode_mask_rle(mask: numpy.ndarray) -> str:
         """Encodes the mask array in Run-Length Encoding. Instead of
         having the bitmap ``0 0 1 1 1 0 0 0 1 1``, the RLE encodes
         the mask as ``0:2 1:3 0:3 1:2``. This is much more compact.
@@ -869,7 +845,7 @@ Nodereshaping).
         nw = nr - nl
 
         # Create mask of corresponding size
-        new_mask = numpy.zeros((nh, nw), dtype=self.mask.dtype)
+        new_mask = numpy.zeros((nh, nw), dtype=self.__mask.dtype)
 
         # Find coordinates where to paste the masks
         spt = self.top - nt  # spt = self_paste_top
@@ -878,7 +854,7 @@ Nodereshaping).
         opl = other.left - nl
 
         # Paste the masks into these places
-        new_mask[spt:spt + self.__height, spl:spl + self.__width] += self.mask
+        new_mask[spt:spt + self.__height, spl:spl + self.__width] += self.__mask
         new_mask[opt:opt + other.height, opl:opl + other.width] += other.mask
 
         # Normalize mask value
@@ -889,7 +865,7 @@ Nodereshaping).
         self.__left = nl
         self.__height = nh
         self.__width = nw
-        self.mask = new_mask
+        self.__mask = new_mask
 
         # Add inlinks and outlinks (check for multiple and self-reference)
         for o in other.outlinks:
@@ -945,7 +921,7 @@ Nodereshaping).
 
     def scale(self, zoom=1.0):
         """Re-compute the CropObject withNode scaling factor."""
-        mask = self.mask * 1.0
+        mask = self.__mask * 1.0
         import skimage.transform
         new_mask_shape = max(int(self.__height * zoom), 1), max(int(self.__width * zoom), 1)
         new_mask = skimage.transform.resize(mask,
@@ -962,7 +938,22 @@ Nodereshaping).
         self.__left = new_left
         self.__height = new_height
         self.__width = new_width
-        self.mask = new_mask
+        self.__mask = new_mask
+
+    def __to_integer_bounds(self):
+        """Ensures that the Node has an integer position and size.
+        (This is important whenever you want to use a mask, and reasonable
+        whenever you do not need sub-pixel resolution...)
+        """
+        bounding_box = self.bounding_box
+        top, left, bottom, right = self.round_bounding_box_to_integer(*bounding_box)
+        height = bottom - top
+        width = right - left
+
+        self.__top = top
+        self.__left = left
+        self.__height = height
+        self.__width = width
 
 
 ##############################################################################
