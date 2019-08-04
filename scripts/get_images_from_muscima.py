@@ -24,7 +24,6 @@ For an overview of all command-line options, call::
   get_images_from_muscima.py -h
 
 """
-from __future__ import print_function, unicode_literals
 from builtins import zip
 import argparse
 import logging
@@ -34,12 +33,6 @@ import time
 import shutil
 
 import mung.dataset
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
-
-
-##############################################################################
 
 
 def _get_cvc_muscima_root():

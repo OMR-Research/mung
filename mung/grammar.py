@@ -22,19 +22,12 @@ to the specification.
     create image:: ../doc/_static/grammar_explainer.png
 
 """
-from __future__ import print_function, unicode_literals
-
-from builtins import str
-from builtins import object
 import codecs
 import logging
 import os
 import pprint
 
 import collections
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
 
 
 class DependencyGrammarParseError(ValueError):

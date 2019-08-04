@@ -45,15 +45,7 @@ which is incidentally the real NodeClass list used
 for annotating MUSCIMA++.
 
 """
-from __future__ import division
-from builtins import object
 import logging
-
-__version__ = "1.0"
-__author__ = "Jan Hajic jr."
-
-
-#######################################################################
 
 class NodeClass(object):
     """Information about the annotation class. We're using it

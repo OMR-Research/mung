@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 """This module implements a Python representation of the Node,
 the basic unit of annotation. See the :class:`Node` documentation."""
-from __future__ import print_function, unicode_literals, division
 
 from math import ceil
 
-from builtins import zip
-from builtins import map
-from builtins import str
-from builtins import range
-from builtins import object
 import copy
 import itertools
 import logging

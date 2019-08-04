@@ -15,19 +15,8 @@ for retrieving the dataset files. If they are not set, you will
 have to supply the roots to the respective functions that manipulate
 these layers of MUSCIMA++.
 """
-from __future__ import print_function, unicode_literals, division
-
-from builtins import str
-from builtins import range
-from builtins import object
 import logging
 import os
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
-
-
-##############################################################################
 
 
 def _get_cvc_muscima_root():

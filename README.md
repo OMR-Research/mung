@@ -10,8 +10,7 @@ It was used for instance in the [MUSCIMA++](https://ufal.mff.cuni.cz/muscima) da
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE.txt)
 [![codecov](https://codecov.io/gh/OMR-Research/mung/branch/master/graph/badge.svg)](https://codecov.io/gh/OMR-Research/mung)
 
-This package should work with both Python 2.7 and Python 3.6,
-although the doctest-based test suite only works on Python 3.
+Requires Python >= 3.6.
 
 
 ## Getting started

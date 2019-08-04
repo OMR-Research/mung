@@ -21,9 +21,6 @@ Also, convert to CSV, to make it grep-able? First: fixed-name cols,
 then: args dict, formatted as key=value,key=value
 
 """
-from __future__ import print_function, unicode_literals, division
-from builtins import str
-from builtins import range
 import argparse
 import codecs
 import collections
@@ -40,10 +37,6 @@ import matplotlib.pyplot as plt
 import operator
 
 from mung.io import parse_cropobject_list
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
-
 
 
 def freqdict(l, sort=True):

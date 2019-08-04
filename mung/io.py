@@ -248,10 +248,6 @@ primitives: notehead plus stem plus flags...), and the grammar
 file is a reference for doing that.
 
 """
-from __future__ import print_function, unicode_literals, division
-
-from builtins import str
-from builtins import map
 import copy
 import logging
 import os

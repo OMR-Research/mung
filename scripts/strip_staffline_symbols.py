@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """This is a script that removes all staffline, staffspace and staff
 symbols, and all relationships that lead to them."""
-from __future__ import print_function, unicode_literals
 import argparse
 import copy
 import logging
@@ -11,10 +10,6 @@ import time
 from mung.io import parse_cropobject_list, export_cropobject_list
 
 STAFF_CLSNAMES = ['staff', 'staff_line', 'staff_space']
-
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
 
 
 def build_argument_parser():

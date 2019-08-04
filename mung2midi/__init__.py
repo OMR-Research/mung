@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 """This is a script that..."""
-from __future__ import print_function, unicode_literals
 import argparse
 import logging
 import time
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
 
 
 def build_argument_parser():

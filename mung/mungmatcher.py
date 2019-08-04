@@ -1,13 +1,7 @@
 """This module implements a class that..."""
-from __future__ import print_function, unicode_literals
-
 import collections
 import copy
-# from mung.graph import NotationGraph
 from mung.inference.constants import _CONST
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
 
 
 class MungMatcher(object):

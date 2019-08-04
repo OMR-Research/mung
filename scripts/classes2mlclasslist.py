@@ -34,8 +34,6 @@ If no group is given, the color changes along the matplotlib
 color cycle.
 
 """
-from __future__ import print_function, unicode_literals, division
-from builtins import object
 import argparse
 import codecs
 import collections
@@ -43,9 +41,6 @@ import colorsys
 import logging
 import os
 import time
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
 
 header = u'''<?xml version="1.0" encoding="utf-8"?>
 <MLClassList noNamespaceSchema="mff-muscima-mlclasses.xsd">

@@ -2,10 +2,6 @@
 """The script ``add_staffline_symbols.py`` takes as input a CVC-MUSCIMA
 (page, writer) index and a corresponding CropObjectList file
 and adds to the CropObjectList staffline and staff objects."""
-from __future__ import print_function, unicode_literals
-from __future__ import division
-from builtins import zip
-from builtins import range
 import argparse
 import logging
 import os
@@ -23,12 +19,6 @@ from mung.dataset import CVC_MUSCIMA
 from mung.io import parse_cropobject_list, export_cropobject_list
 from mung.node import Node
 from mung.utils import connected_components2bboxes, compute_connected_components
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
-
-
-##############################################################################
 
 
 STAFFLINE_CLSNAME = 'staff_line'

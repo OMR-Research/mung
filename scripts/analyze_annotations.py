@@ -18,11 +18,8 @@ Functionality
 * Compute relationship parameters per class pair
 
 """
-from __future__ import print_function, unicode_literals
-from __future__ import division
 import argparse
 import collections
-import json
 import logging
 import pprint
 import time
@@ -31,9 +28,6 @@ import operator
 
 from mung.io import parse_cropobject_list, export_cropobject_graph
 from mung.node import merge_cropobject_lists
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
 
 
 def compute_cropobject_stats(cropobjects, edges=None):

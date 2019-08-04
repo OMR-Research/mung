@@ -11,8 +11,6 @@ The symbols in question are:
 * ``g-clef``, ``c-clef``, ``f-clef``
 
 """
-from __future__ import print_function, unicode_literals, division
-
 import argparse
 import collections
 import logging
@@ -23,12 +21,6 @@ import time
 from mung.inference.constants import InferenceEngineConstants as _CONST
 from mung.io import parse_cropobject_list, export_cropobject_list
 from mung.node import link_cropobjects
-
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
-
-
-##############################################################################
 
 ON_STAFFLINE_RATIO_TRHESHOLD = 0.15
 

@@ -3,12 +3,7 @@ dist: trusty
 language: python
 
 python:
-  - "2.7"
   - "3.6"
-
-matrix:
-  - python: "2.7"
-  - python: "3.6"
 
 install:
   # Display the Python version we are running now
@@ -20,12 +15,8 @@ install:
   # List installed packages for debuggin purposes
   - pip list
 
-  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install typing; fi
-
 script:
-  - pytest
-  # Run the doc-tests only with Python 3, because in Python 2, it reports strings as u'...' instead of '...' and causes a failure
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pytest --cov-report xml --cov --doctest-modules --ignore setup.py; fi
+  - pytest --cov-report xml --cov --doctest-modules --ignore setup.py
 
 after_success:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then codecov; fi
+  - codecov
