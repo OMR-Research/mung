@@ -12,21 +12,21 @@ from skimage.morphology import watershed
 
 from mung.graph import NotationGraph, find_noteheads_on_staff_linked_to_ledger_line
 from mung.inference.constants import InferenceEngineConstants as _CONST
-from mung.node import Node, cropobjects_on_canvas, link_cropobjects
+from mung.node import Node, draw_nodes_on_empty_canvas, link_nodes
 from mung.utils import compute_connected_components
 
 
 def __has_parent_staff(c, cropobjects):
     _cdict = {c.objid: c for c in cropobjects}
     staff_inlinks = [_cdict[i] for i in c.inlinks
-                     if _cdict[i].clsname == _CONST.STAFF_CLSNAME]
+                     if _cdict[i].clsname == _CONST.STAFF_CLASS_NAME]
     return len(staff_inlinks) > 0
 
 
 def __has_child_staffspace(staff, cropobjects):
     _cdict = {c.objid: c for c in cropobjects}
     staffline_outlinks = [_cdict[i] for i in staff.outlinks
-                          if _cdict[i].clsname == _CONST.STAFFSPACE_CLSNAME]
+                          if _cdict[i].clsname == _CONST.STAFFSPACE_CLASS_NAME]
     return len(staffline_outlinks) > 0
 
 
@@ -36,7 +36,7 @@ def __has_neighbor_staffspace(staffline, cropobjects):
     if not __has_parent_staff(staffline, cropobjects):
         return False
     parent_staffs = [_cdict[i] for i in staffline.inlinks
-                     if _cdict[i].clsname == _CONST.STAFF_CLSNAME]
+                     if _cdict[i].clsname == _CONST.STAFF_CLASS_NAME]
     if len(parent_staffs) > 1:
         raise ValueError('More than one parent staff for staffline {0}!'
                          ''.format(staffline.uid))
@@ -65,18 +65,18 @@ def merge_staffline_segments(cropobjects, margin=10):
         had any inlinks, they are preserved (mapped to the new staffline).
     """
     already_processed_stafflines = [c for c in cropobjects
-                                    if (c.clsname == _CONST.STAFFLINE_CLSNAME) and
+                                    if (c.clsname == _CONST.STAFFLINE_CLASS_NAME) and
                                     __has_parent_staff(c, cropobjects)]
     # margin is used to avoid the stafflines touching the edges,
     # which could perhaps break some assumptions down the line.
     old_staffline_cropobjects = [c for c in cropobjects
-                                 if (c.clsname == _CONST.STAFFLINE_CLSNAME) and
+                                 if (c.clsname == _CONST.STAFFLINE_CLASS_NAME) and
                                  not __has_parent_staff(c, cropobjects)]
     if len(old_staffline_cropobjects) == 0:
         logging.info('merge_staffline_segments: nothing new to do!')
         return cropobjects
 
-    canvas, (_t, _l) = cropobjects_on_canvas(old_staffline_cropobjects)
+    canvas, (_t, _l) = draw_nodes_on_empty_canvas(old_staffline_cropobjects)
 
     _staffline_bboxes, staffline_masks = staffline_bboxes_and_masks_from_horizontal_merge(canvas)
     # Bounding boxes need to be adjusted back with respect to the original image!
@@ -91,8 +91,8 @@ def merge_staffline_segments(cropobjects, margin=10):
     staffline_cropobjects = []
     for sl_bb, sl_m in zip(staffline_bboxes, staffline_masks):
         t, l, b, r = sl_bb
-        c = Node(node_id=next_objid,
-                 class_name=_CONST.STAFFLINE_CLSNAME,
+        c = Node(id=next_objid,
+                 class_name=_CONST.STAFFLINE_CLASS_NAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=sl_m,
                  dataset=dataset, document=document)
@@ -100,7 +100,7 @@ def merge_staffline_segments(cropobjects, margin=10):
         next_objid += 1
 
     non_staffline_cropobjects = [c for c in cropobjects
-                                 if c.clsname != _CONST.STAFFLINE_CLSNAME]
+                                 if c.clsname != _CONST.STAFFLINE_CLASS_NAME]
     old_staffline_objids = set([c.objid for c in old_staffline_cropobjects])
     old2new_staffline_objid_map = {}
     for os in old_staffline_cropobjects:
@@ -114,7 +114,7 @@ def merge_staffline_segments(cropobjects, margin=10):
         for o in c.outlinks:
             if o in old_staffline_objids:
                 new_staffline = old2new_staffline_objid_map[o]
-                new_outlinks.append(new_staffline.node_id)
+                new_outlinks.append(new_staffline.id)
                 new_staffline.inlinks.append(c.objid)
             else:
                 new_outlinks.append(o)
@@ -280,13 +280,13 @@ def build_staff_cropobjects(cropobjects):
 
     Assumes the stafflines have already been merged."""
     stafflines = [c for c in cropobjects
-                  if c.clsname == _CONST.STAFFLINE_CLSNAME and
+                  if c.clsname == _CONST.STAFFLINE_CLASS_NAME and
                   not __has_parent_staff(c, cropobjects)]
     if len(stafflines) == 0:
         return []
 
     staffline_bboxes = [c.bounding_box for c in stafflines]
-    canvas, (_t, _l) = cropobjects_on_canvas(stafflines)
+    canvas, (_t, _l) = draw_nodes_on_empty_canvas(stafflines)
 
     logging.warning('Creating staff bboxes and masks.')
 
@@ -313,8 +313,8 @@ def build_staff_cropobjects(cropobjects):
     staff_cropobjects = []
     for s_bb, s_m in zip(staff_bboxes, staff_masks):
         t, l, b, r = s_bb
-        c = Node(node_id=next_objid,
-                 class_name=_CONST.STAFF_CLSNAME,
+        c = Node(id=next_objid,
+                 class_name=_CONST.STAFF_CLASS_NAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=s_m,
                  dataset=dataset, document=document)
@@ -325,7 +325,7 @@ def build_staff_cropobjects(cropobjects):
         sl_from = 5 * i
         sl_to = 5 * (i + 1)
         for sl in stafflines[sl_from:sl_to]:
-            sl.inlinks.append(sc.node_id)
+            sl.inlinks.append(sc.id)
             sc.outlinks.append(sl.objid)
 
     return staff_cropobjects
@@ -353,10 +353,10 @@ def build_staffspace_cropobjects(cropobjects):
     document = cropobjects[0].document
 
     staff_cropobjects = [c for c in cropobjects
-                         if c.clsname == _CONST.STAFF_CLSNAME
+                         if c.clsname == _CONST.STAFF_CLASS_NAME
                          and not __has_child_staffspace(c, cropobjects)]
     staffline_cropobjects = [c for c in cropobjects
-                             if c.clsname == _CONST.STAFFLINE_CLSNAME
+                             if c.clsname == _CONST.STAFFLINE_CLASS_NAME
                              and not __has_neighbor_staffspace(c, cropobjects)]
 
     staffspace_cropobjects = []
@@ -438,7 +438,7 @@ def build_staffspace_cropobjects(cropobjects):
             ss_left = l
             ss_right = r
 
-            staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
+            staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
                               top=ss_top, left=ss_left,
                               height=ss_bottom - ss_top,
                               width=ss_right - ss_left,
@@ -446,7 +446,7 @@ def build_staffspace_cropobjects(cropobjects):
                               dataset=dataset, document=document)
 
             staffspace.inlinks.append(staff.objid)
-            staff.outlinks.append(staffspace.node_id)
+            staff.outlinks.append(staffspace.id)
 
             current_staffspace_cropobjects.append(staffspace)
 
@@ -475,14 +475,14 @@ def build_staffspace_cropobjects(cropobjects):
         uss_top += tss.__height - uss_height
         uss_mask = tss.__mask[:uss_height, :] * 1
 
-        staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
+        staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
                           top=uss_top, left=uss_left,
                           height=uss_height,
                           width=uss_width,
                           mask=uss_mask,
                           dataset=dataset, document=document)
         current_staffspace_cropobjects.append(staffspace)
-        staff.outlinks.append(staffspace.node_id)
+        staff.outlinks.append(staffspace.id)
         staffspace.inlinks.append(staff.objid)
         next_objid += 1
 
@@ -498,14 +498,14 @@ def build_staffspace_cropobjects(cropobjects):
         lss_height = int(bss.__height / 1.2)
         lss_mask = bss.__mask[:lss_height, :] * 1
 
-        staffspace = Node(next_objid, _CONST.STAFFSPACE_CLSNAME,
+        staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
                           top=lss_top, left=lss_left,
                           height=lss_height,
                           width=lss_width,
                           mask=lss_mask,
                           dataset=dataset, document=document)
         current_staffspace_cropobjects.append(staffspace)
-        staff.outlinks.append(staffspace.node_id)
+        staff.outlinks.append(staffspace.id)
         staffspace.inlinks.append(staff.objid)
         next_objid += 1
 
@@ -566,21 +566,21 @@ def add_staff_relationships(cropobjects,
 
     ##########################################################################
     logging.info('Find the staff-related symbols')
-    staffs = [c for c in cropobjects if c.clsname == _CONST.STAFF_CLSNAME]
+    staffs = [c for c in cropobjects if c.clsname == _CONST.STAFF_CLASS_NAME]
 
     staff_related_symbols = collections.defaultdict(list)
     notehead_symbols = collections.defaultdict(list)
     rest_symbols = collections.defaultdict(list)
     for c in cropobjects:
-        if c.clsname in _CONST.STAFF_RELATED_CLSNAMES:
+        if c.clsname in _CONST.STAFF_RELATED_CLASS_NAMES:
             # Check if it already has a staff link
-            if not graph.has_child(c, [_CONST.STAFF_CLSNAME]):
+            if not graph.has_child(c, [_CONST.STAFF_CLASS_NAME]):
                 staff_related_symbols[c.clsname].append(c)
-        if c.clsname in _CONST.NOTEHEAD_CLSNAMES:
-            if not graph.has_child(c, [_CONST.STAFF_CLSNAME]):
+        if c.clsname in _CONST.NOTEHEAD_CLASS_NAMES:
+            if not graph.has_child(c, [_CONST.STAFF_CLASS_NAME]):
                 notehead_symbols[c.clsname].append(c)
-        if c.clsname in _CONST.REST_CLSNAMES:
-            if not graph.has_child(c, [_CONST.STAFF_CLSNAME]):
+        if c.clsname in _CONST.REST_CLASS_NAMES:
+            if not graph.has_child(c, [_CONST.STAFF_CLASS_NAME]):
                 rest_symbols[c.clsname].append(c)
 
     ##########################################################################
@@ -603,7 +603,7 @@ def add_staff_relationships(cropobjects,
                 sl = 0
                 sr = max(sr, c.right)
                 if c.overlaps((st, sl, sb, sr)):
-                    link_cropobjects(c, s, check_docname=False)
+                    link_nodes(c, s, check_document=False)
 
     ##########################################################################
     logging.info('Adding rest --> staff relationships.')
@@ -612,7 +612,7 @@ def add_staff_relationships(cropobjects,
             closest_staff = min([s for s in staffs],
                                 key=lambda x: ((x.bottom + x.top) / 2. - (
                                         c.bottom + c.top) / 2.) ** 2)
-            link_cropobjects(c, closest_staff, check_docname=False)
+            link_nodes(c, closest_staff, check_document=False)
 
     ##########################################################################
     logging.info('Adding notehead relationships.')
@@ -624,11 +624,11 @@ def add_staff_relationships(cropobjects,
     # Sort the staff objects top-down. Assumes stafflines do not cross,
     # and that there are no crazy curves at the end that would make the lower
     # stafflines stick out over the ones above them...
-    stafflines = [c for c in cropobjects if c.clsname == _CONST.STAFFLINE_CLSNAME]
+    stafflines = [c for c in cropobjects if c.clsname == _CONST.STAFFLINE_CLASS_NAME]
     stafflines = sorted(stafflines, key=lambda c: c.top)
-    staffspaces = [c for c in cropobjects if c.clsname == _CONST.STAFFSPACE_CLSNAME]
+    staffspaces = [c for c in cropobjects if c.clsname == _CONST.STAFFSPACE_CLASS_NAME]
     staffspaces = sorted(staffspaces, key=lambda c: c.top)
-    staves = [c for c in cropobjects if c.clsname == _CONST.STAFF_CLSNAME]
+    staves = [c for c in cropobjects if c.clsname == _CONST.STAFF_CLASS_NAME]
     staves = sorted(staves, key=lambda c: c.top)
 
     logging.info('Stafflines: {0}'.format(len(stafflines)))
@@ -643,7 +643,7 @@ def add_staff_relationships(cropobjects,
     #  - per staffline and staffspace: its index (top to bottom) within the staff
     _ss_sl_idx_wrt_staff = {}
     # Reverse indexes:
-    # If I know which staff (by node_id) and which index of staffline/staffspace,
+    # If I know which staff (by id) and which index of staffline/staffspace,
     # I want to retrieve the given staffline/staffspace CropObject:
     _staff_and_idx2ss = collections.defaultdict(dict)
     _staff_and_idx2sl = collections.defaultdict(dict)
@@ -726,7 +726,7 @@ def add_staff_relationships(cropobjects,
                                   ''.format(c.uid, ll_max_dist.uid, staff_min_dist.uid,
                                             distance_of_closest_staff))
                 else:
-                    link_cropobjects(c, staff_min_dist, check_docname=False)
+                    link_nodes(c, staff_min_dist, check_document=False)
                 continue
 
             # - Find the related staffline.
@@ -784,17 +784,17 @@ def add_staff_relationships(cropobjects,
                     _staff = _staff_per_ss_sl[s.objid]
                     tgt_staffspace = _staff_and_idx2ss[_staff.objid][_staffspace_idx_wrt_staff]
                     # Link to staffspace
-                    link_cropobjects(c, tgt_staffspace, check_docname=False)
+                    link_nodes(c, tgt_staffspace, check_document=False)
                     # And link to staff
                     _c_staff = _staff_per_ss_sl[tgt_staffspace.objid]
-                    link_cropobjects(c, _c_staff, check_docname=False)
+                    link_nodes(c, _c_staff, check_document=False)
 
                 else:
                     # Staffline!
-                    link_cropobjects(c, s, check_docname=False)
+                    link_nodes(c, s, check_document=False)
                     # And staff:
                     _c_staff = _staff_per_ss_sl[s.objid]
-                    link_cropobjects(c, _c_staff, check_docname=False)
+                    link_nodes(c, _c_staff, check_document=False)
             elif len(overlapped_stafflines) == 0:
                 # Staffspace!
                 # Link to the staffspace with which the notehead has
@@ -819,9 +819,9 @@ def add_staff_relationships(cropobjects,
                 _ss_i_max = max(list(overlapped_staffspaces.keys()),
                                 key=lambda x: overlapped_staffspaces[x])
                 max_overlap_staffspace = staffspaces[_ss_i_max]
-                link_cropobjects(c, max_overlap_staffspace, check_docname=False)
+                link_nodes(c, max_overlap_staffspace, check_document=False)
                 _c_staff = _staff_per_ss_sl[max_overlap_staffspace.objid]
-                link_cropobjects(c, _c_staff, check_docname=False)
+                link_nodes(c, _c_staff, check_document=False)
 
             elif len(overlapped_stafflines) == 2:
                 # Staffspace between those two lines.
@@ -836,10 +836,10 @@ def add_staff_relationships(cropobjects,
 
                 _staffspace_idx = _ss_sl_idx_wrt_staff[s2.objid]
                 s = _staff_and_idx2ss[_staff2.objid][_staffspace_idx]
-                link_cropobjects(c, s, check_docname=False)
+                link_nodes(c, s, check_document=False)
                 # And link to staff:
                 _c_staff = _staff_per_ss_sl[s.objid]
-                link_cropobjects(c, _c_staff, check_docname=False)
+                link_nodes(c, _c_staff, check_document=False)
 
             elif len(overlapped_stafflines) > 2:
                 logging.warning('Really weird notehead overlapping more than 2 stafflines:'
@@ -847,10 +847,10 @@ def add_staff_relationships(cropobjects,
                 # use the middle staffline -- this will be an error anyway,
                 # but we want to export some MIDI more or less no matter what
                 s_middle = overlapped_stafflines[len(overlapped_stafflines) // 2]
-                link_cropobjects(c, s_middle, check_docname=False)
+                link_nodes(c, s_middle, check_document=False)
                 # And staff:
                 _c_staff = _staff_per_ss_sl[s_middle.objid]
-                link_cropobjects(c, _c_staff, check_docname=False)
+                link_nodes(c, _c_staff, check_document=False)
 
     ##########################################################################
     logging.info('Attaching clefs to stafflines [NOT IMPLEMENTED].')

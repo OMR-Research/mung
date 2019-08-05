@@ -1,20 +1,12 @@
-# -*- coding: utf-8 -*-
-"""This module implements a Python representation of the Node,
-the basic unit of annotation. See the :class:`Node` documentation."""
-
-from math import ceil
-
 import copy
 import itertools
 import logging
-from typing import List, Union, Tuple, Any
+from typing import List, Union, Tuple, Optional, Any
 
 import numpy
+from math import ceil
 
 from mung.utils import compute_connected_components
-
-
-##############################################################################
 
 
 class Node(object):
@@ -66,7 +58,7 @@ class Node(object):
     >>> class_name = 'flat'
     >>> dataset = 'MUSCIMA-pp_2.0'
     >>> document = 'CVC-MUSCIMA_W-35_N-08_D-ideal'
-    >>> node = Node(node_id=611, class_name=class_name,
+    >>> node = Node(id=611, class_name=class_name,
     ...                top=top, left=left, height=height, width=width,
     ...                inlinks=[], outlinks=[],
     ...                mask=mask,
@@ -112,7 +104,7 @@ class Node(object):
     'CVC-MUSCIMA_W-35_N-08_D-ideal'
     >>> node.dataset
     'MUSCIMA-pp_2.0'
-    >>> node.node_id
+    >>> node.id
     611
 
     **Nodes and images**
@@ -132,16 +124,17 @@ class Node(object):
 
     To recover the area corresponding to a Node `c`, use:
 
-    >>> if node.mask is not None: crop = img[node.top:node.bottom, node.left:node.right] * node.mask  #doctest: +SKIP
-    >>> if node.mask is None: crop = img[node.top:node.bottom, node.left:node.right]               #doctest: +SKIP
+    >>> image = numpy.array([]) #doctest: +SKIP
+    >>> if node.mask is not None: crop = image[node.top:node.bottom, node.left:node.right] * node.mask  #doctest: +SKIP
+    >>> if node.mask is None: crop = image[node.top:node.bottom, node.left:node.right]               #doctest: +SKIP
 
     Because this is clunky, we have implemented the following to get the crop:
 
-    >>> crop = node.project_to(img)    #doctest: +SKIP
+    >>> crop = node.project_to(image)    #doctest: +SKIP
 
     And to get the Node projected onto the entire image:
 
-    >>> crop = node.project_on(img)    #doctest: +SKIP
+    >>> crop = node.project_on(image)    #doctest: +SKIP
 
     Above, note the multiplicative role of the mask: while we typically would
     expect the mask to be binary, in principle, this is not strictly necessary.
@@ -156,8 +149,9 @@ class Node(object):
     the Node as a transparent colored transparent rectangle over
     an RGB image. (NOTE: this really changes the input image!)
 
-    >>> node.render(img)           #doctest: +SKIP
-    >>> plt.imshow(img); plt.show() #doctest: +SKIP
+    >>> import matplotlib.pyplot as plt #doctest: +SKIP
+    >>> node.render(image)           #doctest: +SKIP
+    >>> plt.imshow(image); plt.show() #doctest: +SKIP
 
     However, `Node.render()` currently does not support rendering
     the mask.
@@ -217,12 +211,12 @@ class Node(object):
     explains the ``order='C'`` hack in ``set_mask()``.)
     """
 
-    # Delimits the Node UID fields (global, document namespaces, node_id)
+    # Delimits the Node UID fields (global, document namespaces, id)
     UID_DELIMITER = '___'
     DEFAULT_DATASET = 'MUSCIMA_DEFAULT_DATASET_PLACEHOLDER'
     DEFAULT_DOCUMENT = 'default-document'
 
-    def __init__(self, node_id: int,
+    def __init__(self, id: int,
                  class_name: str,
                  top: int,
                  left: int,
@@ -234,7 +228,7 @@ class Node(object):
                  dataset: str = None,
                  document: str = None,
                  data=None):
-        self.__node_id = node_id
+        self.__id = id
         self.__class_name = class_name
         self.__top = top
         self.__left = left
@@ -279,12 +273,12 @@ class Node(object):
         """
         return self.UID_DELIMITER.join([self.dataset,
                                         self.document,
-                                        str(self.node_id)])
+                                        str(self.id)])
 
     @staticmethod
     def parse_unique_id(uid: str) -> (str, str, int):
         """Parse a unique identifier. This breaks down the UID into the dataset name,
-        document name, and node_id
+        document name, and id
 
         The delimiter is expected to be ``___``
         (kept as ``Node.UID_DELIMITER``)
@@ -292,9 +286,9 @@ class Node(object):
         >>> Node.parse_unique_id('MUSCIMA++_2.0___CVC-MUSCIMA_W-05_N-19_D-ideal___424')
         ('MUSCIMA++_2.0', 'CVC-MUSCIMA_W-05_N-19_D-ideal', 424)
 
-        :returns: ``global_namespace, document_namespace, node_id`` triplet.
-            The namespaces are strings, ``node_id`` is an integer. If ``unique_id``
-            is ``None``, returns ``None`` as ``node_id`` and expects it
+        :returns: ``global_namespace, document_namespace, id`` triplet.
+            The namespaces are strings, ``id`` is an integer. If ``unique_id``
+            is ``None``, returns ``None`` as ``id`` and expects it
             to be filled in from the caller Node instance.
         """
         if uid is None:
@@ -307,8 +301,11 @@ class Node(object):
         return global_namespace, document_namespace, node_id
 
     @property
-    def node_id(self) -> int:
-        return self.__node_id
+    def id(self) -> int:
+        return self.__id
+
+    def set_id(self, id):
+        self.__id = id
 
     @property
     def class_name(self) -> str:
@@ -415,52 +412,51 @@ class Node(object):
         """
         return int(top), int(left), int(ceil(bottom)), int(ceil(right))
 
-    def project_to(self, img):
+    def project_to(self, image: numpy.ndarray):
         """This function returns the *crop* of the input image
         corresponding to the Node (incl. masking).
         Assumes zeros are background."""
         # Make a copy! We don't want to modify the original image by the mask.
         # Copy forced by the "* 1" part.
-        crop = img[self.top:self.bottom, self.left:self.right] * 1
+        crop = image[self.top:self.bottom, self.left:self.right] * 1
         if self.__mask is not None:
             crop *= self.__mask
         return crop
 
-    def project_on(self, img):
+    def project_on(self, image: numpy.ndarray):
         """This function returns only those parts of the input image
         that correspond to the Node and masks out everything else
         with zeros. The dimension of the returned array is the same
         as of the input image. This function basically reconstructs
         the symbol as an indicator function over the pixels of
         the annotated image."""
-        output = numpy.zeros(img.shape, img.dtype)
-        crop = self.project_to(img)
+        output = numpy.zeros(image.shape, image.dtype)
+        crop = self.project_to(image)
         output[self.top:self.bottom, self.left:self.right] = crop
         return output
 
-    def render(self, img: numpy.ndarray, alpha: float = 0.3,
+    def render(self, image: numpy.ndarray, alpha: float = 0.3,
                rgb: Tuple[float, float, float] = (1.0, 0.0, 0.0)) -> numpy.ndarray:
         """Renders itself upon the given image as a rectangle
         of the given color and transparency. Might help visualization.
-
-        :param img: A three-channel image (3-D numpy array,
-            with the last dimension being 3)."""
+        """
         color = numpy.array(rgb)
         logging.debug('Rendering object {0}, class_name {1}, t/b/l/r: {2}'
-                      ''.format(self.node_id, self.class_name,
+                      ''.format(self.id, self.class_name,
                                 (self.top, self.bottom, self.left, self.right)))
         # logging.debug('Shape: {0}'.format((self.height, self.width, 3)))
         mask = numpy.ones((self.__height, self.__width, 3)) * color
-        crop = img[self.top:self.bottom, self.left:self.right]
+        crop = image[self.top:self.bottom, self.left:self.right]
         # logging.debug('Mask done, creating crop')
         logging.debug('Shape: {0}. Got crop. Crop shape: {1}, img shape: {2}'
-                      ''.format((self.__height, self.__width, 3), crop.shape, img.shape))
+                      ''.format((self.__height, self.__width, 3), crop.shape, image.shape))
         mix = (crop + alpha * mask) / (1 + alpha)
 
-        img[self.top:self.bottom, self.left:self.right] = mix
-        return img
+        image[self.top:self.bottom, self.left:self.right] = mix
+        return image
 
-    def overlaps(self, bounding_box_or_node: Union[Tuple[int, int, int, int], Any]) -> bool:
+    def overlaps(self, bounding_box_or_node):
+        # type: (Union[Tuple[int, int, int, int], Node]) -> bool
         """Check whether this Node overlaps the given bounding box or Node.
 
         >>> node = Node(0, 'test', 10, 100, height=20, width=10)
@@ -476,7 +472,7 @@ class Node(object):
         False
         >>> node.overlaps((9, 99, 31, 111))    # Encompasses Node
         True
-        >>> node.overlaps((11, 101, 29, 109))
+        >>> node.overlaps((11, 101, 29, 109))  # Within Node
         True
         >>> node.overlaps((9, 101, 31, 109))   # Encompass horz., within vert.
         True
@@ -505,7 +501,8 @@ class Node(object):
                 return True
         return False
 
-    def contains(self, bounding_box_or_node: Union[Tuple[int, int, int, int], Any]) -> bool:
+    def contains(self, bounding_box_or_node):
+        # type: (Union[Tuple[int, int, int, int], Node]) -> bool
         """Check if this Node entirely contains the other bounding
         box (or, the other node's bounding box)."""
         if isinstance(bounding_box_or_node, Node):
@@ -518,8 +515,7 @@ class Node(object):
                 return True
         return False
 
-    def bbox_intersection(self, bounding_box: Tuple[int, int, int, int]) -> \
-            Union[None, Tuple[int, int, int, int]]:
+    def bounding_box_intersection(self, bounding_box: Tuple[int, int, int, int]) -> Optional[Tuple[int, int, int, int]]:
         """Returns the sub-bounding box of this Node intersecting with the given bounding box.
         If the intersection is empty, returns None.
 
@@ -527,16 +523,16 @@ class Node(object):
         >>> node.bounding_box
         (10, 100, 30, 110)
         >>> other_bbox = 20, 100, 40, 105
-        >>> node.bbox_intersection(other_bbox)
+        >>> node.bounding_box_intersection(other_bbox)
         (10, 0, 20, 5)
         >>> containing_bbox = 4, 55, 44, 115
-        >>> node.bbox_intersection(containing_bbox)
+        >>> node.bounding_box_intersection(containing_bbox)
         (0, 0, 20, 10)
         >>> contained_bbox = 12, 102, 22, 108
-        >>> node.bbox_intersection(contained_bbox)
+        >>> node.bounding_box_intersection(contained_bbox)
         (2, 2, 12, 8)
         >>> non_overlapping_bbox = 0, 0, 3, 3
-        >>> node.bbox_intersection(non_overlapping_bbox) is None
+        >>> node.bounding_box_intersection(non_overlapping_bbox) is None
         True
 
         """
@@ -575,7 +571,7 @@ class Node(object):
         >>> node.height, node.width
         (10, 5)
 
-        Assumes integer bounds, which is ensured during CropObject initNode.
+        Assumes integer bounds, which is ensured during CropObject initialization.
         """
         if self.__mask is None:
             return
@@ -611,7 +607,7 @@ class Node(object):
                 trim_right = l
                 break
 
-        logging.debug('Cropobject.crop: Trimming top={0}, left={1},'
+        logging.debug('Node.crop: Trimming top={0}, left={1},'
                       'bottom={2}, right={3}'
                       ''.format(trim_top, trim_left, trim_bottom, trim_right))
 
@@ -624,7 +620,7 @@ class Node(object):
 
         new_mask = self.__mask[rel_t:rel_b, rel_l:rel_r] * 1
 
-        logging.debug('Cropobject.crop: Old mask shape {0}, new mask shape {1}'
+        logging.debug('Node.crop: Old mask shape {0}, new mask shape {1}'
                       ''.format(self.__mask.shape, new_mask.shape))
 
         # new bounding box, relative to image -- used to compute the CropObject's position and size
@@ -645,8 +641,7 @@ class Node(object):
         of :module:`mung.io` for details."""
         lines = []
         lines.append('<Node>')
-        lines.append('\t<Id>{0}</Id>'.format(self.node_id))
-        # lines.append('\t<UniqueId>{0}</UniqueId>'.format(self.unique_id))
+        lines.append('\t<Id>{0}</Id>'.format(self.id))
         lines.append('\t<ClassName>{0}</ClassName>'.format(self.class_name))
         lines.append('\t<Top>{0}</Top>'.format(self.top))
         lines.append('\t<Left>{0}</Left>'.format(self.left))
@@ -672,14 +667,14 @@ class Node(object):
 
     def encode_mask(self, mode: str = 'rle') -> str:
         """Encode a binary array ``mask`` as a string, compliant
-        with the CropObject formNodecation in :mod:`mung.io`.
+        with the Node format specification in :mod:`mung.io`.
         """
         if mode == 'rle':
             return self.encode_mask_rle(self.mask)
         elif mode == 'bitmap':
             return self.encode_mask_bitmap(self.mask)
 
-    def encode_data(self) -> Union[None, str]:
+    def encode_data(self) -> Optional[str]:
         if self.data is None:
             return None
         if len(self.data) == 0:
@@ -710,7 +705,7 @@ class Node(object):
 
         return '\n'.join(lines)
 
-    def data_display_text(self):
+    def data_display_text(self) -> str:
         if self.data is None:
             return '[No data]'
         if len(self.data) == 0:
@@ -768,8 +763,8 @@ class Node(object):
         output = ' '.join(output_strings)
         return output
 
-    def decode_mask(self, mask_string, shape):
-        """Decodes a CropObject maskNodeto a binary
+    def decode_mask(self, mask_string: str, shape) -> Optional[numpy.ndarray]:
+        """Decodes a Node mask string into a binary
         numpy array of the given shape."""
         mode = self._determine_mask_mode(mask_string)
         if mode == 'rle':
@@ -777,7 +772,7 @@ class Node(object):
         elif mode == 'bitmap':
             return self.decode_mask_bitmap(mask_string, shape=shape)
 
-    def _determine_mask_mode(self, mask_string):
+    def _determine_mask_mode(self, mask_string: str):
         """If the mask string starts with '0:' or '1:', or generally
         if it contains a non-0 or 1 symbol, assume it is RLE."""
         mode = 'bitmap'
@@ -788,20 +783,20 @@ class Node(object):
         return mode
 
     @staticmethod
-    def decode_mask_bitmap(mask_string, shape):
+    def decode_mask_bitmap(mask_string: str, shape) -> Optional[numpy.ndarray]:
         """Decodes the mask array from the encoded form to the 2D numpy array."""
         if mask_string == 'None':
             return None
         try:
             values = list(map(float, mask_string.split()))
         except ValueError:
-            logging.info('CropObject.decoNode Cannot decode mask values:\n{0}'.format(mask_string))
+            logging.info('Node.decode_mask_bitmap() Cannot decode mask values:\n{0}'.format(mask_string))
             raise
         mask = numpy.array(values).reshape(shape)
         return mask
 
     @staticmethod
-    def decode_mask_rle(mask_string, shape):
+    def decode_mask_rle(mask_string: str, shape) -> Optional[numpy.ndarray]:
         """Decodes the mask array from the RLE-encoded form
         to the 2D numpy array.
         """
@@ -819,39 +814,37 @@ class Node(object):
         return mask
 
     def join(self, other):
-        """CropObject "addition": performs an OR on this
-        and the ``other`` CropObjects' masks and bounding boxes,
+        """Node "addition": performs an OR on this
+        and the ``other`` Nodes' masks and bounding boxes,
         and assigns to this CropObject the result. Merges
         also the inlinks and outlinks.
 
-        Works only if the document spaces for both CropObjects
+        Works only if the document spaces for both Nodes
         are the same. (Otherwise changes nothing.)
 
         The ``class_name`` of the ``other`` is ignored.
         """
         if self.document != other.document:
-            logging.warning('Trying to join CropObject from'
-                            ' into this CropObject from skipping.'
-                            ''.format(other.document, self.document))
+            logging.warning("Trying to join Node from different documents, which is forbidden. Skipping join.")
             return
 
         # Get combined bounding box
-        nt = min(self.top, other.top)
-        nl = min(self.left, other.left)
-        nb = max(self.bottom, other.bottom)
-        nr = max(self.right, other.right)
+        new_top = min(self.top, other.top)
+        new_left = min(self.left, other.left)
+        new_bottom = max(self.bottom, other.bottom)
+        new_right = max(self.right, other.right)
 
-        nh = nb - nt
-        nw = nr - nl
+        new_height = new_bottom - new_top
+        new_width = new_right - new_left
 
         # Create mask of corresponding size
-        new_mask = numpy.zeros((nh, nw), dtype=self.__mask.dtype)
+        new_mask = numpy.zeros((new_height, new_width), dtype=self.__mask.dtype)
 
         # Find coordinates where to paste the masks
-        spt = self.top - nt  # spt = self_paste_top
-        spl = self.left - nl
-        opt = other.top - nt
-        opl = other.left - nl
+        spt = self.top - new_top
+        spl = self.left - new_left
+        opt = other.top - new_top
+        opl = other.left - new_left
 
         # Paste the masks into these places
         new_mask[spt:spt + self.__height, spl:spl + self.__width] += self.__mask
@@ -860,44 +853,48 @@ class Node(object):
         # Normalize mask value
         new_mask[new_mask != 0] = 1
 
-        # Assign the new variables to this CropObject
-        self.__top = nt
-        self.__left = nl
-        self.__height = nh
-        self.__width = nw
+        # Assign the new variables to this Node
+        self.__top = new_top
+        self.__left = new_left
+        self.__height = new_height
+        self.__width = new_width
         self.__mask = new_mask
 
         # Add inlinks and outlinks (check for multiple and self-reference)
         for o in other.outlinks:
-            if (o not in self.outlinks) and (o != self.node_id):
+            if (o not in self.outlinks) and (o != self.id):
                 self.outlinks.append(o)
         for i in other.inlinks:
-            if (i not in self.inlinks) and (i != self.node_id):
+            if (i not in self.inlinks) and (i != self.id):
                 self.inlinks.append(i)
 
-    def get_outlink_objects(self, cropobjects):
-        """Out of the given ``cropobject`` list, return a list
-        of those to which this CropObject has Node
-        Can deal with CropObjects from multiple documents.
+    def get_outlink_objects(self, nodes):
+        # type: (List[Node]) -> List[Node]
+        """Out of the given ``nodes`` list, return a list
+        of those to which this Node has outlinks
+        Can deal with Nodes from multiple documents.
         """
-        output = []
+        output = []  # type: List[Node]
         if len(self.outlinks) == 0:
             return output
 
         _outlink_set = frozenset(self.outlinks)
 
-        for c in cropobjects:
+        for c in nodes:
             if c.document != self.document:
                 continue
-            if c.objid in _outlink_set:
+            if c.id in _outlink_set:
                 output.append(c)
             if len(output) == len(self.outlinks):
                 break
         return output
 
-    def get_inlink_objects(self, cropobjects):
+    def get_inlink_objects(self, nodes):
+        # type: (List[Node]) -> List[Node]
         """Out of the given ``cropobject`` list, return a list
-        of those from which this CropObject has Node        Can deal with CropObjects from multiple documents.
+        of those from which this CropObject has inlinks
+
+        Can deal with CropObjects from multiple documents.
         """
         output = []
         if len(self.inlinks) == 0:
@@ -905,22 +902,22 @@ class Node(object):
 
         _inlink_set = frozenset(self.inlinks)
 
-        for c in cropobjects:
-            if c.document != self.document:
+        for node in nodes:
+            if node.document != self.document:
                 continue
-            if c.objid in _inlink_set:
-                output.append(c)
+            if node.id in _inlink_set:
+                output.append(node)
             if len(output) == len(self.inlinks):
                 break
         return output
 
-    def translate(self, down=0, right=0):
-        """Move the cropobject down and right by the given amount of pixels."""
+    def translate(self, down: int = 0, right: int = 0):
+        """Move the Node down and right by the given amount of pixels."""
         self.__top += down
         self.__left += right
 
-    def scale(self, zoom=1.0):
-        """Re-compute the CropObject withNode scaling factor."""
+    def scale(self, zoom: float = 1.0):
+        """Re-compute the Node with the given scaling factor."""
         mask = self.__mask * 1.0
         import skimage.transform
         new_mask_shape = max(int(self.__height * zoom), 1), max(int(self.__width * zoom), 1)
@@ -955,103 +952,150 @@ class Node(object):
         self.__height = height
         self.__width = width
 
+    def distance_to(self, node) -> Any:
+        """Computes the distance between this node and another node.
+        Their minimum vertical and horizontal distances are each taken
+        separately, and the euclidean norm is computed from them."""
+        if self.document != node.document:
+            logging.warning('Cannot compute distances between CropObjects'
+                            ' from different documents! ({0} vs. {1})'
+                            ''.format(self.document, node.document))
+
+        if (self.top <= node.top <= self.bottom) or (node.top <= self.top <= node.bottom):
+            delta_vert = 0
+        elif self.top < node.top:
+            delta_vert = node.top - self.bottom
+        else:
+            delta_vert = self.top - node.bottom
+
+        if (self.left <= node.left <= self.right) or (node.left <= self.left <= node.right):
+            delta_horz = 0
+        elif self.left < node.left:
+            delta_horz = node.left - self.right
+        else:
+            delta_horz = self.left - node.right
+
+        return numpy.sqrt(delta_vert ** 2 + delta_horz ** 2)
+
+    def compute_recall_precision_fscore_on_mask(self, other_node):
+        # type: (Node) -> Tuple[float, float, float]
+        """Compute the recall, precision and f-score of the predicted
+        cropobject's mask against the ground truth cropobject's mask."""
+
+        if bounding_box_intersection(self.bounding_box, other_node.bounding_box) is None:
+            return 0.0, 0.0, 0.0
+
+        mask_intersection = compute_unifying_mask([(self), (other_node)], intersection=False)
+
+        gt_pasted_mask = mask_intersection * 1
+        t, l, b, r = compute_unifying_bounding_box([self, other_node])
+        h, w = b - t, r - l
+        ct, cl, cb, cr = self.top - t, \
+                         self.left - l, \
+                         h - (b - self.bottom), \
+                         w - (r - self.right)
+        gt_pasted_mask[ct:cb, cl:cr] += self.mask
+        gt_pasted_mask[gt_pasted_mask != 0] = 1
+
+        pred_pasted_mask = mask_intersection * 1
+        t, l, b, r = other_node.bounding_box
+        h, w = b - t, r - l
+        ct, cl, cb, cr = other_node.top - t, \
+                         other_node.left - l, \
+                         h - (b - other_node.bottom), \
+                         w - (r - other_node.right)
+        pred_pasted_mask[ct:cb, cl:cr] += other_node.mask
+        pred_pasted_mask[pred_pasted_mask != 0] = 1
+
+        true_positives = float(mask_intersection.sum())
+        false_positives = pred_pasted_mask.sum() - true_positives
+        false_negatives = gt_pasted_mask.sum() - true_positives
+        recall = true_positives / (true_positives + false_negatives)
+        precision = true_positives / (true_positives + false_positives)
+        f_score = (2 * recall * precision) / (recall + precision)
+
+        return recall, precision, f_score
+
 
 ##############################################################################
-# Functions for merging CropObjects and CropObjectLists
-def split_cropobject_on_connected_components(c, next_objid):
-    """Split the CropObject intoNodet per connected component
-    of the mask. All inlinks/outlinks are retained in all the newly
-    created CropObjects, and the old object is not changed. (If there
-    is only one connected component, the object is returned unchanged
-    in a list of length 1.)
 
-    An ``node_id`` must be provided at which to start numbering the newly
-    created CropObjects.
+
+def split_node_by_its_connected_components(node: Node, next_node_id: int) -> List[Node]:
+    """Split the Node into one object per connected component
+    of the mask. All inlinks/outlinks are retained in all the newly
+    created Nodes, and the old object is not changed.
+    If there is only one connected component, the object is returned unchanged
+    in a list with one entry.
+
+    A ``id`` must be provided at which to start numbering the newly
+    created Nodes.
 
     The ``data`` attribute is also retained.
     """
-    mask = c.mask
-
     # "Safety margin"
-    canvas = numpy.zeros((mask.shape[0] + 2, mask.shape[1] + 2))
-    canvas[1:-1, 1:-1] = mask
-    cc, labels, bboxes = compute_connected_components(canvas)
+    canvas = numpy.zeros((node.mask.shape[0] + 2, node.mask.shape[1] + 2))
+    canvas[1:-1, 1:-1] = node.mask
+    number_of_connected_components, labels, bounding_boxes = compute_connected_components(canvas)
 
-    logging.info('CropObject.spliNodecs, bboxes: {1}'.format(cc, bboxes))
+    logging.info('Node.split(): {0} connected components, bounding boxes: {1}'
+                 .format(number_of_connected_components, bounding_boxes))
 
-    if len(bboxes) == 1:
-        return [c]
+    if len(bounding_boxes) == 1:
+        return [node]
 
     output = []
 
-    _next_objid = next_objid
-    for label, (t, l, b, r) in list(bboxes.items()):
+    for label, (top, left, bottom, right) in list(bounding_boxes.items()):
         # Background in compute_connected_components() doesn't work?
         if label == 0:
             continue
 
-        h = b - t
-        w = r - l
+        height = bottom - top
+        width = right - left
         m_label = (labels == label).astype('uint8')
-        m = m_label[t:b, l:r]
-        top = t + c.top - 1
-        left = l + c.left - 1
-        objid = _next_objid
-        inlinks = copy.deepcopy(c.inlinks)
-        outlinks = copy.deepcopy(c.outlinks)
-        data = copy.deepcopy(c.data)
+        m = m_label[top:bottom, left:right]
+        top = top + node.top - 1
+        left = left + node.left - 1
+        node_id = next_node_id
+        inlinks = copy.deepcopy(node.inlinks)
+        outlinks = copy.deepcopy(node.outlinks)
+        data = copy.deepcopy(node.data)
+        dataset = node.dataset
+        document = node.document
 
-        new_c = Node(objid, c.clsname, top, left, w, h,
-                     inlinks=inlinks, outlinks=outlinks,
-                     mask=m, data=data)
-        output.append(new_c)
+        new_node = Node(node_id, node.class_name, top, left, width, height,
+                        inlinks=inlinks, outlinks=outlinks,
+                        mask=m, data=data, dataset=dataset, document=document)
+        output.append(new_node)
 
-        _next_objid += 1
+        next_node_id += 1
 
     return output
 
 
-def cropobjects_merge(fr, to, clsname, objid):
-    """Merge the given CropObjects with respect to the other.
-    Returns the new CropObject (witNodeying any of the inputs)."""
-    if fr.document != to.document:
-        raise ValueError('Cannot merge CropObjects from different documents!'
-                         ' fr: {0}, to: {1}'.format(fr.document, to.document))
-
-    mt, ml, mb, mr = compute_unifying_bounding_box([fr, to])
-    mh = mb - mt
-    mw = mr - ml
-    mmask = compute_unifying_mask([fr, to])
-    m_inlinks, m_outlinks = cropobjects_merge_links([fr, to])
-
-    m_doc = fr.document
-    m_dataset = fr.dataset
-
-    output = Node(objid, clsname,
-                  top=mt, left=ml, height=mh, width=mw,
-                  mask=mmask,
-                  inlinks=m_inlinks, outlinks=m_outlinks,
-                  dataset=m_dataset, document=m_doc)
-    return output
+def merge_nodes(first_node: Node, second_node: Node, class_name: str, id: int) -> Node:
+    """Merge the given Nodes with respect to the other.
+    Returns a new Node (without modifying any of the inputs)."""
+    return merge_multiple_nodes([first_node, second_node], class_name, id)
 
 
-def cropobjects_merge_multiple(cropobjects, clsname, objid):
+def merge_multiple_nodes(nodes: List[Node], class_name: str, id: int) -> Node:
     """Merge multiple cropobjects. Does not modify any of the inputs."""
-    if len(set([c.document for c in cropobjects])) > 1:
+    if len(set([c.document for c in nodes])) > 1:
         raise ValueError('Cannot merge CropObjects from different documents!')
-    mt, ml, mb, mr = compute_unifying_bounding_box(cropobjects)
-    mh, mw = mb - mt, mr - ml
-    m_mask = compute_unifying_mask(cropobjects)
-    m_inlinks, m_outlinks = cropobjects_merge_links(cropobjects)
+    merged_top, merged_left, merged_bottom, merged_right = compute_unifying_bounding_box(nodes)
+    merged_height, merged_width = merged_bottom - merged_top, merged_right - merged_left
+    merged_mask = compute_unifying_mask(nodes)
+    merged_inlinks, merged_outlinks = merge_inlinks_and_outlinks_to_nodes_outside_of_this_list(nodes)
 
-    m_doc = cropobjects[0].document
-    m_dataset = cropobjects[0].dataset
+    dataset = nodes[0].dataset
+    document = nodes[0].document
 
-    output = Node(objid, clsname,
-                  top=mt, left=ml, height=mh, width=mw,
-                  mask=m_mask,
-                  inlinks=m_inlinks, outlinks=m_outlinks,
-                  dataset=m_dataset, document=m_doc)
+    output = Node(id, class_name,
+                  top=merged_top, left=merged_left, height=merged_height, width=merged_width,
+                  mask=merged_mask,
+                  inlinks=merged_inlinks, outlinks=merged_outlinks,
+                  dataset=dataset, document=document)
     return output
 
 
@@ -1072,7 +1116,7 @@ def compute_unifying_bounding_box(nodes: List[Node]) -> (int, int, int, int):
     return it, il, ib, ir
 
 
-def compute_unifying_mask(nodes: List[Node], intersection=False) -> Union[None, numpy.ndarray]:
+def compute_unifying_mask(nodes: List[Node], intersection=False) -> Optional[numpy.ndarray]:
     """ Merges the masks of the given Nodes into one. Masks are combined by an OR operation.
 
     >>> c1 = Node(0, 'name', 10, 10, 4, 1, mask=numpy.ones((1, 4), dtype='uint8'))
@@ -1128,72 +1172,62 @@ def compute_unifying_mask(nodes: List[Node], intersection=False) -> Union[None, 
     return output_mask
 
 
-def cropobjects_merge_links(cropobjects):
-    """Collect all inlinks and outlinks of the given set of CropObjects
-    to CropObjects outside of this set. The rationale for this is that
-    these given ``cropobjects`` will be merged into one, so relationships
+def merge_inlinks_and_outlinks_to_nodes_outside_of_this_list(nodes: List[Node]) -> Tuple[List[int], List[int]]:
+    """Collect all inlinks and outlinks of the given set of Nodes
+    to Nodes outside of this set. The rationale for this is that
+    these given ``nodes`` will be merged into one, so relationships
     within the set would become loops and disappear.
 
     (Note that this is not sufficient to update the relationships upon
-    a merge, because the affected CropObjects *outside* the given set
+    a merge, because the affected Nodess *outside* the given set
     will need to have their inlinks/outlinks redirected to the new object.)
 
     :returns: A tuple of lists: ``(inlinks, outlinks)``
     """
-    _internal_objids = frozenset([c.objid for c in cropobjects])
+    all_node_ids = frozenset([node.id for node in nodes])
     outlinks = []
     inlinks = []
-    for c in cropobjects:
+    for c in nodes:
         # No duplicates
         outlinks.extend([o for o in c.outlinks
-                         if (o not in _internal_objids) and (o not in outlinks)])
+                         if (o not in all_node_ids) and (o not in outlinks)])
         inlinks.extend([i for i in c.inlinks
-                        if (i not in _internal_objids) and (i not in inlinks)])
+                        if (i not in all_node_ids) and (i not in inlinks)])
     return inlinks, outlinks
 
 
-def merge_cropobject_lists(*cropobject_lists):
-    """Combines the CropObject lists from different documents
+def merge_node_lists_from_multiple_documents(node_lists: List[List[Node]]) -> List[Node]:
+    """Combines the Node lists from different documents
     into one list, so that inlink/outlink references still work.
     This is useful only if you want to merge two documents
     into one (e.g., if your annotators worked on different "layers"
     of data, and you want to merge these annotations).
 
-    This just means shifting the ``node_id`` (and thus inlinks
+    This just means shifting the ``id`` (and thus inlinks
     and outlinks). It is assumed the lists pertain to the same
     image. Uses deepcopy to avoid exposing the original lists
     to modification through the merged list.
 
-    .. warning::
-
-        If you are ever exporting the merged list, make sure to
-        set the ``unique_id`` for the outputs correctly, if you want
-        to create a new document.
-
-    .. warning::
-
-        Currently cannot handle precedence edges.
+    Currently cannot handle precedence edges.
 
     """
-    max_objids = [max([c.objid for c in c_list]) for c_list in cropobject_lists]
-    min_objids = [min([c.objid for c in c_list]) for c_list in cropobject_lists]
-    shift_by = [0] + [sum(max_objids[:i]) - min_objids[i] + 1 for i in range(1, len(max_objids))]
+    max_node_ids = [max([node.id for node in c_list]) for c_list in node_lists]
+    min_node_ids = [min([node.id for node in c_list]) for c_list in node_lists]
+    shift_by = [0] + [sum(max_node_ids[:i]) - min_node_ids[i] + 1 for i in range(1, len(max_node_ids))]
 
     new_lists = []
-    for clist, s in zip(cropobject_lists, shift_by):
+    for nodes, s in zip(node_lists, shift_by):
         new_list = []
-        for c in clist:
-            new_c = copy.deepcopy(c)
-            new_objid = c.objid + s
-            new_c.objid = new_objid
+        for node in nodes:
+            new_node = copy.deepcopy(node)
+            new_id = node.id + s
+            new_node.set_id(new_id)
 
             # Graph handling
-            new_c.inlinks = [i + s for i in c.inlinks]
-            new_c.outlinks = [o + s for o in c.outlinks]
+            new_node.inlinks = [i + s for i in node.inlinks]
+            new_node.outlinks = [o + s for o in node.outlinks]
 
-            # Should also handle precedence...?
-
-            new_list.append(new_c)
+            new_list.append(new_node)
         new_lists.append(new_list)
 
     output = list(itertools.chain(*new_lists))
@@ -1201,41 +1235,39 @@ def merge_cropobject_lists(*cropobject_lists):
     return output
 
 
-def link_cropobjects(fr, to, check_docname=True):
-    """Add a relationship from the ``fr`` CropObject
-    Nodeo`` CropObject. ModNodeCropObjects
-    in-place.
+def link_nodes(from_node: Node, to_node: Node, check_document: bool = True):
+    """Add a relationship from one node to the other. Updates the nodes in-place.
 
     If the objects are already linked, does nothing.
 
-    :param check_docname: If set, checks for ``docname``
-        match and raises a ValueError if the CropObjects
+    :param check_document: If set, checks whether ``document`` name
+        matches and raises a ValueError if the Nodes
         come from different documents.
     """
-    if fr.document != to.document:
-        if check_docname:
+    if from_node.document != to_node.document:
+        if check_document:
             raise ValueError('Cannot link two CropObjects that are')
         else:
             logging.warning('Attempting to link CropObjects from two different'
                             ' docments. From: {0}, to: {1}'
-                            ''.format(fr.document, to.document))
+                            ''.format(from_node.document, to_node.document))
 
-    if (to.objid not in fr.outlinks) and (fr.objid in to.inlinks):
+    if (to_node.id not in from_node.outlinks) and (from_node.id in to_node.inlinks):
         logging.warning('Malformed object graph in document {0}:'
                         ' Relationship {1} --> {2} already exists as inlink,'
                         ' but not as outlink!.'
-                        ''.format(fr.document, fr.objid, to.objid))
-    fr.outlinks.append(to.objid)
-    to.inlinks.append(fr.objid)
+                        ''.format(from_node.document, from_node.id, to_node.id))
+    from_node.outlinks.append(to_node.id)
+    to_node.inlinks.append(from_node.id)
 
 
-def bbox_intersection(bbox_this, bbox_other):
+def bounding_box_intersection(first_bounding_box: Tuple[int, int, int, int],
+                              second_bounding_box: Tuple[int, int, int, int]) -> Optional[Tuple[int, int, int, int]]:
     """Returns the t, l, b, r coordinates of the sub-bounding box
     of bbox_this that is also inside bbox_other.
     If the bounding boxes do not overlap, returns None."""
-    t, l, b, r = bbox_other
-
-    tt, tl, tb, tr = bbox_this
+    t, l, b, r = second_bounding_box
+    tt, tl, tb, tr = first_bounding_box
 
     out_top = max(t, tt)
     out_bottom = min(b, tb)
@@ -1251,7 +1283,9 @@ def bbox_intersection(bbox_this, bbox_other):
         return None
 
 
-def bbox_dice(bbox_this, bbox_other, vertical=False, horizontal=False):
+def bounding_box_dice_coefficient(first_bounding_box: Tuple[int, int, int, int],
+                                  second_bounding_box: Tuple[int, int, int, int], vertical: bool = False,
+                                  horizontal: bool = False) -> float:
     """Compute the Dice coefficient (intersection over union)
     for the given two bounding boxes.
 
@@ -1261,8 +1295,8 @@ def bbox_dice(bbox_this, bbox_other, vertical=False, horizontal=False):
         If both vertical and horizontal are set, will return
         normal IoU, as if they were both false.
     """
-    t_t, t_l, t_b, t_r = bbox_this
-    o_t, o_l, o_b, o_r = bbox_other
+    t_t, t_l, t_b, t_r = first_bounding_box
+    o_t, o_l, o_b, o_r = second_bounding_box
 
     u_t, i_t = min(t_t, o_t), max(t_t, o_t)
     u_l, i_l = min(t_l, o_l), max(t_l, o_l)
@@ -1277,111 +1311,40 @@ def bbox_dice(bbox_this, bbox_other, vertical=False, horizontal=False):
 
     if vertical and not horizontal:
         if u_vertical == 0:
-            return 0
+            return 0.0
         else:
             return i_vertical / u_vertical
     elif horizontal and not vertical:
         if u_horizontal == 0:
-            return 0
+            return 0.0
         else:
             return i_horizontal / u_horizontal
     else:
         if (u_horizontal == 0) or (u_vertical == 0):
-            return 0
+            return 0.0
         else:
             return (i_horizontal * i_vertical) / (u_horizontal * u_vertical)
 
 
-def cropobject_distance(c, d):
-    """Computes the distance between two CropObjects.
-    Their minimum vertical and horizontal distances are each taken
-    separately, and the euclidean norm is computed from them."""
-    if c.document != d.document:
-        logging.warning('Cannot compute distances between CropObjects'
-                        ' from different documents! ({0} vs. {1})'
-                        ''.format(c.document, d.document))
+def draw_nodes_on_empty_canvas(nodes: List[Node], margin: int = 10) -> Tuple[numpy.ndarray, Tuple[int, int]]:
+    """Draws all the given Nodes onto a zero background.
+    The size of the canvas adapts to the Nodes, with the    given margin.
 
-    c_t, c_l, c_b, c_r = c.bounding_box
-    d_t, d_l, d_b, d_r = d.bounding_box
-
-    delta_vert = 0
-    delta_horz = 0
-
-    if (c_t <= d_t <= c_b) or (d_t <= c_t <= d_b):
-        delta_vert = 0
-    elif c_t < d_t:
-        delta_vert = d_t - c_b
-    else:
-        delta_vert = c_t - d_b
-
-    if (c_l <= d_l <= c_r) or (d_l <= c_l <= d_r):
-        delta_horz = 0
-    elif c_l < d_l:
-        delta_horz = d_l - c_r
-    else:
-        delta_horz = c_l - d_r
-
-    return numpy.sqrt(delta_vert ** 2 + delta_horz ** 2)
-
-
-def cropobjects_on_canvas(cropobjects, margin=10):
-    """Draws all the given CropObjects onto a zero background.
-    The size of the canvas adapts to the CropObjects, with the
-    given margin.
-
-    Also returns the top left corner coordinates w.r.t. CropObjects' bboxes.
+    Also returns the top left corner coordinates w.r.t. Nodes' bounding boxes.
     """
 
     # margin is used to avoid the stafflines touching the edges,
     # which could perhaps break some assumptions down the line.
-    it, il, ib, ir = compute_unifying_bounding_box(cropobjects)
-    _t, _l, _b, _r = max(0, it - margin), max(0, il - margin), ib + margin, ir + margin
+    top, left, bottom, right = compute_unifying_bounding_box(nodes)
+    top_with_margin, left_with_margin, bottom_with_margin, right_with_margin = \
+        max(0, top - margin), max(0, left - margin), bottom + margin, right + margin
 
-    canvas = numpy.zeros((_b - _t, _r - _l))
+    canvas = numpy.zeros((bottom_with_margin - top_with_margin, right_with_margin - left_with_margin))
 
-    for c in cropobjects:
-        canvas[c.top - _t:c.bottom - _t, c.left - _l:c.right - _l] = c.mask * 1
+    for node in nodes:
+        canvas[node.top - top_with_margin:node.bottom - top_with_margin,
+        node.left - left_with_margin:node.right - left_with_margin] = node.mask * 1
 
     canvas[canvas != 0] = 1
 
-    return canvas, (_t, _l)
-
-
-def cropobject_mask_rpf(cropobject_gt, cropobject_pred):
-    """Compute the recall, precision and f-score of the predicted
-    cropobject's mask against the ground truth cropobject's mask."""
-    if bbox_intersection(cropobject_gt.bounding_box,
-                         cropobject_pred.bounding_box) is None:
-        return 0.0, 0.0, 0.0
-
-    mask_intersection = compute_unifying_mask([cropobject_gt,
-                                               cropobject_pred],
-                                              intersection=False)
-
-    gt_pasted_mask = mask_intersection * 1
-    t, l, b, r = compute_unifying_bounding_box([cropobject_gt, cropobject_pred])
-    h, w = b - t, r - l
-    ct, cl, cb, cr = cropobject_gt.top - t, \
-                     cropobject_gt.left - l, \
-                     h - (b - cropobject_gt.bottom), \
-                     w - (r - cropobject_gt.right)
-    gt_pasted_mask[ct:cb, cl:cr] += cropobject_gt.mask
-    gt_pasted_mask[gt_pasted_mask != 0] = 1
-
-    pred_pasted_mask = mask_intersection * 1
-    t, l, b, r = compute_unifying_bounding_box([cropobject_pred, cropobject_pred])
-    h, w = b - t, r - l
-    ct, cl, cb, cr = cropobject_pred.top - t, \
-                     cropobject_pred.left - l, \
-                     h - (b - cropobject_pred.bottom), \
-                     w - (r - cropobject_pred.right)
-    pred_pasted_mask[ct:cb, cl:cr] += cropobject_pred.mask
-    pred_pasted_mask[pred_pasted_mask != 0] = 1
-
-    tp = float(mask_intersection.sum())
-    fp = pred_pasted_mask.sum() - tp
-    fn = gt_pasted_mask.sum() - tp
-    rec, prec = tp / (tp + fn), tp / (tp + fp)
-    fsc = (2 * rec * prec) / (rec + prec)
-
-    return rec, prec, fsc
+    return canvas, (top_with_margin, left_with_margin)

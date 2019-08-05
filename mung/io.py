@@ -133,17 +133,17 @@ Individual elements of a ``<CropObject>``
   the mask is not given, the object is understood to occupy the entire
   bounding box. For the representation, see Implementation notes
   below.
-* ``<Inlinks>``: whitespace-separate ``node_id`` list, representing CropObjects
+* ``<Inlinks>``: whitespace-separate ``id`` list, representing CropObjects
   **from** which a relationship leads to this CropObject. (Relationships are
   directed edges, forming a directed graph of CropObjects.) The objids are
-  valid in the same scope as the CropObject's ``node_id``: don't mix
+  valid in the same scope as the CropObject's ``id``: don't mix
   CropObjects from multiple scopes (e.g., multiple CropObjectLists)!
   If you are using CropObjects from multiple CropObjectLists at the same
   time, make sure to check against the ``unique_id``s.
-* ``<Outlinks>``: whitespace-separate ``node_id`` list, representing CropObjects
+* ``<Outlinks>``: whitespace-separate ``id`` list, representing CropObjects
   **to** which a relationship leads to this CropObject. (Relationships are
   directed edges, forming a directed graph of CropObjects.) The objids are
-  valid in the same scope as the CropObject's ``node_id``: don't mix
+  valid in the same scope as the CropObject's ``id``: don't mix
   CropObjects from multiple scopes (e.g., multiple CropObjectLists)!
   If you are using CropObjects from multiple CropObjectLists at the same
   time, make sure to check against the ``unique_id``s.
@@ -356,7 +356,7 @@ def read_nodes_from_file(filename: str) -> List[Node]:
 
         #################################
         # Create the object.
-        obj = Node(node_id=node_id,
+        obj = Node(id=node_id,
                    class_name=class_name,
                    top=top,
                    left=left,
@@ -364,8 +364,8 @@ def read_nodes_from_file(filename: str) -> List[Node]:
                    height=height,
                    inlinks=inlinks,
                    outlinks=outlinks,
-                   dataset="DATASET_PLACEHOLDER", #TODO: Replace this with loading the actual values
-                   document="DOCUMENT_PLACEHOLDER", #TODO: Replace this with loading the actual values
+                   dataset="DATASET_PLACEHOLDER",  #TODO: Replace this with loading the actual values
+                   document="DOCUMENT_PLACEHOLDER",  #TODO: Replace this with loading the actual values
                    data=data_dict)
 
         #################################
@@ -393,7 +393,7 @@ def read_nodes_from_file(filename: str) -> List[Node]:
 def validate_nodes_graph_structure(cropobjects):
     """Check that the graph defined by the ``inlinks`` and ``outlinks``
     in the given list of CropObjects is valid: no relationships
-    leading from or to objects with non-existent ``node_id``s.
+    leading from or to objects with non-existent ``id``s.
 
     Can deal with ``cropobjects`` coming from a combination
     of documents, through the CropObject ``document`` property.
@@ -422,7 +422,7 @@ def validate_document_graph_structure(nodes):
     # type: (List[Node]) -> bool
     """Check that the graph defined by the ``inlinks`` and ``outlinks``
     in the given list of CropObjects is valid: no relationships
-    leading from or to objects with non-existent ``node_id``s.
+    leading from or to objects with non-existent ``id``s.
 
     Checks that all the CropObjects come from one document. (Raises
     a ``ValueError`` otherwise.)
@@ -436,7 +436,7 @@ def validate_document_graph_structure(nodes):
         raise ValueError('Got CropObjects from multiple documents!')
 
     is_valid = True
-    node_ids = frozenset([node.node_id for node in nodes])
+    node_ids = frozenset([node.id for node in nodes])
     for c in nodes:
         inlinks = c.inlinks
         for i in inlinks:
@@ -468,7 +468,7 @@ def export_cropobject_graph(cropobjects, validate=True):
         if the graph defined by the CropObjects is
         invalid.
 
-    :returns: A list of ``(from, to)`` node_id pairs
+    :returns: A list of ``(from, to)`` id pairs
         that represent edges in the CropObject graph.
     """
     if validate:

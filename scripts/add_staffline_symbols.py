@@ -267,7 +267,7 @@ def main(args):
     staffline_cropobjects = []
     for sl_bb, sl_m in zip(staffline_bboxes, staffline_masks):
         t, l, b, r = sl_bb
-        c = Node(node_id=next_objid,
+        c = Node(id=next_objid,
                  class_name=STAFFLINE_CLSNAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=sl_m,
@@ -281,7 +281,7 @@ def main(args):
         staff_cropobjects = []
         for s_bb, s_m in zip(staff_bboxes, staff_masks):
             t, l, b, r = s_bb
-            c = Node(node_id=next_objid,
+            c = Node(id=next_objid,
                      class_name=STAFF_CLSNAME,
                      top=t, left=l, height=b - t, width=r - l,
                      mask=s_m,
@@ -294,13 +294,13 @@ def main(args):
             sl_from = 5 * i
             sl_to = 5 * (i + 1)
             for sl in staffline_cropobjects[sl_from:sl_to]:
-                sl.inlinks.append(sc.node_id)
-                sc.outlinks.append(sl.node_id)
+                sl.inlinks.append(sc.id)
+                sc.outlinks.append(sl.id)
 
         # Add the staffspaces.
         staffspace_cropobjects = []
         for i, staff in enumerate(staff_cropobjects):
-            current_stafflines = [sc for sc in staffline_cropobjects if sc.node_id in staff.outlinks]
+            current_stafflines = [sc for sc in staffline_cropobjects if sc.id in staff.outlinks]
             sorted_stafflines = sorted(current_stafflines, key=lambda x: x.top)
 
             current_staffspace_cropobjects = []
@@ -381,8 +381,8 @@ def main(args):
                                   mask=staffspace_mask,
                                   dataset=dataset, document=document)
 
-                staffspace.inlinks.append(staff.node_id)
-                staff.outlinks.append(staffspace.node_id)
+                staffspace.inlinks.append(staff.id)
+                staff.outlinks.append(staffspace.id)
 
                 current_staffspace_cropobjects.append(staffspace)
 
@@ -417,8 +417,8 @@ def main(args):
                               mask=uss_mask,
                               dataset=dataset, document=document)
             current_staffspace_cropobjects.append(staffspace)
-            staff.outlinks.append(staffspace.node_id)
-            staffspace.inlinks.append(staff.node_id)
+            staff.outlinks.append(staffspace.id)
+            staffspace.inlinks.append(staff.id)
             next_objid += 1
 
             # Lower staffspace
@@ -440,8 +440,8 @@ def main(args):
                               mask=lss_mask,
                               dataset=dataset, document=document)
             current_staffspace_cropobjects.append(staffspace)
-            staff.outlinks.append(staffspace.node_id)
-            staffspace.inlinks.append(staff.node_id)
+            staff.outlinks.append(staffspace.id)
+            staffspace.inlinks.append(staff.id)
             next_objid += 1
 
             # ################ End of dealing with upper/lower staffspace ######

@@ -1,5 +1,9 @@
 import logging
+
+import numpy
 from skimage.measure import label
+from typing import Tuple, Dict, Any, List
+
 from mung.inference.constants import InferenceEngineConstants as _CONST
 
 
@@ -43,11 +47,12 @@ def connected_components2bboxes(labels):
     return bboxes
 
 
-def compute_connected_components(image):
+def compute_connected_components(image: numpy.ndarray) -> \
+        Tuple[int, numpy.ndarray, Dict[int, List[int]]]:
     labels = label(image, background=0)
-    cc = int(labels.max())
+    number_of_connected_components = int(labels.max())
     bboxes = connected_components2bboxes(labels)
-    return cc, labels, bboxes
+    return number_of_connected_components, labels, bboxes
 
 
 def resolve_notehead_wrt_staffline(notehead, staffline_or_ledger_line):
@@ -120,7 +125,7 @@ def resolve_notehead_wrt_staffline(notehead, staffline_or_ledger_line):
 
 def is_notehead_on_line(notehead, line_obj):
     """Check whether given notehead is positioned on the line object."""
-    if line_obj.clsname not in _CONST.STAFFLINE_LIKE_CROPOBJECT_CLSNAMES:
+    if line_obj.clsname not in _CONST.STAFFLINE_LIKE_CLASS_NAMES:
         raise ValueError('Cannot resolve relative position of notehead'
                          ' {0} to non-staffline-like object {1}'
                          ''.format(notehead.uid, line_obj.uid))

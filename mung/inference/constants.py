@@ -1,13 +1,8 @@
 """This module implements constants that are used inside the pitch,
 duration and onset inference algorithm."""
-from __future__ import print_function, unicode_literals, division
-
-from builtins import range
-from builtins import object
 import operator
 
-__version__ = "0.0.1"
-__author__ = "Jan Hajic jr."
+from typing import List
 
 
 class InferenceEngineConstants(object):
@@ -20,17 +15,16 @@ class InferenceEngineConstants(object):
     is smaller than this, it means the notehead is most probably *NOT*
     on the l.l. and is next to it.'''
 
-    STAFFLINE_CLSNAME = 'staff_line'
-    STAFFSPACE_CLSNAME = 'staff_space'
-    STAFF_CLSNAME = 'staff'
+    STAFFLINE_CLASS_NAME = 'staff_line'
+    STAFFSPACE_CLASS_NAME = 'staff_space'
+    STAFF_CLASS_NAME = 'staff'
 
-    STAFF_CROPOBJECT_CLSNAMES = ['staff_line', 'staff_space', 'staff']
+    STAFF_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME, STAFF_CLASS_NAME]
+    STAFFLINE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME]
 
-    STAFFLINE_CROPOBJECT_CLSNAMES = ['staff_line', 'staff_space']
+    STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, 'ledger_line']
 
-    STAFFLINE_LIKE_CROPOBJECT_CLSNAMES = ['staff_line', 'ledger_line']
-
-    STAFF_RELATED_CLSNAMES = {
+    STAFF_RELATED_CLASS_NAMES = {
         'staff_grouping',
         'measure_separator',
         'key_signature',
@@ -38,12 +32,12 @@ class InferenceEngineConstants(object):
         'g-clef', 'c-clef', 'f-clef', 'other-clef',
     }
 
-    STYSTEM_LEVEL_CLSNAMES = {
+    STYSTEM_LEVEL_CLASS_NAMES = {
         'staff_grouping',
         'measure_separator',
     }
 
-    NOTEHEAD_CLSNAMES = {
+    NOTEHEAD_CLASS_NAMES = {
         'noteheadFull',
         'notehead-empty',
         'notehead-square',
@@ -52,37 +46,37 @@ class InferenceEngineConstants(object):
         'grace-notehead-empty',
     }
 
-    NONGRACE_NOTEHEAD_CLSNAMES = {
+    NONGRACE_NOTEHEAD_CLASS_NAMES = {
         'noteheadFull',
         'notehead-empty',
     }
 
-    CLEF_CLSNAMES = {
+    CLEF_CLASS_NAMES = {
         'g-clef',
         'c-clef',
         'f-clef',
     }
 
-    KEY_SIGNATURE_CLSNAMES = {
+    KEY_SIGNATURE_CLASS_NAMES = {
         'key_signature',
     }
 
-    MEASURE_SEPARATOR_CLSNAMES = {
+    MEASURE_SEPARATOR_CLASS_NAMES = {
         'measure_separator',
     }
 
-    FLAGS_CLSNAMES = {
+    FLAGS_CLASS_NAMES = {
         '8th_flag',
         '16th_flag',
         '32th_flag',
         '64th_and_higher_flag',
     }
 
-    BEAM_CLSNAMES = {
+    BEAM_CLASS_NAMES = {
         'beam',
     }
 
-    FLAGS_AND_BEAMS ={
+    FLAGS_AND_BEAMS = {
         '8th_flag',
         '16th_flag',
         '32th_flag',
@@ -90,7 +84,7 @@ class InferenceEngineConstants(object):
         'beam',
     }
 
-    ACCIDENTAL_CLSNAMES = {
+    ACCIDENTAL_CLASS_NAMES = {
         'sharp': 1,
         'flat': -1,
         'natural': 0,
@@ -171,7 +165,7 @@ class InferenceEngineConstants(object):
     ACCIDENTAL_CODES = {'sharp': '#', 'flat': 'b',
                         'double_sharp': 'x', 'double_flat': 'bb'}
 
-    REST_CLSNAMES = {
+    REST_CLASS_NAMES = {
         'whole_rest',
         'half_rest',
         'quarter_rest',
@@ -182,7 +176,7 @@ class InferenceEngineConstants(object):
         'multi-measure_rest',
     }
 
-    MEAUSURE_LASTING_CLSNAMES = {
+    MEAUSURE_LASTING_CLASS_NAMES = {
         'whole_rest',
         'multi-measure_rest',
         'repeat-measure',
@@ -222,26 +216,26 @@ class InferenceEngineConstants(object):
     }
 
     @property
-    def clsnames_affecting_onsets(self):
+    def classes_affecting_onsets(self):
         """Returns a list of Node class names for objects
         that affect onsets. Assumes notehead and rest durations
         have already been given."""
         output = set()
-        output.update(self.NONGRACE_NOTEHEAD_CLSNAMES)
-        output.update(self.REST_CLSNAMES)
-        output.update(self.MEASURE_SEPARATOR_CLSNAMES)
+        output.update(self.NONGRACE_NOTEHEAD_CLASS_NAMES)
+        output.update(self.REST_CLASS_NAMES)
+        output.update(self.MEASURE_SEPARATOR_CLASS_NAMES)
         output.update(self.TIME_SIGNATURES)
         output.add('repeat_measure')
         return output
 
     @property
-    def clsnames_bearing_duration(self):
+    def classes_bearing_duration(self):
         """Returns the list of classes that actually bear duration,
         i.e. contribute to onsets of their descendants in the precedence
         graph."""
         output = set()
-        output.update(self.NONGRACE_NOTEHEAD_CLSNAMES)
-        output.update(self.REST_CLSNAMES)
+        output.update(self.NONGRACE_NOTEHEAD_CLASS_NAMES)
+        output.update(self.REST_CLASS_NAMES)
         return output
 
     @staticmethod

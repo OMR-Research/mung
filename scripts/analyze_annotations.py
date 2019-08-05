@@ -27,7 +27,7 @@ import time
 import operator
 
 from mung.io import read_nodes_from_file, export_cropobject_graph
-from mung.node import merge_cropobject_lists
+from mung.node import merge_node_lists_from_multiple_documents
 
 
 def compute_cropobject_stats(cropobjects, edges=None):
@@ -134,8 +134,8 @@ def main(args):
 
     # Merge the Node lists into one.
     # This is done so that the resulting object graph can be manipulated
-    # at once, without node_id clashes.
-    cropobjects = merge_cropobject_lists(*cropobject_lists)
+    # at once, without id clashes.
+    cropobjects = merge_node_lists_from_multiple_documents(cropobject_lists)
 
     edges = export_cropobject_graph(cropobjects)
 

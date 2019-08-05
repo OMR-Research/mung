@@ -4,8 +4,10 @@ import copy
 import logging
 import operator
 
+from typing import List, Union, Dict
+
 from mung.inference.constants import _CONST
-from mung.node import Node, cropobject_mask_rpf
+from mung.node import Node
 from mung.utils import resolve_notehead_wrt_staffline
 
 
@@ -20,65 +22,64 @@ class NotationGraphUnsupportedError(NotImplementedError):
 class NotationGraph(object):
     """The NotationGraph class is the abstraction for a notation graph."""
 
-    def __init__(self, cropobjects):
+    def __init__(self, nodes: List[Node]):
         """Initialize the notation graph with a list of CropObjects."""
-        self.cropobjects = cropobjects
-        self._cdict = {c.objid: c for c in self.cropobjects}
+        self.nodes = nodes
+        self.id_to_node_mapping = {node.id: node for node in self.nodes}  # type: Dict[int, Node]
 
     def __len__(self):
-        return len(self.cropobjects)
+        return len(self.nodes)
 
-    def __to_objid(self, cropobject_or_objid):
-        if isinstance(cropobject_or_objid, Node):
-            objid = cropobject_or_objid.node_id
+    def __to_id(self, node_or_id: Union[Node, int]) -> int:
+        if isinstance(node_or_id, Node):
+            return node_or_id.id
         else:
-            objid = cropobject_or_objid
-        return objid
+            return node_or_id
 
     @property
     def edges(self):
         edges = set()
-        for c in self.cropobjects:
-            for t in c.outlinks:
-                if (c.objid, t) not in edges:
-                    edges.add((c.objid, t))
+        for node in self.nodes:
+            for t in node.outlinks:
+                if (node.id, t) not in edges:
+                    edges.add((node.id, t))
         return edges
 
-    def children(self, cropobject_or_objid, classes=None):
+    def children(self, cropobject_or_objid: Union[Node, int], classes=None):
         """Find all children of the given node."""
-        objid = self.__to_objid(cropobject_or_objid)
-        if objid not in self._cdict:
-            raise ValueError('Node {0} not in graph!'.format(self._cdict[objid].uid))
+        objid = self.__to_id(cropobject_or_objid)
+        if objid not in self.id_to_node_mapping:
+            raise ValueError('Node {0} not in graph!'.format(self.id_to_node_mapping[objid].id))
 
-        c = self._cdict[objid]
+        c = self.id_to_node_mapping[objid]
         output = []
         for o in c.outlinks:
-            if o in self._cdict:
+            if o in self.id_to_node_mapping:
                 if classes is None:
-                    output.append(self._cdict[o])
-                elif self._cdict[o].clsname in classes:
-                    output.append(self._cdict[o])
+                    output.append(self.id_to_node_mapping[o])
+                elif self.id_to_node_mapping[o].class_name in classes:
+                    output.append(self.id_to_node_mapping[o])
         return output
 
-    def parents(self, cropobject_or_objid, classes=None):
+    def parents(self, cropobject_or_objid: Union[Node, int], classes=None):
         """Find all parents of the given node."""
-        objid = self.__to_objid(cropobject_or_objid)
-        if objid not in self._cdict:
-            raise ValueError('Node {0} not in graph!'.format(self._cdict[objid].uid))
+        objid = self.__to_id(cropobject_or_objid)
+        if objid not in self.id_to_node_mapping:
+            raise ValueError('Node {0} not in graph!'.format(self.id_to_node_mapping[objid].id))
 
-        c = self._cdict[objid]
+        c = self.id_to_node_mapping[objid]
         output = []
         for i in c.inlinks:
-            if i in self._cdict:
+            if i in self.id_to_node_mapping:
                 if classes is None:
-                    output.append(self._cdict[i])
-                elif self._cdict[i].clsname in classes:
-                    output.append(self._cdict[i])
+                    output.append(self.id_to_node_mapping[i])
+                elif self.id_to_node_mapping[i].class_name in classes:
+                    output.append(self.id_to_node_mapping[i])
         return output
 
-    def descendants(self, cropobject_or_objid, classes=None):
+    def descendants(self, cropobject_or_objid: Union[Node, int], classes=None):
         """Find all descendants of the given node."""
-        objid = self.__to_objid(cropobject_or_objid)
+        objid = self.__to_id(cropobject_or_objid)
 
         descendant_objids = []
         queue = [objid]
@@ -95,11 +96,11 @@ class NotationGraph(object):
                 if o not in queue:
                     queue.append(o)
 
-        return [self._cdict[o] for o in descendant_objids]
+        return [self.id_to_node_mapping[o] for o in descendant_objids]
 
-    def ancestors(self, cropobject_or_objid, classes=None):
+    def ancestors(self, cropobject_or_objid: Union[Node, int], classes=None):
         """Find all ancestors of the given node."""
-        objid = self.__to_objid(cropobject_or_objid)
+        objid = self.__to_id(cropobject_or_objid)
 
         ancestor_objids = []
         queue = [objid]
@@ -116,56 +117,56 @@ class NotationGraph(object):
                 if o not in queue:
                     queue.append(o)
 
-        return [self._cdict[objid] for objid in ancestor_objids]
+        return [self.id_to_node_mapping[objid] for objid in ancestor_objids]
 
-    def has_child(self, cropobject_or_objid, classes=None):
+    def has_child(self, cropobject_or_objid: Union[Node, int], classes=None):
         children = self.children(cropobject_or_objid, classes=classes)
         return len(children) > 0
 
-    def has_parent(self, cropobject_or_objid, classes=None):
+    def has_parent(self, cropobject_or_objid: Union[Node, int], classes=None):
         parents = self.parents(cropobject_or_objid, classes=classes)
         return len(parents) > 0
 
-    def is_child_of(self, cropobject_or_objid, other_cropobject_or_objid):
+    def is_child_of(self, cropobject_or_objid: Union[Node, int], other_cropobject_or_objid: Union[Node, int]) -> bool:
         """Check whether the first symbol is a child of the second symbol."""
-        to_objid = self.__to_objid(cropobject_or_objid)
-        from_objid = self.__to_objid(other_cropobject_or_objid)
+        to_objid = self.__to_id(cropobject_or_objid)
+        from_objid = self.__to_id(other_cropobject_or_objid)
 
-        c = self._cdict[from_objid]
+        c = self.id_to_node_mapping[from_objid]
         if to_objid in c.outlinks:
             return True
         else:
             return False
 
-    def is_parent_of(self, cropobject_or_objid, other_cropobject_or_objid):
+    def is_parent_of(self, cropobject_or_objid: Union[Node, int], other_cropobject_or_objid: Union[Node, int]) -> bool:
         """Check whether the first symbol is a parent of the second symbol."""
-        from_objid = self.__to_objid(cropobject_or_objid)
-        to_objid = self.__to_objid(other_cropobject_or_objid)
+        from_objid = self.__to_id(cropobject_or_objid)
+        to_objid = self.__to_id(other_cropobject_or_objid)
 
-        c = self._cdict[from_objid]
+        c = self.id_to_node_mapping[from_objid]
         if to_objid in c.outlinks:
             return True
         else:
             return False
 
-    def __getitem__(self, objid):
-        """Returns a Node based on its node_id."""
-        return self._cdict[objid]
+    def __getitem__(self, id) -> Node:
+        """Returns a Node based on its id."""
+        return self.id_to_node_mapping[id]
 
-    def is_stem_direction_above(self, notehead, stem):
+    def is_stem_direction_above(self, notehead: Node, stem: Node):
         """Determines whether the given stem of the given notehead
         is above it or below. This is not trivial due to chords.
         """
-        if notehead.objid not in self._cdict:
+        if notehead.id not in self.id_to_node_mapping:
             raise NotationGraphError('Asking for notehead which is not'
-                                     ' in graph: {0}'.format(notehead.uid))
+                                     ' in graph: {0}'.format(notehead.id))
 
         # This works even if there is just one. There should always be one.
         sibling_noteheads = self.parents(stem, classes=_CONST.NOTEHEAD_CLSNAMES)
         if notehead not in sibling_noteheads:
             raise ValueError('Asked for stem direction, but notehead {0} is'
                              ' unrelated to given stem {1}!'
-                             ''.format(notehead.uid, stem.uid))
+                             ''.format(notehead.id, stem.id))
 
         topmost_notehead = min(sibling_noteheads, key=lambda x: x.top)
         bottom_notehead = max(sibling_noteheads, key=lambda x: x.bottom)
@@ -175,7 +176,7 @@ class NotationGraph(object):
 
         return d_top > d_bottom
 
-    def is_symbol_above_notehead(self, notehead, other, compare_on_intersect=False):
+    def is_symbol_above_notehead(self, notehead: Node, other: Node, compare_on_intersect: bool = False) -> bool:
         """Determines whether the given other symbol is above
         the given notehead.
 
@@ -200,9 +201,9 @@ class NotationGraph(object):
         # Get vertical bounds of beam submask
         other_submask_hsum = beam_submask.sum(axis=1)
         other_submask_top = min([i for i in range(beam_submask.shape[0])
-                                if other_submask_hsum[i] != 0]) + other.top
+                                 if other_submask_hsum[i] != 0]) + other.top
         other_submask_bottom = max([i for i in range(beam_submask.shape[0])
-                                   if other_submask_hsum[i] != 0]) + other.top
+                                    if other_submask_hsum[i] != 0]) + other.top
         if (notehead.top <= other_submask_top <= notehead.bottom) \
                 or (other_submask_bottom <= notehead.top <= other_submask_bottom):
             if compare_on_intersect:
@@ -226,33 +227,33 @@ class NotationGraph(object):
 
         self.remove_edges_for_vertex(objid)
 
-        c = self._cdict[objid]
-        self.cropobjects.remove(c)
-        del self._cdict[objid]
+        c = self.id_to_node_mapping[objid]
+        self.nodes.remove(c)
+        del self.id_to_node_mapping[objid]
 
     def remove_edge(self, fr, to):
-        if fr not in self._cdict:
-            raise ValueError('Cannot remove edge from node_id {0}: not in graph!'
+        if fr not in self.id_to_node_mapping:
+            raise ValueError('Cannot remove edge from id {0}: not in graph!'
                              ''.format(fr))
-        if to not in self._cdict:
-            raise ValueError('Cannot remove edge to node_id {0}: not in graph!'
+        if to not in self.id_to_node_mapping:
+            raise ValueError('Cannot remove edge to id {0}: not in graph!'
                              ''.format(to))
 
         # print('removing edge {0}'.format((fr, to)))
-        f = self._cdict[fr]
+        f = self.id_to_node_mapping[fr]
         # print('\tf outlinks before: {0}'.format(f.outlinks))
         f.outlinks.remove(to)
         # print('\tf outlinks after: {0}'.format(f.outlinks))
-        t = self._cdict[to]
+        t = self.id_to_node_mapping[to]
         # print('\tt outlinks before: {0}'.format(t.outlinks))
         t.inlinks.remove(fr)
         # print('\tt outlinks after: {0}'.format(t.outlinks))
 
     def remove_edges_for_vertex(self, objid):
-        if objid not in self._cdict:
-            raise ValueError('Cannot remove vertex with node_id {0}: not in graph!'
+        if objid not in self.id_to_node_mapping:
+            raise ValueError('Cannot remove vertex with id {0}: not in graph!'
                              ''.format(objid))
-        c = self._cdict[objid]
+        c = self.id_to_node_mapping[objid]
 
         # Remove from inlinks and outlinks:
         for o in copy.deepcopy(c.outlinks):
@@ -262,7 +263,7 @@ class NotationGraph(object):
 
     def remove_classes(self, clsnames):
         """Remove all vertices with these clsnames."""
-        to_remove = [c.objid for c in self.cropobjects if c.clsname in clsnames]
+        to_remove = [c.objid for c in self.nodes if c.class_name in clsnames]
         for objid in to_remove:
             self.remove_vertex(objid)
 
@@ -271,8 +272,8 @@ class NotationGraph(object):
         predecessors is linked to all of its descendants.
         If there are no predecessors or no descendants, the precedence
         edges are simply removed."""
-        objid = self.__to_objid(cropobject_or_objid)
-        c = self._cdict[objid]
+        objid = self.__to_id(cropobject_or_objid)
+        c = self.id_to_node_mapping[objid]
 
         predecessors, descendants = [], []
 
@@ -294,7 +295,7 @@ class NotationGraph(object):
 
         # Remove inlinks
         for p_objid in predecessors:
-            p = self._cdict[p_objid]
+            p = self.id_to_node_mapping[p_objid]
             if 'precedence_outlinks' not in p.data:
                 raise ValueError('Predecessor {} of cropobject {} does not have precedence outlinks!'
                                  ''.format(p_objid, c.objid))
@@ -306,7 +307,7 @@ class NotationGraph(object):
 
         # Remove outlinks
         for d_objid in descendants:
-            d = self._cdict[d_objid]
+            d = self.id_to_node_mapping[d_objid]
             if 'precedence_inlinks' not in d.data:
                 raise ValueError('Descendant {} of cropobject {} does not have precedence inlinks!'
                                  ''.format(d_objid, c.objid))
@@ -318,30 +319,30 @@ class NotationGraph(object):
 
         # Bridge removed element
         for p_objid in predecessors:
-            p = self._cdict[p_objid]
+            p = self.id_to_node_mapping[p_objid]
             for d_objid in descendants:
-                d = self._cdict[d_objid]
+                d = self.id_to_node_mapping[d_objid]
                 if d_objid not in p.data['precedence_outlinks']:
                     p.data['precedence_outlinks'].append(d_objid)
                 if p_objid not in d.data['precedence_inlinks']:
                     d.data['precedence_inlinks'].append(p_objid)
 
     def has_edge(self, fr, to):
-        if fr not in self._cdict:
+        if fr not in self.id_to_node_mapping:
             logging.warning('Asking for object {}, which is not in graph.'
                             ''.format(fr))
-        if to not in self._cdict:
+        if to not in self.id_to_node_mapping:
             logging.warning('Asking for object {}, which is not in graph.'
                             ''.format(to))
 
-        if to in self._cdict[fr].outlinks:
-            if fr in self._cdict[to].inlinks:
+        if to in self.id_to_node_mapping[fr].outlinks:
+            if fr in self.id_to_node_mapping[to].inlinks:
                 return True
             else:
                 raise NotationGraphError('has_edge({}, {}): found {} in outlinks'
                                          ' of {}, but not {} in inlinks of {}!'
                                          ''.format(fr, to, to, fr, fr, to))
-        elif fr in self._cdict[to].inlinks:
+        elif fr in self.id_to_node_mapping[to].inlinks:
             raise NotationGraphError('has_edge({}, {}): found {} in inlinks'
                                      ' of {}, but not {} in outlinks of {}!'
                                      ''.format(fr, to, fr, to, to, fr))
@@ -351,15 +352,15 @@ class NotationGraph(object):
     def add_edge(self, fr, to):
         """Add an edge between the MuNGOs with objids ``fr --> to``.
         If the edge is already in the graph, warns and does nothing."""
-        if fr not in self._cdict:
-            raise NotationGraphError('Cannot remove edge from node_id {0}: not in graph!'
+        if fr not in self.id_to_node_mapping:
+            raise NotationGraphError('Cannot remove edge from id {0}: not in graph!'
                                      ''.format(fr))
-        if to not in self._cdict:
-            raise NotationGraphError('Cannot remove edge to node_id {0}: not in graph!'
+        if to not in self.id_to_node_mapping:
+            raise NotationGraphError('Cannot remove edge to id {0}: not in graph!'
                                      ''.format(to))
 
-        if to in self._cdict[fr].outlinks:
-            if fr in self._cdict[to].inlinks:
+        if to in self.id_to_node_mapping[fr].outlinks:
+            if fr in self.id_to_node_mapping[to].inlinks:
                 logging.info('Adding edge that is alredy in the graph: {} --> {}'
                              ' -- doing nothing'.format(fr, to))
                 return
@@ -367,13 +368,14 @@ class NotationGraph(object):
                 raise NotationGraphError('add_edge({}, {}): found {} in outlinks'
                                          ' of {}, but not {} in inlinks of {}!'
                                          ''.format(fr, to, to, fr, fr, to))
-        elif fr in self._cdict[to].inlinks:
+        elif fr in self.id_to_node_mapping[to].inlinks:
             raise NotationGraphError('add_edge({}, {}): found {} in inlinks'
                                      ' of {}, but not {} in outlinks of {}!'
                                      ''.format(fr, to, fr, to, to, fr))
 
-        self._cdict[fr].outlinks.append(to)
-        self._cdict[to].inlinks.append(fr)
+        self.id_to_node_mapping[fr].outlinks.append(to)
+        self.id_to_node_mapping[to].inlinks.append(fr)
+
 
 ##############################################################################
 
@@ -405,13 +407,13 @@ def group_staffs_into_systems(cropobjects,
     graph = NotationGraph(cropobjects)
     _cdict = {c.objid: c for c in cropobjects}
     staff_groups = [c for c in cropobjects
-                    if c.clsname == 'staff_grouping']
+                    if c.class_name == 'staff_grouping']
 
     # Do not consider staffs that have no notehead or rest children.
-    empty_staffs = [c for c in cropobjects if (c.clsname == 'staff') and
+    empty_staffs = [c for c in cropobjects if (c.class_name == 'staff') and
                     (len([i for i in c.inlinks
-                          if ((_cdict[i].clsname in _CONST.NOTEHEAD_CLSNAMES) or
-                              (_cdict[i].clsname in _CONST.REST_CLSNAMES))])
+                          if ((_cdict[i].class_name in _CONST.NOTEHEAD_CLSNAMES) or
+                              (_cdict[i].class_name in _CONST.REST_CLSNAMES))])
                      == 0)]
     print('Empty staffs: {0}'.format('\n'.join([c.uid for c in empty_staffs])))
 
@@ -421,12 +423,12 @@ def group_staffs_into_systems(cropobjects,
     if use_fallback_measure_separators:  # and (len(staff_groups) == 0):
         # Collect measure separators, sort them left to right
         measure_separators = [c for c in cropobjects
-                              if c.clsname in _CONST.MEASURE_SEPARATOR_CLSNAMES]
+                              if c.class_name in _CONST.MEASURE_SEPARATOR_CLSNAMES]
         measure_separators = sorted(measure_separators,
                                     key=operator.attrgetter('left'))
         # Use only the leftmost measure separator for each staff.
         staffs = [c for c in cropobjects
-                  if c.clsname in [_CONST.STAFF_CLSNAME]]
+                  if c.class_name in [_CONST.STAFF_CLSNAME]]
 
         if leftmost_measure_separators_only:
             leftmost_measure_separators = set()
@@ -443,7 +445,7 @@ def group_staffs_into_systems(cropobjects,
 
     if len(staff_groups) != 0:
         staffs_per_group = {c.objid: [_cdict[i] for i in sorted(c.outlinks)
-                                      if _cdict[i].clsname == 'staff']
+                                      if _cdict[i].class_name == 'staff']
                             for c in staff_groups}
         # Build hierarchy of staff_grouping based on inclusion
         # between grouped staff sets.
@@ -469,12 +471,12 @@ def group_staffs_into_systems(cropobjects,
                 outer_staff_groups.append(sg)
 
         systems = [[c for c in cropobjects
-                    if (c.clsname == 'staff') and (c.objid in sg.outlinks)]
+                    if (c.class_name == 'staff') and (c.objid in sg.outlinks)]
                    for sg in outer_staff_groups]
     else:
         # Here we use the empty staff fallback
         systems = [[c] for c in cropobjects
-                   if (c.clsname == 'staff') and (c not in empty_staffs)]
+                   if (c.class_name == 'staff') and (c not in empty_staffs)]
 
     return systems
 
@@ -488,16 +490,16 @@ def group_by_staff(cropobjects):
     * the object is a descendant of an ancestor of the staff, *except*
       measure separators and staff groupings.
     """
-    g = NotationGraph(cropobjects=cropobjects)
+    g = NotationGraph(nodes=cropobjects)
 
-    staffs = [c for c in cropobjects if c.clsname == _CONST.STAFF_CLSNAME]
+    staffs = [c for c in cropobjects if c.class_name == _CONST.STAFF_CLSNAME]
     objects_per_staff = dict()
     for staff in staffs:
         descendants = g.descendants(staff)
         ancestors = g.ancestors(staff)
         a_descendants = []
         for ancestor in ancestors:
-            if ancestor.clsname in _CONST.SYSTEM_LEVEL_CLSNAMES:
+            if ancestor.class_name in _CONST.SYSTEM_LEVEL_CLSNAMES:
                 continue
             _ad = g.descendants(ancestor)
             a_descendants.extend(_ad)
@@ -545,7 +547,7 @@ def find_related_staffs(query_cropobjects, all_cropobjects,
     related_staffs = set()
     for c in query_cropobjects:
         desc_staffs = graph.descendants(c, classes=[_CONST.STAFF_CLSNAME])
-        anc_staffs =  graph.ancestors(c, classes=[_CONST.STAFF_CLSNAME])
+        anc_staffs = graph.ancestors(c, classes=[_CONST.STAFF_CLSNAME])
         current_staffs = set(desc_staffs + anc_staffs)
         related_staffs = related_staffs.union(current_staffs)
 
@@ -578,7 +580,7 @@ def find_beams_incoherent_with_stems(cropobjects):
         is not coherent with the stem direction for the notehead.
     """
     graph = NotationGraph(cropobjects)
-    noteheads = [c for c in cropobjects if c.clsname in _CONST.NOTEHEAD_CLSNAMES]
+    noteheads = [c for c in cropobjects if c.class_name in _CONST.NOTEHEAD_CLSNAMES]
 
     incoherent_pairs = []
     for n in noteheads:
@@ -625,7 +627,7 @@ def find_ledger_lines_with_noteheads_from_both_directions(cropobjects):
     problem_ledger_lines = []
 
     for c in cropobjects:
-        if c.clsname != 'ledger_line':
+        if c.class_name != 'ledger_line':
             continue
 
         noteheads = graph.parents(c, classes=_CONST.NOTEHEAD_CLSNAMES)
@@ -655,7 +657,7 @@ def find_noteheads_with_ledger_line_and_staff_conflict(cropobjects):
     problem_noteheads = []
 
     for c in cropobjects:
-        if c.clsname not in _CONST.NOTEHEAD_CLSNAMES:
+        if c.class_name not in _CONST.NOTEHEAD_CLSNAMES:
             continue
 
         lls = graph.children(c, ['ledger_line'])
@@ -679,13 +681,13 @@ def find_noteheads_on_staff_linked_to_ledger_line(cropobjects):
     graph = NotationGraph(cropobjects)
     problem_noteheads = []
 
-    stafflines = sorted([c for c in cropobjects if c.clsname == 'staff_line'],
+    stafflines = sorted([c for c in cropobjects if c.class_name == 'staff_line'],
                         key=lambda x: x.top)
-    staffspaces = sorted([c for c in cropobjects if c.clsname == 'staff_space'],
+    staffspaces = sorted([c for c in cropobjects if c.class_name == 'staff_space'],
                          key=lambda x: x.top)
 
     for c in cropobjects:
-        if c.clsname not in _CONST.NOTEHEAD_CLSNAMES:
+        if c.class_name not in _CONST.NOTEHEAD_CLSNAMES:
             continue
 
         lls = graph.children(c, ['ledger_line'])
@@ -726,7 +728,7 @@ def find_misdirected_ledger_line_edges(cropobjects,
     misdirected_object_pairs = []
 
     for c in cropobjects:
-        if c.clsname not in _CONST.NOTEHEAD_CLSNAMES:
+        if c.class_name not in _CONST.NOTEHEAD_CLSNAMES:
             continue
 
         lls = graph.children(c, ['ledger_line'])
@@ -792,7 +794,7 @@ def resolve_ledger_line_or_staffline_object(cropobjects):
     problem_object_pairs = []
 
     for c in cropobjects:
-        if c.clsname not in _CONST.NOTEHEAD_CLSNAMES:
+        if c.class_name not in _CONST.NOTEHEAD_CLSNAMES:
             continue
 
         lls = graph.children(c, ['ledger_line'])
@@ -835,7 +837,7 @@ def group_by_measure(cropobjects):
     logging.debug('Find measure separators.')
 
     measure_separators = [c for c in cropobjects
-                          if c.clsname in _CONST.MEASURE_SEPARATOR_CLSNAMES]
+                          if c.class_name in _CONST.MEASURE_SEPARATOR_CLSNAMES]
 
     if len(measure_separators) == 0:
         return cropobjects
@@ -855,28 +857,28 @@ def group_by_measure(cropobjects):
 # Searching for MuNGOs that are contained within other MuNGOs
 # and removing them safely from the MuNG.
 
-def find_contained_cropobjects(cropobjects, mask_threshold=0.95):
-    """Find all cropobjects that are contained within other cropobjects
+def find_contained_nodes(nodes: List[Node], mask_threshold: float = 0.95):
+    """Find all nodes that are contained within other nodes
     and not connected by an edge from container to contained.
 
     Does *NOT* check for transitive edges!"""
-    graph = NotationGraph(cropobjects)
+    graph = NotationGraph(nodes)
 
     # We should have some smarter indexing structure here, but since
     # we are just checking bounding boxes for candidates first,
     # it does not matter too much.
 
-    nonstaff_cropobjects = [c for c in cropobjects
-                            if c.clsname not in _CONST.STAFF_CROPOBJECT_CLSNAMES]
+    nonstaff_nodes = [c for c in nodes
+                      if c.class_name not in _CONST.STAFF_CROPOBJECT_CLSNAMES]
 
     contained_cropobjects = []
-    for c1 in nonstaff_cropobjects:
-        for c2 in nonstaff_cropobjects:
-            if c1.objid == c2.objid:
+    for c1 in nonstaff_nodes:
+        for c2 in nonstaff_nodes:
+            if c1.id == c2.id:
                 continue
             if c1.contains(c2):
                 # Check mask overlap
-                r, p, f = cropobject_mask_rpf(c1, c2)
+                r, p, f = c1.compute_recall_precision_fscore_on_mask(c2)
                 if r < mask_threshold:
                     continue
                 if c2.objid in c1.outlinks:
@@ -906,4 +908,4 @@ def remove_contained_cropobjects(cropobjects, contained):
     for c in contained:
         graph.remove_vertex(c.objid)
 
-    return list(graph._cdict.values())
+    return list(graph.id_to_node_mapping.values())

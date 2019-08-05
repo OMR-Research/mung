@@ -51,24 +51,24 @@ import numpy
 from mung.io import read_nodes_from_file
 
 
-def bbox_intersection(origin, intersect):
+def bounding_box_intersection(origin, intersect):
     """Returns the coordinates of the origin bounding box that
     are intersected by the intersect bounding box.
 
     >>> bounding_box = 10, 100, 30, 110
     >>> other_bbox = 20, 100, 40, 105
-    >>> bbox_intersection(bounding_box, other_bbox)
+    >>> bounding_box_intersection(bounding_box, other_bbox)
     (10, 0, 20, 5)
-    >>> bbox_intersection(other_bbox, bounding_box)
+    >>> bounding_box_intersection(other_bbox, bounding_box)
     (0, 0, 10, 5)
     >>> containing_bbox = 4, 55, 44, 115
-    >>> bbox_intersection(bounding_box, containing_bbox)
+    >>> bounding_box_intersection(bounding_box, containing_bbox)
     (0, 0, 20, 10)
     >>> contained_bbox = 12, 102, 22, 108
-    >>> bbox_intersection(bounding_box, contained_bbox)
+    >>> bounding_box_intersection(bounding_box, contained_bbox)
     (2, 2, 12, 8)
     >>> non_overlapping_bbox = 0, 0, 3, 3
-    >>> bbox_intersection(bounding_box, non_overlapping_bbox) is None
+    >>> bounding_box_intersection(bounding_box, non_overlapping_bbox) is None
     True
 
     """
@@ -97,16 +97,16 @@ def pixel_metrics(truth, prediction):
     Node given the truth Node."""
     recall, precision, fscore = 0, 0, 0
 
-    intersection_truth = bbox_intersection(truth.bounding_box,
-                                           prediction.bounding_box)
+    intersection_truth = bounding_box_intersection(truth.bounding_box,
+                                                   prediction.bounding_box)
     if intersection_truth is None:
         logging.debug('No intersection for CropObjects: t={0},'
                       ' p={1}'.format(truth.bounding_box,
                                       prediction.bounding_box))
         return recall, precision, fscore
 
-    intersection_pred = bbox_intersection(prediction.bounding_box,
-                                          truth.bounding_box)
+    intersection_pred = bounding_box_intersection(prediction.bounding_box,
+                                                  truth.bounding_box)
 
     logging.debug('Found intersection for CropObjects: t={0},'
                   ' p={1}'.format(truth.bounding_box,

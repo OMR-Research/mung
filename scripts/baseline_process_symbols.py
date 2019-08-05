@@ -13,16 +13,18 @@ import traceback
 
 import numpy
 from sklearn.feature_extraction import DictVectorizer
+from typing import List, Dict
 
 from mung.graph import find_beams_incoherent_with_stems, NotationGraph
-from mung.graph import find_contained_cropobjects, remove_contained_cropobjects
+from mung.graph import find_contained_nodes, remove_contained_cropobjects
 from mung.graph import find_misdirected_ledger_line_edges
 from mung.inference.inference import OnsetsInferenceEngine, MIDIBuilder
 from mung.inference.inference import PitchInferenceEngine
 from mung.inference.constants import _CONST
 from mung.io import parse_node_classes, read_nodes_from_file, export_cropobject_list
-from mung.node import cropobject_distance, bbox_intersection, cropobjects_merge_multiple, link_cropobjects
-from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, build_staffspace_cropobjects, add_staff_relationships
+from mung.node import bounding_box_intersection, merge_multiple_nodes, link_nodes, Node
+from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, build_staffspace_cropobjects, \
+    add_staff_relationships
 
 
 def add_key_signatures(cropobjects):
@@ -77,8 +79,8 @@ def add_key_signatures(cropobjects):
                            if m.clsname in _CONST.ACCIDENTAL_CLSNAMES]
         relevant_acc_bbox = s.top, leftmost_clef.left, s.bottom, leftmost_notehead.left
         relevant_accidentals = [m for m in all_accidentals
-                                if bbox_intersection(m.bounding_box,
-                                                     relevant_acc_bbox)
+                                if bounding_box_intersection(m.bounding_box,
+                                                             relevant_acc_bbox)
                                 is not None]
 
         # Order A_S left-to-right.
@@ -104,14 +106,14 @@ def add_key_signatures(cropobjects):
             # Note: there might be spurious links from the accidentals
             # to notheads, if they were mis-interpreted during parsing.
             # This actually might not matter; needs testing.
-            key_signature = cropobjects_merge_multiple(
+            key_signature = merge_multiple_nodes(
                 key_signature_accidentals,
-                clsname=_key_signature_clsname,
-                objid=_current_key_signature_objid)
+                class_name=_key_signature_clsname,
+                id=_current_key_signature_objid)
             _current_key_signature_objid += 1
-            link_cropobjects(key_signature, s)
+            link_nodes(key_signature, s)
             for a in key_signature_accidentals:
-                link_cropobjects(key_signature, a)
+                link_nodes(key_signature, a)
 
             key_signatures.append(key_signature)
 
@@ -483,7 +485,7 @@ class DependencyGrammar(object):
                                          cmin, cmax)
 
         # Now check for rule-based inlinks and outlinks.
-        #for f in outlinks:
+        # for f in outlinks:
         #    oc = self.outlink_cardinalities[f]
         if provide_reasons:
             return wrong_vertices, wrong_inlinks, wrong_outlinks, \
@@ -553,7 +555,7 @@ class DependencyGrammar(object):
         lhs_tokens = lhs.strip().split()
         rhs_tokens = rhs.strip().split()
 
-        #logging.info('DependencyGrammar: tokens lhs={0}, rhs={1}'
+        # logging.info('DependencyGrammar: tokens lhs={0}, rhs={1}'
         #             ''.format(lhs_tokens, rhs_tokens))
 
         # Normal rule line? Aggregate cardinality line?
@@ -671,7 +673,7 @@ class DependencyGrammar(object):
         wildcard_idx = token.index(self.WILDCARD)
         prefix = token[:wildcard_idx]
         if wildcard_idx < len(token) - 1:
-            suffix = token[wildcard_idx+1:]
+            suffix = token[wildcard_idx + 1:]
         else:
             suffix = ''
 
@@ -772,7 +774,7 @@ class PairwiseClfFeatureExtractor(object):
                         'target': tgt}
         return feature_dict
 
-    def get_features_distance_relative_bbox_and_clsname(self, c_from, c_to):
+    def get_features_distance_relative_bbox_and_clsname(self, from_node: Node, to_node: Node) -> Dict:
         """Extract a feature vector from the given pair of CropObjects.
         Does *NOT* convert the class names to integers.
 
@@ -782,17 +784,17 @@ class PairwiseClfFeatureExtractor(object):
         Returns a tuple.
         """
         target = 0
-        if c_from.document == c_to.document:
-            if c_to.objid in c_from.outlinks:
+        if from_node.document == to_node.document:
+            if to_node.id in from_node.outlinks:
                 target = 1
-        distance = cropobject_distance(c_from, c_to)
+        distance = from_node.distance_to(to_node)
         features = (distance,
-                    c_to.top - c_from.top,
-                    c_to.left - c_from.left,
-                    c_to.bottom - c_from.bottom,
-                    c_to.right - c_from.right,
-                    c_from.clsname,
-                    c_to.clsname,
+                    to_node.top - from_node.top,
+                    to_node.left - from_node.left,
+                    to_node.bottom - from_node.bottom,
+                    to_node.right - from_node.right,
+                    from_node.class_name,
+                    to_node.class_name,
                     target)
         dist, dt, dl, db, dr, cu, cv, tgt = features
         if cu.startswith('letter'): cu = 'letter'
@@ -854,59 +856,59 @@ class PairwiseClassificationParser(object):
 
         return edges
 
-    def _only_one_stem_per_notehead(self, cropobjects, edges):
-        _cdict = {c.objid: c for c in cropobjects}
+    def _only_one_stem_per_notehead(self, nodes: List[Node], edges):
+        node_id_to_node_mapping = {n.id: n for n in nodes}  # type: Dict[int, Node]
 
         # Collect stems per notehead
         stems_per_notehead = collections.defaultdict(list)
         stem_objids = set()
-        for f_objid, t_objid in edges:
-            f = _cdict[f_objid]
-            t = _cdict[t_objid]
-            if (f.clsname in _CONST.NOTEHEAD_CLSNAMES) and \
-                (t.clsname == 'stem'):
-                stems_per_notehead[f_objid].append(t_objid)
-                stem_objids.add(t_objid)
+        for from_id, to_id in edges:
+            from_node = node_id_to_node_mapping[from_id]
+            to_node = node_id_to_node_mapping[to_id]
+            if (from_node.class_name in _CONST.NOTEHEAD_CLSNAMES) and \
+                    (to_node.class_name == 'stem'):
+                stems_per_notehead[from_id].append(to_id)
+                stem_objids.add(to_id)
 
         # Pick the closest one (by minimum distance)
         closest_stems_per_notehead = dict()
         for n_objid in stems_per_notehead:
-            n = _cdict[n_objid]
-            stems = [_cdict[objid] for objid in stems_per_notehead[n_objid]]
-            closest_stem = min(stems, key=lambda s: cropobject_distance(n, s))
-            closest_stems_per_notehead[n_objid] = closest_stem.objid
+            n = node_id_to_node_mapping[n_objid]
+            stems = [node_id_to_node_mapping[objid] for objid in stems_per_notehead[n_objid]]
+            closest_stem = min(stems, key=lambda s: n.distance_to(s))
+            closest_stems_per_notehead[n_objid] = closest_stem.id
 
         # Filter the edges
         edges = [(f_objid, t_objid) for f_objid, t_objid in edges
                  if (f_objid not in closest_stems_per_notehead) or
-                    (t_objid not in stem_objids) or
-                    (closest_stems_per_notehead[f_objid] == t_objid)]
+                 (t_objid not in stem_objids) or
+                 (closest_stems_per_notehead[f_objid] == t_objid)]
 
         return edges
 
-    def _every_full_notehead_has_a_stem(self, cropobjects, edges):
-        _cdict = {c.objid: c for c in cropobjects}
+    def _every_full_notehead_has_a_stem(self, nodes: List[Node], edges):
+        node_id_to_node_mapping = {c.id: c for c in nodes}  # type: Dict[int, Node]
 
         # Collect stems per notehead
-        notehead_objids = set([c.objid for c in cropobjects if c.clsname == 'noteheadFull'])
-        stem_objids = set([c.objid for c in cropobjects if c.clsname == 'stem'])
+        notehead_objids = set([c.id for c in nodes if c.class_name == 'noteheadFull'])
+        stem_objids = set([c.id for c in nodes if c.class_name == 'stem'])
 
         noteheads_with_stem_objids = set()
         stems_with_notehead_objids = set()
         for f, t in edges:
-            if _cdict[f].clsname == 'noteheadFull':
-                if _cdict[t].clsname == 'stem':
+            if node_id_to_node_mapping[f].class_name == 'noteheadFull':
+                if node_id_to_node_mapping[t].class_name == 'stem':
                     noteheads_with_stem_objids.add(f)
                     stems_with_notehead_objids.add(t)
 
-        noteheads_without_stems = {n: _cdict[n] for n in notehead_objids
-                                      if n not in noteheads_with_stem_objids}
-        stems_without_noteheads = {n: _cdict[n] for n in stem_objids
-                                      if n not in stems_with_notehead_objids}
+        noteheads_without_stems = {n: node_id_to_node_mapping[n] for n in notehead_objids
+                                   if n not in noteheads_with_stem_objids}
+        stems_without_noteheads = {n: node_id_to_node_mapping[n] for n in stem_objids
+                                   if n not in stems_with_notehead_objids}
 
         # To each notehead, assign the closest stem that is not yet taken.
         closest_stem_per_notehead = {objid: min(stems_without_noteheads,
-                                            key=lambda x: cropobject_distance(_cdict[x], n))
+                                                key=lambda x: node_id_to_node_mapping[x].distance_to(n))
                                      for objid, n in list(noteheads_without_stems.items())}
 
         # Filter edges that are too long
@@ -914,22 +916,20 @@ class PairwiseClassificationParser(object):
         closest_stem_threshold_distance = 80
         closest_stem_per_notehead = {n_objid: s_objid
                                      for n_objid, s_objid in list(closest_stem_per_notehead.items())
-                                     if cropobject_distance(_cdict[n_objid],
-                                                            _cdict[s_objid])
-                                         < closest_stem_threshold_distance
+                                     if node_id_to_node_mapping[n_objid].distance_to(node_id_to_node_mapping[s_objid])
+                                     < closest_stem_threshold_distance
                                      }
-
 
         return edges + list(closest_stem_per_notehead.items())
 
-    def extract_all_pairs(self, cropobjects):
+    def extract_all_pairs(self, nodes: List[Node]):
         pairs = []
         features = []
-        for u in cropobjects:
-            for v in cropobjects:
-                if u.objid == v.objid:
+        for u in nodes:
+            for v in nodes:
+                if u.id == v.id:
                     continue
-                distance = cropobject_distance(u, v)
+                distance = u.distance_to(v)
                 if distance < self.MAXIMUM_DISTANCE_THRESHOLD:
                     pairs.append((u, v))
                     f = self.extractor(u, v)
@@ -1128,7 +1128,7 @@ def infer_precedence_edges(cropobjects, factor_by_staff=True):
     edges = []
     for i in range(len(sorted_equiv_objs) - 1):
         fr_objs = sorted_equiv_objs[i]
-        to_objs = sorted_equiv_objs[i+1]
+        to_objs = sorted_equiv_objs[i + 1]
         for f in fr_objs:
             for t in to_objs:
                 edges.append((f.objid, t.objid))
@@ -1141,16 +1141,15 @@ def add_precedence_edges(cropobjects, edges):
     # Ensure unique
     edges = set(edges)
     _cdict = {c.objid: c for c in cropobjects}
-    
+
     for f, t in edges:
-        cf, ct = _cdict[f] ,_cdict[t]
-        
+        cf, ct = _cdict[f], _cdict[t]
+
         if cf.data is None:
             cf.data = dict()
         if 'precedence_outlinks' not in cf.data:
             cf.data['precedence_outlinks'] = []
         cf.data['precedence_outlinks'].append(t)
-
 
         if ct.data is None:
             ct.data = dict()
@@ -1159,6 +1158,7 @@ def add_precedence_edges(cropobjects, edges):
         ct.data['precedence_inlinks'].append(f)
 
     return cropobjects
+
 
 ##############################################################################
 # Build the MIDI
@@ -1332,8 +1332,8 @@ def main(args):
     # Filter contained here.
     if args.filter_contained:
         logging.info('Finding contained cropobjects...')
-        contained = find_contained_cropobjects(cropobjects,
-                                               mask_threshold=0.95)
+        contained = find_contained_nodes(cropobjects,
+                                         mask_threshold=0.95)
         NEVER_DISCARD_CLASSES = ['key_signature', 'time_signature']
         contained = [c for c in contained if c.clsname not in NEVER_DISCARD_CLASSES]
 
