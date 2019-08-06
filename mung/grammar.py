@@ -146,7 +146,7 @@ class DependencyGrammar(object):
     We can check for errors against our music notation symbols dependency
     grammar:
 
-    >>> wrong_vertices, wrong_inlinks, wrong_outlinks = \
+    >>> wrong_vertices, wrong_inlinks, wrong_outlinks, _, _, _ = \
             dependency_graph.find_invalid_in_graph(vertices=vertices, edges=edges)
 
     Because the edge ``(0, 3)`` connects a full notehead to an empty notehead,
