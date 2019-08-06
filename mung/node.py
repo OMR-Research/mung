@@ -58,7 +58,7 @@ class Node(object):
     >>> class_name = 'flat'
     >>> dataset = 'MUSCIMA-pp_2.0'
     >>> document = 'CVC-MUSCIMA_W-35_N-08_D-ideal'
-    >>> node = Node(id=611, class_name=class_name,
+    >>> node = Node(611, class_name=class_name,
     ...                top=top, left=left, height=height, width=width,
     ...                inlinks=[], outlinks=[],
     ...                mask=mask,
@@ -216,7 +216,7 @@ class Node(object):
     DEFAULT_DATASET = 'MUSCIMA_DEFAULT_DATASET_PLACEHOLDER'
     DEFAULT_DOCUMENT = 'default-document'
 
-    def __init__(self, id: int,
+    def __init__(self, id_: int,
                  class_name: str,
                  top: int,
                  left: int,
@@ -228,7 +228,7 @@ class Node(object):
                  dataset: str = None,
                  document: str = None,
                  data=None):
-        self.__id = id
+        self.__id = id_
         self.__class_name = class_name
         self.__top = top
         self.__left = left
@@ -304,8 +304,8 @@ class Node(object):
     def id(self) -> int:
         return self.__id
 
-    def set_id(self, id):
-        self.__id = id
+    def set_id(self, id_):
+        self.__id = id_
 
     @property
     def class_name(self) -> str:
@@ -506,16 +506,17 @@ class Node(object):
         """Check if this Node entirely contains the other bounding
         box (or, the other node's bounding box)."""
         if isinstance(bounding_box_or_node, Node):
-            t, l, b, r = bounding_box_or_node.bounding_box
+            top, left, bottom, right = bounding_box_or_node.bounding_box
         else:
-            t, l, b, r = bounding_box_or_node
+            top, left, bottom, right = bounding_box_or_node
 
-        if self.top <= t <= b <= self.bottom:
-            if self.left <= l <= r <= self.right:
+        if self.top <= top <= bottom <= self.bottom:
+            if self.left <= left <= right <= self.right:
                 return True
         return False
 
-    def bounding_box_intersection(self, bounding_box: Tuple[int, int, int, int]) -> Optional[Tuple[int, int, int, int]]:
+    def bounding_box_intersection(self, bounding_box: Tuple[int, int, int, int]) \
+            -> Optional[Tuple[int, int, int, int]]:
         """Returns the sub-bounding box of this Node intersecting with the given bounding box.
         If the intersection is empty, returns None.
 
@@ -790,7 +791,8 @@ class Node(object):
         try:
             values = list(map(float, mask_string.split()))
         except ValueError:
-            logging.info('Node.decode_mask_bitmap() Cannot decode mask values:\n{0}'.format(mask_string))
+            logging.info(
+                'Node.decode_mask_bitmap() Cannot decode mask values:\n{0}'.format(mask_string))
             raise
         mask = numpy.array(values).reshape(shape)
         return mask
@@ -825,7 +827,8 @@ class Node(object):
         The ``class_name`` of the ``other`` is ignored.
         """
         if self.document != other.document:
-            logging.warning("Trying to join Node from different documents, which is forbidden. Skipping join.")
+            logging.warning(
+                "Trying to join Node from different documents, which is forbidden. Skipping join.")
             return
 
         # Get combined bounding box
@@ -871,41 +874,31 @@ class Node(object):
     def get_outlink_objects(self, nodes):
         # type: (List[Node]) -> List[Node]
         """Out of the given ``nodes`` list, return a list
-        of those to which this Node has outlinks
+        of those to which this Node has outlinks.
         Can deal with Nodes from multiple documents.
         """
-        output = []  # type: List[Node]
-        if len(self.outlinks) == 0:
-            return output
-
-        _outlink_set = frozenset(self.outlinks)
-
-        for c in nodes:
-            if c.document != self.document:
-                continue
-            if c.id in _outlink_set:
-                output.append(c)
-            if len(output) == len(self.outlinks):
-                break
-        return output
+        return self.__check_nodes_that_have_links(self.outlinks, nodes)
 
     def get_inlink_objects(self, nodes):
         # type: (List[Node]) -> List[Node]
-        """Out of the given ``cropobject`` list, return a list
-        of those from which this CropObject has inlinks
-
-        Can deal with CropObjects from multiple documents.
+        """Out of the given ``nodes`` list, return a list
+        of those from which this node has inlinks
+        Can deal with Nodes from multiple documents.
         """
+        return self.__check_nodes_that_have_links(self.inlinks, nodes)
+
+    def __check_nodes_that_have_links(self, links, nodes):
+        # type: (List[int], List[Node]) -> List[Node]
         output = []
-        if len(self.inlinks) == 0:
+        if len(links) == 0:
             return output
 
-        _inlink_set = frozenset(self.inlinks)
+        link_set = frozenset(links)
 
         for node in nodes:
             if node.document != self.document:
                 continue
-            if node.id in _inlink_set:
+            if node.id in link_set:
                 output.append(node)
             if len(output) == len(self.inlinks):
                 break
@@ -980,7 +973,7 @@ class Node(object):
     def compute_recall_precision_fscore_on_mask(self, other_node):
         # type: (Node) -> Tuple[float, float, float]
         """Compute the recall, precision and f-score of the predicted
-        cropobject's mask against the ground truth cropobject's mask."""
+        Node's mask against another node's mask."""
 
         if bounding_box_intersection(self.bounding_box, other_node.bounding_box) is None:
             return 0.0, 0.0, 0.0
@@ -1073,25 +1066,26 @@ def split_node_by_its_connected_components(node: Node, next_node_id: int) -> Lis
     return output
 
 
-def merge_nodes(first_node: Node, second_node: Node, class_name: str, id: int) -> Node:
+def merge_nodes(first_node: Node, second_node: Node, class_name: str, id_: int) -> Node:
     """Merge the given Nodes with respect to the other.
     Returns a new Node (without modifying any of the inputs)."""
-    return merge_multiple_nodes([first_node, second_node], class_name, id)
+    return merge_multiple_nodes([first_node, second_node], class_name, id_)
 
 
-def merge_multiple_nodes(nodes: List[Node], class_name: str, id: int) -> Node:
-    """Merge multiple cropobjects. Does not modify any of the inputs."""
+def merge_multiple_nodes(nodes: List[Node], class_name: str, id_: int) -> Node:
+    """Merge multiple nodes. Does not modify any of the inputs."""
     if len(set([c.document for c in nodes])) > 1:
         raise ValueError('Cannot merge CropObjects from different documents!')
     merged_top, merged_left, merged_bottom, merged_right = compute_unifying_bounding_box(nodes)
     merged_height, merged_width = merged_bottom - merged_top, merged_right - merged_left
     merged_mask = compute_unifying_mask(nodes)
-    merged_inlinks, merged_outlinks = merge_inlinks_and_outlinks_to_nodes_outside_of_this_list(nodes)
+    merged_inlinks, merged_outlinks = merge_inlinks_and_outlinks_to_nodes_outside_of_this_list(
+        nodes)
 
     dataset = nodes[0].dataset
     document = nodes[0].document
 
-    output = Node(id, class_name,
+    output = Node(id_, class_name,
                   top=merged_top, left=merged_left, height=merged_height, width=merged_width,
                   mask=merged_mask,
                   inlinks=merged_inlinks, outlinks=merged_outlinks,
@@ -1142,6 +1136,8 @@ def compute_unifying_mask(nodes: List[Node], intersection=False) -> Optional[num
 
     If some Nodes have masks and some don't, this call with throw an error.
 
+    :param nodes: The list of nodes whose masks will be merged
+
     :param intersection: Instead of a union, return the mask
         intersection: only those pixels which are common to all
         the Nodes.
@@ -1153,7 +1149,7 @@ def compute_unifying_mask(nodes: List[Node], intersection=False) -> Optional[num
     for node in nodes:
         if node.mask is None:
             # Some nodes have masks and some don't
-            raise ValueError('Cannot deal with a mix of masked and non-masked cropobjects.')
+            raise ValueError('Cannot deal with a mix of masked and non-masked Nodes.')
 
     top, left, bottom, right = compute_unifying_bounding_box(nodes)
     height = bottom - top
@@ -1172,7 +1168,8 @@ def compute_unifying_mask(nodes: List[Node], intersection=False) -> Optional[num
     return output_mask
 
 
-def merge_inlinks_and_outlinks_to_nodes_outside_of_this_list(nodes: List[Node]) -> Tuple[List[int], List[int]]:
+def merge_inlinks_and_outlinks_to_nodes_outside_of_this_list(nodes: List[Node]) \
+        -> Tuple[List[int], List[int]]:
     """Collect all inlinks and outlinks of the given set of Nodes
     to Nodes outside of this set. The rationale for this is that
     these given ``nodes`` will be merged into one, so relationships
@@ -1213,7 +1210,8 @@ def merge_node_lists_from_multiple_documents(node_lists: List[List[Node]]) -> Li
     """
     max_node_ids = [max([node.id for node in c_list]) for c_list in node_lists]
     min_node_ids = [min([node.id for node in c_list]) for c_list in node_lists]
-    shift_by = [0] + [sum(max_node_ids[:i]) - min_node_ids[i] + 1 for i in range(1, len(max_node_ids))]
+    shift_by = [0] + [sum(max_node_ids[:i]) - min_node_ids[i] + 1 for i in
+                      range(1, len(max_node_ids))]
 
     new_lists = []
     for nodes, s in zip(node_lists, shift_by):
@@ -1235,17 +1233,13 @@ def merge_node_lists_from_multiple_documents(node_lists: List[List[Node]]) -> Li
     return output
 
 
-def link_nodes(from_node: Node, to_node: Node, check_document: bool = True):
+def link_nodes(from_node: Node, to_node: Node, check_that_nodes_have_the_same_document: bool = True):
     """Add a relationship from one node to the other. Updates the nodes in-place.
 
     If the objects are already linked, does nothing.
-
-    :param check_document: If set, checks whether ``document`` name
-        matches and raises a ValueError if the Nodes
-        come from different documents.
     """
     if from_node.document != to_node.document:
-        if check_document:
+        if check_that_nodes_have_the_same_document:
             raise ValueError('Cannot link two CropObjects that are')
         else:
             logging.warning('Attempting to link CropObjects from two different'
@@ -1262,7 +1256,8 @@ def link_nodes(from_node: Node, to_node: Node, check_document: bool = True):
 
 
 def bounding_box_intersection(first_bounding_box: Tuple[int, int, int, int],
-                              second_bounding_box: Tuple[int, int, int, int]) -> Optional[Tuple[int, int, int, int]]:
+                              second_bounding_box: Tuple[int, int, int, int]) -> Optional[
+    Tuple[int, int, int, int]]:
     """Returns the t, l, b, r coordinates of the sub-bounding box
     of bbox_this that is also inside bbox_other.
     If the bounding boxes do not overlap, returns None."""
@@ -1284,7 +1279,8 @@ def bounding_box_intersection(first_bounding_box: Tuple[int, int, int, int],
 
 
 def bounding_box_dice_coefficient(first_bounding_box: Tuple[int, int, int, int],
-                                  second_bounding_box: Tuple[int, int, int, int], vertical: bool = False,
+                                  second_bounding_box: Tuple[int, int, int, int],
+                                  vertical: bool = False,
                                   horizontal: bool = False) -> float:
     """Compute the Dice coefficient (intersection over union)
     for the given two bounding boxes.
@@ -1326,7 +1322,8 @@ def bounding_box_dice_coefficient(first_bounding_box: Tuple[int, int, int, int],
             return (i_horizontal * i_vertical) / (u_horizontal * u_vertical)
 
 
-def draw_nodes_on_empty_canvas(nodes: List[Node], margin: int = 10) -> Tuple[numpy.ndarray, Tuple[int, int]]:
+def draw_nodes_on_empty_canvas(nodes: List[Node], margin: int = 10) -> Tuple[
+    numpy.ndarray, Tuple[int, int]]:
     """Draws all the given Nodes onto a zero background.
     The size of the canvas adapts to the Nodes, with the    given margin.
 
@@ -1339,7 +1336,8 @@ def draw_nodes_on_empty_canvas(nodes: List[Node], margin: int = 10) -> Tuple[num
     top_with_margin, left_with_margin, bottom_with_margin, right_with_margin = \
         max(0, top - margin), max(0, left - margin), bottom + margin, right + margin
 
-    canvas = numpy.zeros((bottom_with_margin - top_with_margin, right_with_margin - left_with_margin))
+    canvas = numpy.zeros(
+        (bottom_with_margin - top_with_margin, right_with_margin - left_with_margin))
 
     for node in nodes:
         canvas[node.top - top_with_margin:node.bottom - top_with_margin,

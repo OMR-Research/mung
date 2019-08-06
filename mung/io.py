@@ -356,7 +356,7 @@ def read_nodes_from_file(filename: str) -> List[Node]:
 
         #################################
         # Create the object.
-        obj = Node(id=node_id,
+        obj = Node(id_=node_id,
                    class_name=class_name,
                    top=top,
                    left=left,
@@ -542,6 +542,8 @@ def parse_node_classes(filename):
     node_classes_xml = tree.getroot()
     node_classes = []
     for node_class_xml in node_classes_xml:
+        if node_class_xml.tag != "NodeClass":
+            continue
         node_class = NodeClass(class_id=int(node_class_xml.findall('Id')[0].text),
                                name=node_class_xml.findall('Name')[0].text,
                                group_name=node_class_xml.findall('GroupName')[0].text,

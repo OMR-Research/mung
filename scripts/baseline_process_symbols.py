@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """This is a script that processes a set of symbols in order to obtain the pitch
 recognition baseline. Intended to be used on top of an object detection stage."""
 import argparse
@@ -17,13 +16,14 @@ from typing import List, Dict
 
 from mung.graph import find_beams_incoherent_with_stems, NotationGraph
 from mung.graph import find_contained_nodes, remove_contained_cropobjects
-from mung.graph import find_misdirected_ledger_line_edges
+from mung.graph import find_misdirected_leger_line_edges
 from mung.inference.inference import OnsetsInferenceEngine, MIDIBuilder
 from mung.inference.inference import PitchInferenceEngine
 from mung.inference.constants import _CONST
 from mung.io import parse_node_classes, read_nodes_from_file, export_cropobject_list
 from mung.node import bounding_box_intersection, merge_multiple_nodes, link_nodes, Node
-from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, build_staffspace_cropobjects, \
+from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, \
+    build_staffspace_cropobjects, \
     add_staff_relationships
 
 
@@ -109,7 +109,7 @@ def add_key_signatures(cropobjects):
             key_signature = merge_multiple_nodes(
                 key_signature_accidentals,
                 class_name=_key_signature_clsname,
-                id=_current_key_signature_objid)
+                id_=_current_key_signature_objid)
             _current_key_signature_objid += 1
             link_nodes(key_signature, s)
             for a in key_signature_accidentals:
@@ -141,13 +141,13 @@ class DependencyGrammar(object):
     they use: **dependency** rules, and **constituency** rules. Dependency
     rules specify which symbols are governing, and which symbols are governed::
 
-      notehead_full | stem
+      noteheadFull | stem
 
     There can be multiple left-hand side and right-hand side symbols,
     as a shortcut for a list of rules::
 
-        notehead_full | stem beam
-        notehead_full notehead_empty | ledger_line duration-dot tie grace_note
+        noteheadFull | stem beam
+        noteheadFull noteheadHalf | ledger_line duration-dot tie grace_note
 
     The asterisk works as a wildcard. Currently, only one wildcard per symbol
     is allowed::
@@ -196,7 +196,7 @@ class DependencyGrammar(object):
     A sharp or flat can only belong to one key signature. However,
     not every sharp belongs to a key signature::
 
-      key_signature | sharp{,1} flat{,1} natural{,1} double_sharp{,1} double_flat{,1}
+      keySignature | accidentalSharp{,1} accidentalFlat{,1} accidentalNatural{,1} accidentalDoubleSharp{,1} accidentalDoubleFlat{,1}
 
     For the left-hand side of the rule, the cardinality restrictions apply to
     outlinks towards symbols of classes on the right-hand side of the rule.
@@ -206,15 +206,15 @@ class DependencyGrammar(object):
     It is also possible to specify that regardless of where outlinks
     lead, a symbol should always have at least some::
 
-      time_signature{1,} |
+      timeSignature{1,} |
       repeat{2,} |
 
     And analogously for inlinks:
 
-      | letter_*{1,}
-      | numeral_*{1,}
-      | ledger_line{1,}
-      | grace-notehead-*{1,}
+      | letter*{1,}
+      | numeral*{1,}
+      | legerLine{1,}
+      | notehead*Small{1,}
 
     Interface
     ---------
@@ -227,7 +227,7 @@ class DependencyGrammar(object):
     >>> mlclass_dict = {node_class.class_id: node_class for node_class in parse_node_classes(mlpath)}
     >>> g = DependencyGrammar(grammar_filename=fpath, mlclasses=mlclass_dict)
     >>> len(g.rules)
-    551
+    646
 
     Grammar I/O
     -----------
@@ -263,11 +263,11 @@ class DependencyGrammar(object):
     >>> l = 'notehead*{,2} | stem'
     >>> rules, inlink_cards, outlink_cards, _, _ = g.parse_dependency_grammar_line(l)
     >>> rules
-    [('noteheadFull', 'stem'), ('notehead-empty', 'stem')]
-    >>> outlink_cards['notehead-empty']
+    [('noteheadFull', 'stem'), ('noteheadFullSmall', 'stem'), ('noteheadHalfSmall', 'stem'), ('noteheadHalf', 'stem'), ('noteheadWhole', 'stem')]
+    >>> outlink_cards['noteheadHalf']
     {'stem': (0, 2)}
     >>> inlink_cards['stem']
-    {'noteheadFull': (0, 10000), 'notehead-empty': (0, 10000)}
+    {'noteheadFull': (0, 10000), 'noteheadFullSmall': (0, 10000), 'noteheadHalfSmall': (0, 10000), 'noteheadHalf': (0, 10000), 'noteheadWhole': (0, 10000)}
 
     A key signature can have any number of sharps, flats, or naturals,
     but if a given symbol is part of a key signature, it can only be part of one.
@@ -282,18 +282,18 @@ class DependencyGrammar(object):
     You can also give *aggregate* cardinality rules, of the style "whatever rule
     applies, there should be at least X/at most Y edges for this type of object".
 
-    >>> l = 'key-signature{1,} |'
+    >>> l = 'keySignature{1,} |'
     >>> _, _, _, _, out_aggregate_cards = g.parse_dependency_grammar_line(l)
     >>> out_aggregate_cards
-    {'key-signature': (1, 10000)}
-    >>> l = 'grace-notehead*{1,} |'
+    {'keySignature': (1, 10000)}
+    >>> l = 'notehead*Small{1,} |'
     >>> _, _, _, _, out_aggregate_cards = g.parse_dependency_grammar_line(l)
     >>> out_aggregate_cards
-    {'grace-notehead-full': (1, 10000), 'grace-notehead-empty': (1, 10000)}
-    >>> l = '| beam{1,} stem{1,} flat{1,}'
+    {'noteheadFullSmall': (1, 10000), 'noteheadHalfSmall': (1, 10000)}
+    >>> l = '| beam{1,} stem{1,} accidentalFlat{1,}'
     >>> _, _, _, in_aggregate_cards, _ = g.parse_dependency_grammar_line(l)
     >>> in_aggregate_cards
-    {'beam': (1, 10000), 'stem': (1, 10000), 'flat': (1, 10000)}
+    {'beam': (1, 10000), 'stem': (1, 10000), 'accidentalFlat': (1, 10000)}
 
     """
 
@@ -301,7 +301,7 @@ class DependencyGrammar(object):
 
     _MAX_CARD = 10000
 
-    def __init__(self, grammar_filename, mlclasses):
+    def __init__(self, grammar_filename: str, mlclasses):
         """Initialize the Grammar: fill in alphabet and parse rules."""
         self.alphabet = {str(m.name): m for m in list(mlclasses.values())}
         # logging.info('DependencyGrammar: got alphabet:\n{0}'
@@ -505,7 +505,8 @@ class DependencyGrammar(object):
         _invalid_lines = []
         with codecs.open(filename, 'r', 'utf-8') as hdl:
             for line_no, line in enumerate(hdl):
-                l_rules, in_card, out_card, in_agg_card, out_agg_card = self.parse_dependency_grammar_line(line)
+                l_rules, in_card, out_card, in_agg_card, out_agg_card = self.parse_dependency_grammar_line(
+                    line)
 
                 if not self._validate_rules(l_rules):
                     _invalid_lines.append((line_no, line))
@@ -774,7 +775,8 @@ class PairwiseClfFeatureExtractor(object):
                         'target': tgt}
         return feature_dict
 
-    def get_features_distance_relative_bbox_and_clsname(self, from_node: Node, to_node: Node) -> Dict:
+    def get_features_distance_relative_bbox_and_clsname(self, from_node: Node,
+                                                        to_node: Node) -> Dict:
         """Extract a feature vector from the given pair of CropObjects.
         Does *NOT* convert the class names to integers.
 
@@ -838,7 +840,8 @@ class PairwiseClassificationParser(object):
 
         pairs, features = self.extract_all_pairs(cropobjects)
 
-        logging.info('Clf.Parse: {0} object pairs from {1} objects'.format(len(pairs), len(cropobjects)))
+        logging.info(
+            'Clf.Parse: {0} object pairs from {1} objects'.format(len(pairs), len(cropobjects)))
 
         preds = self.clf.predict(features)
 
@@ -908,7 +911,8 @@ class PairwiseClassificationParser(object):
 
         # To each notehead, assign the closest stem that is not yet taken.
         closest_stem_per_notehead = {objid: min(stems_without_noteheads,
-                                                key=lambda x: node_id_to_node_mapping[x].distance_to(n))
+                                                key=lambda x: node_id_to_node_mapping[
+                                                    x].distance_to(n))
                                      for objid, n in list(noteheads_without_stems.items())}
 
         # Filter edges that are too long
@@ -916,7 +920,8 @@ class PairwiseClassificationParser(object):
         closest_stem_threshold_distance = 80
         closest_stem_per_notehead = {n_objid: s_objid
                                      for n_objid, s_objid in list(closest_stem_per_notehead.items())
-                                     if node_id_to_node_mapping[n_objid].distance_to(node_id_to_node_mapping[s_objid])
+                                     if node_id_to_node_mapping[n_objid].distance_to(
+                node_id_to_node_mapping[s_objid])
                                      < closest_stem_threshold_distance
                                      }
 
@@ -1020,16 +1025,16 @@ def process_stafflines(cropobjects,
     return new_cropobjects
 
 
-def find_wrong_edges(cropobjects, grammar):
-    _cdict = {c.objid: c for c in cropobjects}
-    graph = NotationGraph(cropobjects)
+def find_wrong_edges(nodes: List[Node], grammar):
+    _cdict = {node.id: node for node in nodes}
+    graph = NotationGraph(nodes)
 
-    incoherent_beam_pairs = find_beams_incoherent_with_stems(cropobjects)
+    incoherent_beam_pairs = find_beams_incoherent_with_stems(nodes)
     # Switching off misdirected ledger lines: there is something wrong with them
-    misdirected_ledger_lines = find_misdirected_ledger_line_edges(cropobjects)
+    misdirected_leger_lines = find_misdirected_leger_line_edges(nodes)
 
     wrong_edges = [(n.objid, b.objid)
-                   for n, b in incoherent_beam_pairs + misdirected_ledger_lines]
+                   for n, b in incoherent_beam_pairs + misdirected_leger_lines]
 
     disallowed_symbol_class_pairs = [(f, t) for f, t in graph.edges
                                      if not grammar.validate_edge(_cdict[f].clsname,

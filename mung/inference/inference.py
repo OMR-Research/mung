@@ -671,7 +671,7 @@ class PitchInferenceEngine(object):
             # Determining whether the notehead is on a ledger
             # line or in the adjacent temp staffspace.
             # This uses a magic number, ON_STAFFLINE_RATIO_THRESHOLD.
-            _on_ledger_line = True
+            on_leger_line = True
 
             ### DEBUG!!!
             dtop, dbottom = 1, 1
@@ -680,13 +680,13 @@ class PitchInferenceEngine(object):
             # of ledger line (could happen with slanted LLs and very small
             # noteheads).
             if closest_ll.top <= notehead.top <= notehead.bottom <= closest_ll.bottom:
-                _on_ledger_line = True
+                on_leger_line = True
 
             # No vertical overlap between LL and notehead
             elif closest_ll.top > notehead.bottom:
-                _on_ledger_line = False
+                on_leger_line = False
             elif notehead.top > closest_ll.bottom:
-                _on_ledger_line = False
+                on_leger_line = False
 
             # Complicated situations: overlap
             else:
@@ -696,20 +696,20 @@ class PitchInferenceEngine(object):
                     dbottom = notehead.bottom - closest_ll.bottom
 
                     if min(dtop, dbottom) / max(dtop, dbottom) \
-                            < InferenceEngineConstants.ON_STAFFLINE_RATIO_TRHESHOLD:
-                        _on_ledger_line = False
+                            < InferenceEngineConstants.ON_STAFFLINE_RATIO_THRESHOLD:
+                        on_leger_line = False
 
                         # Check orientation congruent with rel. to staff.
                         # If it is wrong (e.g., notehead mostly under LL
                         # but above staffline, and looks like off-LL),
                         # change back to on-LL.
                         if (dtop > dbottom) and not is_above_staff:
-                            _on_ledger_line = True
+                            on_leger_line = True
                             logging.debug('Notehead in LL space with wrong orientation '
                                           'w.r.t. staff:'
                                           ' {0}'.format(notehead.uid))
                         if (dbottom > dtop) and is_above_staff:
-                            _on_ledger_line = True
+                            on_leger_line = True
                             logging.debug('Notehead in LL space with wrong orientation '
                                           'w.r.t. staff:'
                                           ' {0}'.format(notehead.uid))
@@ -720,7 +720,7 @@ class PitchInferenceEngine(object):
                     # dbottom = max(notehead.bottom - closest_ll.top, 1)
                     # if float(dbottom) / float(dtop) \
                     #         < InferenceEngineConstants.ON_STAFFLINE_RATIO_TRHESHOLD:
-                    _on_ledger_line = False
+                    on_leger_line = False
 
                 # Notehead interlaced with ledger line, ledger line on top
                 elif closest_ll.top <= notehead.top <= closest_ll.bottom < notehead.bottom:
@@ -728,7 +728,7 @@ class PitchInferenceEngine(object):
                     # dbottom = notehead.bottom - closest_ll.bottom
                     # if float(dtop) / float(dbottom) \
                     #         < InferenceEngineConstants.ON_STAFFLINE_RATIO_TRHESHOLD:
-                    _on_ledger_line = False
+                    on_leger_line = False
 
                 else:
                     raise ValueError('Strange notehead {0} vs. ledger line {1}'
@@ -738,7 +738,7 @@ class PitchInferenceEngine(object):
                                                closest_ll.bounding_box))
 
             delta = (2 * n_lls - 1) + 5
-            if not _on_ledger_line:
+            if not on_leger_line:
                 delta += 1
 
             if not is_above_staff:
@@ -750,7 +750,7 @@ class PitchInferenceEngine(object):
             #     logging.info('Closest LL id: {0}'.format(closest_ll.id))
             #     logging.info('no. of LLs: {0}'.format(n_lls))
             #     logging.info('Is above staff: {0}'.format(is_above_staff))
-            #     logging.info('On ledger line: {0}'.format(_on_ledger_line))
+            #     logging.info('On ledger line: {0}'.format(on_leger_line))
             #     logging.info('Dtop: {0}, Dbottom: {1}'.format(dtop, dbottom))
             #     logging.info('Delta: {0}'.format(delta))
 

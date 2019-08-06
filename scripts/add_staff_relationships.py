@@ -18,9 +18,11 @@ import os
 import pprint
 import time
 
+from typing import List
+
 from mung.inference.constants import InferenceEngineConstants as _CONST
 from mung.io import read_nodes_from_file, export_cropobject_list
-from mung.node import link_nodes
+from mung.node import link_nodes, Node
 
 ON_STAFFLINE_RATIO_TRHESHOLD = 0.15
 
@@ -59,20 +61,20 @@ REST_CLSNAMES = {
 
 ##############################################################################
 
-def add_staff_relationships(cropobjects,
-                            notehead_staffspace_threshold=0.2):
-    _cropobjects_dict = {c.objid: c for c in cropobjects}
+def add_staff_relationships(nodes: List[Node],
+                            notehead_staffspace_threshold: float = 0.2):
+    id_to_node_mapping = {node.id: node for node in nodes}
 
     ON_STAFFLINE_RATIO_TRHESHOLD = notehead_staffspace_threshold
 
     ##########################################################################
     logging.info('Find the staff-related symbols')
-    staffs = [c for c in cropobjects if c.clsname == _CONST.STAFF_CLASS_NAME]
+    staffs = [c for c in nodes if c.clsname == _CONST.STAFF_CLASS_NAME]
 
     staff_related_symbols = collections.defaultdict(list)
     notehead_symbols = collections.defaultdict(list)
     rest_symbols = collections.defaultdict(list)
-    for c in cropobjects:
+    for c in nodes:
         if c.clsname in _CONST.STAFF_RELATED_CLASS_NAMES:
             staff_related_symbols[c.clsname].append(c)
         if c.clsname in _CONST.NOTEHEAD_CLASS_NAMES:
@@ -107,7 +109,8 @@ def add_staff_relationships(cropobjects,
     for clsname, cs in list(rest_symbols.items()):
         for c in cs:
             closest_staff = min([s for s in staffs],
-                                key=lambda x: ((x.bottom + x.top) / 2. - (c.bottom + c.top) / 2.) ** 2)
+                                key=lambda x: ((x.bottom + x.top) / 2. - (
+                                            c.bottom + c.top) / 2.) ** 2)
             link_nodes(c, closest_staff)
 
     ##########################################################################
@@ -120,11 +123,11 @@ def add_staff_relationships(cropobjects,
     # Sort the staff objects top-down. Assumes stafflines do not cross,
     # and that there are no crazy curves at the end that would make the lower
     # stafflines stick out over the ones above them...
-    stafflines = [c for c in cropobjects if c.clsname == _CONST.STAFFLINE_CLASS_NAME]
+    stafflines = [c for c in nodes if c.clsname == _CONST.STAFFLINE_CLASS_NAME]
     stafflines = sorted(stafflines, key=lambda c: c.top)
-    staffspaces = [c for c in cropobjects if c.clsname == _CONST.STAFFSPACE_CLASS_NAME]
-    staffspaces= sorted(staffspaces, key=lambda c: c.top)
-    staves = [c for c in cropobjects if c.clsname == _CONST.STAFF_CLASS_NAME]
+    staffspaces = [c for c in nodes if c.clsname == _CONST.STAFFSPACE_CLASS_NAME]
+    staffspaces = sorted(staffspaces, key=lambda c: c.top)
+    staves = [c for c in nodes if c.clsname == _CONST.STAFF_CLASS_NAME]
     staves = sorted(staves, key=lambda c: c.top)
 
     # Indexing data structures.
@@ -158,28 +161,7 @@ def add_staff_relationships(cropobjects,
             _ss_sl_idx_wrt_staff[_ss.objid] = i
             _staff_and_idx2ss[_staff.objid][i] = _ss
 
-    # pprint.pprint(_ss_sl_idx_wrt_staff)
     logging.debug(pprint.pformat(dict(_staff_and_idx2ss)))
-    # pprint.pprint(dict(_staff_and_idx2sl))
-
-    # # Get bounding box of all participating symbols
-    # notehead_staff_bbox_coords = [c.bounding_box
-    #                               for c in list(itertools.chain(*notehead_symbols.values()))
-    #                                        + stafflines
-    #                                        + staffspaces
-    #                                        + staves]
-    # t, l, b, r = min([b[0] for b in notehead_staff_bbox_coords]), \
-    #              min([b[1] for b in notehead_staff_bbox_coords]), \
-    #              max([b[2] for b in notehead_staff_bbox_coords]), \
-    #              max([b[3] for b in notehead_staff_bbox_coords])
-    #
-    # h, w = b - t, r - l
-    # # Maybe later: ensure a 1-px empty border? (h+2, w+2) and the appropriate +1 when
-    # # projecting cropobjects onto the canvas...
-    # staffline_canvas = numpy.zeros((h, w), dtype='uint8')
-    # for s in stafflines:
-    #     dt, dl, db, dr = s.top - t, s.left - l, s.bottom - t, s.right - l
-    #     staffline_canvas[dt:db, dl:dr] += s.mask
 
     for clsname, cs in list(notehead_symbols.items()):
         for c in cs:
@@ -190,17 +172,17 @@ def add_staff_relationships(cropobjects,
             # Add relationship to given staffline or staffspace.
 
             # If notehead has ledger lines, skip it for now.
-            _has_ledger_line = False
+            has_leger_line = False
             for o in c.outlinks:
-                if _cropobjects_dict[o].clsname == 'ledger_line':
-                    _has_ledger_line = True
+                if id_to_node_mapping[o].clsname == 'ledger_line':
+                    has_leger_line = True
                     break
 
-            if _has_ledger_line:
+            if has_leger_line:
                 # Attach to the appropriate staff:
                 # meaning, staff closest to the innermost ledger line.
-                lls = [_cropobjects_dict[o] for o in c.outlinks
-                       if _cropobjects_dict[o].clsname == 'ledger_line']
+                lls = [id_to_node_mapping[o] for o in c.outlinks
+                       if id_to_node_mapping[o].clsname == 'ledger_line']
                 # Furthest from notehead's top is innermost.
                 # (If notehead is below staff and crosses a ll., one
                 #  of these numbers will be negative. But that doesn't matter.)
@@ -234,7 +216,8 @@ def add_staff_relationships(cropobjects,
             if c.objid < 10:
                 logging.debug('Notehead {0} ({1}): overlaps {2} stafflines'.format(c.uid,
                                                                                    c.bounding_box,
-                                                                                   len(overlapped_stafflines),
+                                                                                   len(
+                                                                                       overlapped_stafflines),
                                                                                    ))
 
             if len(overlapped_stafflines) == 1:
@@ -243,7 +226,8 @@ def add_staff_relationships(cropobjects,
                 dbottom = cb - s.bottom
                 if min(dtop, dbottom) / max(dtop, dbottom) < ON_STAFFLINE_RATIO_TRHESHOLD:
                     logging.info('Notehead {0}, staffline {1}: very small ratio {2:.2f}'
-                                  ''.format(c.objid, s.objid, min(dtop, dbottom) / max(dtop, dbottom)))
+                                 ''.format(c.objid, s.objid,
+                                           min(dtop, dbottom) / max(dtop, dbottom)))
                     # Staffspace?
                     #
                     # To get staffspace:
@@ -326,10 +310,10 @@ def add_staff_relationships(cropobjects,
 
     ##########################################################################
     logging.info('Attaching clefs to stafflines [NOT IMPLEMENTED].')
-    clefs = [c for c in cropobjects if c.clsname in ['g-clef', 'c-clef', 'f-clef']]
+    clefs = [c for c in nodes if c.clsname in ['g-clef', 'c-clef', 'f-clef']]
 
     ##########################################################################
-    return cropobjects
+    return nodes
 
 
 ###############################################################################

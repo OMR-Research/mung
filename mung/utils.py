@@ -55,12 +55,12 @@ def compute_connected_components(image: numpy.ndarray) -> \
     return number_of_connected_components, labels, bboxes
 
 
-def resolve_notehead_wrt_staffline(notehead, staffline_or_ledger_line):
+def resolve_notehead_wrt_staffline(notehead, staffline_or_leger_line):
     """Resolves the relative vertical position of the notehead with respect
-    to the given staff_line or ledger_line object. Returns -1 if notehead
+    to the given staff_line or ledgerLine object. Returns -1 if notehead
     is *below* staffline, 0 if notehead is *on* staffline, and 1 if notehead
     is *above* staffline."""
-    ll = staffline_or_ledger_line
+    ll = staffline_or_leger_line
 
     # Determining whether the notehead is on a ledger
     # line or in the adjacent temp staffspace.
@@ -90,7 +90,7 @@ def resolve_notehead_wrt_staffline(notehead, staffline_or_ledger_line):
             dbottom = notehead.bottom - ll.bottom
 
             if min(dtop, dbottom) / max(dtop, dbottom) \
-                    < _CONST.ON_STAFFLINE_RATIO_TRHESHOLD:
+                    < _CONST.ON_STAFFLINE_RATIO_THRESHOLD:
                 if dtop > dbottom:
                     output_position = 1
                 else:

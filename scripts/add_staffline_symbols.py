@@ -15,7 +15,7 @@ from skimage.morphology import watershed
 from skimage.filters import gaussian
 import matplotlib.pyplot as plt
 
-from mung.dataset import CVC_MUSCIMA
+from mung.dataset import CvcMuscimaDataset
 from mung.io import read_nodes_from_file, export_cropobject_list
 from mung.node import Node
 from mung.utils import connected_components2bboxes, compute_connected_components
@@ -127,7 +127,7 @@ def main(args):
     #  - Initialize Dataset. This checks for the root.
 
     if args.staff_imfile is None:
-        cvc_dataset = CVC_MUSCIMA(root=args.root)
+        cvc_dataset = CvcMuscimaDataset(root=args.root)
         args.staff_imfile = cvc_dataset.imfile(page=args.number,
                                                writer=args.writer,
                                                distortion='ideal',
@@ -267,7 +267,7 @@ def main(args):
     staffline_cropobjects = []
     for sl_bb, sl_m in zip(staffline_bboxes, staffline_masks):
         t, l, b, r = sl_bb
-        c = Node(id=next_objid,
+        c = Node(id_=next_objid,
                  class_name=STAFFLINE_CLSNAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=sl_m,
@@ -281,7 +281,7 @@ def main(args):
         staff_cropobjects = []
         for s_bb, s_m in zip(staff_bboxes, staff_masks):
             t, l, b, r = s_bb
-            c = Node(id=next_objid,
+            c = Node(id_=next_objid,
                      class_name=STAFF_CLSNAME,
                      top=t, left=l, height=b - t, width=r - l,
                      mask=s_m,

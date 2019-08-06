@@ -1,139 +1,150 @@
 ##############################################################################
-# This is the dependency grammar for the default annotations symbols.
-# Check out the muscima.grammar module for documentation of the file format.
+This is the dependency grammar for the default annotations symbols.
 
 
 ##############################################################################
 # Notes and grace notes
 # (no notehead-to-text attachment)
 
-notehead-* grace-notehead-* | sharp flat natural double_sharp double_flat ledger_line stem
-notehead-* grace-notehead-* | duration-dot
-noteheadFull grace-notehead-full | *_flag beam
+notehead* | accidental* legerLine stem
+notehead* | augmentationDot
+noteheadFull* | flag* beam
 
-notehead-* grace-notehead-* | staccato-dot other-dot tenuto accent strong_accent
-notehead-* grace-notehead-* | curved-line_(tie-or-slur) slur tie hairpin-cresc. hairpin-decr.
-notehead-* grace-notehead-* | ornament(s)
-notehead-* grace-notehead-* | trill_"wobble" trill arpeggio_"wobble" glissando fermata
-notehead-* grace-notehead-* | tuple
-notehead-* grace-notehead-* | instrument_specific
+notehead* | articulation* characterDot
+notehead* | slur tie dynamicCrescendoHairpin dynamicDiminuendoHairpin
+notehead* | ornament
+notehead* | wiggleTrill ornamentTrill arpeggio glissando fermata*
+notehead* | tuple
+notehead* | instrumentSpecific
 
-noteheadFull | grace-notehead-full grace-notehead-empty
-notehead-empty | grace-notehead-full grace-notehead-empty
+noteheadFull noteheadHalf noteheadWhole | noteheadFullSmall noteheadHalfSmall
 
 # Aggregate cardinalities
 
 noteheadFull{1,} |
-grace-notehead-full{1,} |
+noteheadFullSmall{1,} |
 
-| grace-notehead-*{1,}
+| noteheadFullSmall{1,}
+| noteheadHalfSmall{1,}
 | beam{1,} stem{1,}
-| duration-dot{1,} other-dot{1,} tenuto{1,} accent{1,} strong_accent{1,}
-| sharp{1,} flat{1,} natural{1,} double_sharp{1,} double_flat{1,}
-| ledger_line{1,}
-| curved-line_(tie-or-slur){1,} slur{2,} tie{2,}
-| *_flag{1,}
+| augmentationDot{1,} characterDot{1,} articulation*{1,}
+| accidental*{1,}
+| legerLine{1,}
+| slur{2,} tie{2,}
+| flag*{1,}
 
 
 ##############################################################################
 # Rests
 
-whole_rest half_rest *th_rest | duration-dot
-*_rest | tuple
-*_rest | fermata
+rest* | augmentationDot
+rest* | tuple
+rest* | fermata*
 
 
 ##############################################################################
 # Stem modifiers
 
-stem | grace_strikethrough
-stem | tremolo_mark single-note_tremolo multiple-note_tremolo
+stem | graceNoteAcciaccatura
+stem | tremoloMark singleNoteTremolo multipleNoteTremolo
 
-| grace_strikethrough{1}
+| graceNoteAcciaccatura{1}
 
 
 ##############################################################################
 # Notations
 
 
-trill | trill_"wobble" letter_t letter_r other-dot letter_T letter_R letter_other
-trill | sharp flat natural double_sharp double_flat
-| trill{1,}
-trill{1,} |
+ornamentTrill | wiggleTrill characterSmallT characterSmallR characterDot characterCapitalT characterCapitalR characterOther
+ornamentTrill | accidental*
+| ornamentTrill{1,}
+ornamentTrill{1,} |
 
-tuple | tuple_bracket/line numeral_*
+tuple | tupleBracket numeral*
 tuple{1,}
-| tuple_bracket/line{1,}
+| tupleBracket{1,}
 
-volta | other_numeric_sign horizontal_spanner dotted_horizontal_spanner
-transposition_text | horizontal_spanner dotted_horizontal_spanner
+volta | otherNumericSign horizontalSpanner dottedHorizontalSpanner
+transpositionText | horizontalSpanner dottedHorizontalSpanner
 
-*-clef | transposition_text
+*Clef | transpositionText
 
-| arpeggio_"wobble"{1,}
+| arpeggio{1,}
 
 
 ##############################################################################
 # Part defaults
 
-key_signature | sharp flat double_sharp double_flat natural
-key_signature{1,} |
+keySignature | accidental*
+keySignature{1,} |
 
-time_signature | whole-time_mark alla_breve other_time_signature numeral_*
-time_signature{1,} |
-| whole-time_mark{1,} alla_breve{1,} other_time_signature{1,}
+timeSignature | timeSigCommon timeSigCutCommon numeral*
+timeSignature{1,} |
+| timeSigCommon{1,} timeSigCutCommon{1,}
 
 
 ##############################################################################
 # Measure delimiters
 
-measure_separator | *_barline
-measure_separator{1,} |
+measureSeparator | barline*
+measureSeparator{1,} |
 
-repeat | repeat-dot thin_barline thick_barline
+repeat | repeatDot barline barlineHeavy
 repeat{1,} |
-| repeat-dot{1,}
+| repeatDot{1,}
 
-staff_grouping | *_barline multi-staff_bracket multi-staff_brace
-staff_grouping | staff_grouping
-staff_grouping{1,}
+staffGrouping | barline* bracket brace
+staffGrouping | staffGrouping
+staffGrouping{1,}
 
-# Every barline is a measure_separator or staff grouping
-| *_barline{1,}
+# Every barline is a measureSeparator or staff grouping
+| barline*{1,}
 
 # Non-duration fermatas are attached to a measure delimiter
-measure_separator | fermata
+measureSeparator | fermata*
+
+
+##############################################################################
+# Staff rules
+
+staff | staffLine staffSpace
+keySignature timeSignature gClef cClef fClef | staff
+measureSeparator | staff
+staffGrouping | staff
+
+| staffLine{1,}
+
 
 
 ##############################################################################
 # Text rules
 
-dynamics_text | letter_p letter_f letter_m letter_s letter_z letter_r other-dot
-dynamics_text | letter_F letter_M letter_P
+dynamicsText | characterSmallP characterSmallF characterSmallM characterSmallS characterSmallZ characterSmallR
+dynamicsText | characterCapitalF characterCapitalM characterCapitalP
+dynamicsText | dynamicLetterP dynamicLetterM dynamicLetterF dynamicLetterS dynamicLetterZ dynamicLetterR dynamicLetterN
 
-tempo_text | letter_* numeral_* other-dot
+tempoText | character* numeral* characterDot
 
-lyrics_text | letter_* other-dot
+lyricsText | character* characterDot
 
-instrument_name | letter_* numeral_* other-dot
+instrumentName | character* numeral* characterDot
 
-rehearsal_mark | letter_* numeral_* other-dot
+rehearsalMark | character* numeral* characterDot
 
-transposition_text | letter_v letter_V letter_a letter_A
-transposition_text | numeral_1 numeral_5 numeral_8
+transpositionText | characterSmallV characterCapitalV characterSmallA characterCapitalA characterSmallM characterCapitalM characterSmallE characterCapitalE
+transpositionText | numeral1 numeral5 numeral8
 
-figured_bass_text | numeral_* sharp flat double_sharp double_flat natural
+figuredBassText | numeral* accidental*
 
-other_text | letter_* numeral_* other-dot
+otherText | character* numeral* characterDot
 
-bar_number | numeral_*
-other_numeric_sign | numeral_* other-dot letter_other
-*_text | continuation/connection_dash
+barNumber | numeral*
+otherNumericSign | numeral* characterDot characterOther
 
 # Figured bass is attached to noteheads
-notehead-* | figured_bass_text
+notehead* | figuredBassText
 
-*_text{1,} |
-rehearsal_mark{1,} |
-| numeral_*{1,}
-| letter_*{1,1}
+*Text{1,} |
+rehearsalMark{1,} |
+| numeral*{1,}
+| character*{1,1}

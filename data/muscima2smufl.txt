@@ -21,7 +21,7 @@ quarter_rest
 64th_and_higher_rest
 multi-measure_rest
 repeat_measure
-ledger_line
+legerLine
 grace_strikethrough
 grace-notehead-full
 grace-notehead-empty

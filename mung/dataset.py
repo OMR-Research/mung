@@ -27,7 +27,9 @@ def _get_cvc_muscima_root():
         logging.info('muscima.dataset: environmental variable CVC_MUSCIMA_ROOT not defined.')
         return None
 
+
 CVC_MUSCIMA_ROOT = _get_cvc_muscima_root()
+
 
 ##############################################################################
 
@@ -40,13 +42,15 @@ def _get_mff_muscima_root():
         logging.info('muscima.dataset: environmental variable MUSCIMA_PLUSPLUS_ROOT not defined.')
         return None
 
+
 MUSCIMA_PLUSPLUS_ROOT = _get_mff_muscima_root()
+
 
 ##############################################################################
 
 
-class CVC_MUSCIMA(object):
-    """The :class:`CVC_MUSCIMA` class implements a wrapper around
+class CvcMuscimaDataset(object):
+    """The :class:`CvcMuscimaDataset` class implements a wrapper around
     the CVC-MUSCIMA dataset file structure that allows easy retrieval
     of filenames based on the page number (1 - 20), writer number
     (1 - 50), distortion, and mode (full image, staffline pixels only, or
@@ -109,18 +113,18 @@ class CVC_MUSCIMA(object):
                              ' Choose one of:\n{1}'
                              ''.format(mode, self.MODES))
 
-        fname = os.path.join(self.root, distortion,
-                             self._number2writer_dir(writer),
-                             self._mode2dir(mode),
-                             self._number2page_file(page))
-        if not os.path.isfile(fname):
+        filename = os.path.join(self.root, distortion,
+                                self.__number2writer_dir(writer),
+                                self.__mode2dir(mode),
+                                self.__number2page_file(page))
+        if not os.path.isfile(filename):
             logging.warning('The requested file {0} should be available,'
                             ' but does not seem to be there. Are you sure'
                             ' the CVC-MUSCIMA root is set correctly? ({1})'
-                            ''.format(fname, self.root))
-        return fname
+                            ''.format(filename, self.root))
+        return filename
 
-    def _number2page_file(self, n):
+    def __number2page_file(self, n):
         if (n < 1) or (n > 20):
             raise ValueError('Invalid CVC-MUSCIMA score number {0}.'
                              ' Valid only between 1 and 20.'.format(n))
@@ -129,7 +133,7 @@ class CVC_MUSCIMA(object):
         else:
             return 'p0' + str(n) + '.png'
 
-    def _number2writer_dir(self, n):
+    def __number2writer_dir(self, n):
         if (n < 1) or (n > 50):
             raise ValueError('Invalid MUSCIMA writer number {0}.'
                              ' Valid only between 1 and 50.'.format(n))
@@ -138,7 +142,7 @@ class CVC_MUSCIMA(object):
         else:
             return 'w-' + str(n)
 
-    def _mode2dir(self, mode):
+    def __mode2dir(self, mode):
         if mode == 'full':
             return 'image'
         elif mode == 'symbol':
@@ -146,7 +150,7 @@ class CVC_MUSCIMA(object):
         elif mode == 'staff_only':
             return 'gt'
 
-    def validate(self, fail_early=True):
+    def validate(self, fail_early: bool = True):
         """Checks whether the instantiated CVC_MUSCIMA instance really
         corresponds to the CVC-MUSCIMA dataset: all the 12 x 1000 expected
         CVC-MUSCIMA files should be present.

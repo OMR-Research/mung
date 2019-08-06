@@ -47,6 +47,7 @@ for annotating MUSCIMA++.
 """
 import logging
 
+
 class NodeClass(object):
     """Information about the annotation class. We're using it
     mostly to get the color of rendered Node.
@@ -55,6 +56,7 @@ class NodeClass(object):
     functionality beyond simply existing and writing itself
     out in the appropriate XML format.
     """
+
     def __init__(self, class_id, name, group_name, color):
         self.class_id = class_id
         self.name = name
@@ -73,6 +75,7 @@ class NodeClass(object):
         lines.append('    <Color>{0}</Color>'.format(rgb2hex(self.color)))
         lines.append('</NodeClass>')
         return '\n'.join(lines)
+
 
 #######################################################################
 # Utility functions for name/writer conversions
@@ -97,7 +100,7 @@ def parse_hex(hstr):
     """
     out = 0
     for i, l in enumerate(reversed(hstr)):
-        out += (16**i) * _hex_tr[l]
+        out += (16 ** i) * _hex_tr[l]
     return out
 
 

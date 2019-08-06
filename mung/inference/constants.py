@@ -8,28 +8,28 @@ from typing import List
 class InferenceEngineConstants(object):
     """This class stores the constants used for pitch inference."""
 
-    ON_STAFFLINE_RATIO_TRHESHOLD = 0.2
+    ON_STAFFLINE_RATIO_THRESHOLD = 0.2
     '''Magic number for determining whether a notehead is *on* a ledger
     line, or *next* to a ledger line: if the ratio between the smaller
     and larger vertical difference of (top, bottom) vs. l.l. (top, bottom)
     is smaller than this, it means the notehead is most probably *NOT*
     on the l.l. and is next to it.'''
 
-    STAFFLINE_CLASS_NAME = 'staff_line'
-    STAFFSPACE_CLASS_NAME = 'staff_space'
+    STAFFLINE_CLASS_NAME = 'staffLine'
+    STAFFSPACE_CLASS_NAME = 'staffSpace'
     STAFF_CLASS_NAME = 'staff'
 
     STAFF_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME, STAFF_CLASS_NAME]
     STAFFLINE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME]
 
-    STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, 'ledger_line']
+    STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, 'legerLine']
 
     STAFF_RELATED_CLASS_NAMES = {
-        'staff_grouping',
-        'measure_separator',
-        'key_signature',
-        'time_signature',
-        'g-clef', 'c-clef', 'f-clef', 'other-clef',
+        'staffGrouping',
+        'measureSeparator',
+        'keySignature',
+        'timeSignature',
+        'gClef', 'cClef', 'fClef',
     }
 
     STYSTEM_LEVEL_CLASS_NAMES = {
@@ -39,57 +39,55 @@ class InferenceEngineConstants(object):
 
     NOTEHEAD_CLASS_NAMES = {
         'noteheadFull',
-        'notehead-empty',
-        'notehead-square',
-        'notehead-square-full',
-        'grace-notehead-full',
-        'grace-notehead-empty',
+        'noteheadHalf',
+        'noteheadWhole',
+        'noteheadFullSmall',
+        'noteheadHalfSmall',
     }
 
     NONGRACE_NOTEHEAD_CLASS_NAMES = {
         'noteheadFull',
-        'notehead-empty',
+        'noteheadHalf',
+        'noteheadWhole',
     }
 
     CLEF_CLASS_NAMES = {
-        'g-clef',
-        'c-clef',
-        'f-clef',
+        'gClef',
+        'cClef',
+        'fClef',
     }
 
     KEY_SIGNATURE_CLASS_NAMES = {
-        'key_signature',
+        'keySignature',
     }
 
     MEASURE_SEPARATOR_CLASS_NAMES = {
-        'measure_separator',
+        'measureSeparator',
     }
 
     FLAGS_CLASS_NAMES = {
-        '8th_flag',
-        '16th_flag',
-        '32th_flag',
-        '64th_and_higher_flag',
+        'flag8thUp',
+        'flag8thDown',
+        'flag16thUp',
+        'flag16thDown',
+        'flag32ndUp',
+        'flag32ndDown',
+        'flag64thUp',
+        'flag64thDown',
     }
 
     BEAM_CLASS_NAMES = {
         'beam',
     }
 
-    FLAGS_AND_BEAMS = {
-        '8th_flag',
-        '16th_flag',
-        '32th_flag',
-        '64th_and_higher_flag',
-        'beam',
-    }
+    FLAGS_AND_BEAMS = set(list(FLAGS_CLASS_NAMES) + list(BEAM_CLASS_NAMES))
 
     ACCIDENTAL_CLASS_NAMES = {
-        'sharp': 1,
-        'flat': -1,
-        'natural': 0,
-        'double_sharp': 2,
-        'double_flat': -2,
+        'accidentalSharp': 1,
+        'accidentalFlat': -1,
+        'accidentalNatural': 0,
+        'accidentalDoubleSharp': 2,
+        'accidentalDoubleFlat': -2,
     }
 
     MIDI_CODE_RESIDUES_FOR_PITCH_STEPS = {
@@ -141,20 +139,20 @@ class InferenceEngineConstants(object):
 
     # FROM clef --> TO clef. Imagine this on inline accidental delta
     CLEF_CHANGE_DELTA = {
-        'g-clef': {
-            'g-clef': 0,
-            'c-clef': 6,
-            'f-clef': 12,
+        'gClef': {
+            'gClef': 0,
+            'cClef': 6,
+            'fClef': 12,
         },
-        'c-clef': {
-            'g-clef': -6,
-            'c-clef': 0,
-            'f-clef': 6,
+        'cClef': {
+            'gClef': -6,
+            'cClef': 0,
+            'fClef': 6,
         },
-        'f-clef': {
-            'g-clef': -12,
-            'c-clef': -6,
-            'f-clef': 0,
+        'fClef': {
+            'gClef': -12,
+            'cClef': -6,
+            'fClef': 0,
         }
     }
 
@@ -162,57 +160,56 @@ class InferenceEngineConstants(object):
                    'C', 'D', 'E', 'F', 'G', 'A', 'B']
     # Wrap around twice for easier indexing.
 
-    ACCIDENTAL_CODES = {'sharp': '#', 'flat': 'b',
-                        'double_sharp': 'x', 'double_flat': 'bb'}
+    ACCIDENTAL_CODES = {'accidentalSharp': '#', 'accidentalFlat': 'b',
+                        'accidentalDoubleSharp': 'x', 'accidentalDoubleFlat': 'bb'}
 
     REST_CLASS_NAMES = {
-        'whole_rest',
-        'half_rest',
-        'quarter_rest',
-        '8th_rest',
-        '16th_rest',
-        '32th_rest',
-        '64th_and_higher_rest',
-        'multi-measure_rest',
+        'restWhole',
+        'restHalf',
+        'restQuarter',
+        'rest8th',
+        'rest16th',
+        'rest32nd',
+        'rest64th',
+        'multiMeasureRest',
     }
 
     MEAUSURE_LASTING_CLASS_NAMES = {
-        'whole_rest',
-        'multi-measure_rest',
-        'repeat-measure',
+        'restWhole',
+        'multiMeasureRest',
+        'repeat1Bar',
     }
 
     TIME_SIGNATURES = {
-        'time_signature',
+        'timeSignature',
     }
 
     TIME_SIGNATURE_MEMBERS = {
-        'whole-time_mark',
-        'alla_breve',
-        'numeral_0',
-        'numeral_1',
-        'numeral_2',
-        'numeral_3',
-        'numeral_4',
-        'numeral_5',
-        'numeral_6',
-        'numeral_7',
-        'numeral_8',
-        'numeral_9',
-        'letter_other',
+        'timeSigCommon',
+        'timeSigCutCommon',
+        'numeral0',
+        'numeral1',
+        'numeral2',
+        'numeral3',
+        'numeral4',
+        'numeral5',
+        'numeral6',
+        'numeral7',
+        'numeral8',
+        'numeral9',
     }
 
     NUMERALS = {
-        'numeral_0',
-        'numeral_1',
-        'numeral_2',
-        'numeral_3',
-        'numeral_4',
-        'numeral_5',
-        'numeral_6',
-        'numeral_7',
-        'numeral_8',
-        'numeral_9',
+        'numeral0',
+        'numeral1',
+        'numeral2',
+        'numeral3',
+        'numeral4',
+        'numeral5',
+        'numeral6',
+        'numeral7',
+        'numeral8',
+        'numeral9',
     }
 
     @property
@@ -225,7 +222,7 @@ class InferenceEngineConstants(object):
         output.update(self.REST_CLASS_NAMES)
         output.update(self.MEASURE_SEPARATOR_CLASS_NAMES)
         output.update(self.TIME_SIGNATURES)
-        output.add('repeat_measure')
+        output.add('repeat1Bar')
         return output
 
     @property

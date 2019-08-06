@@ -23,7 +23,7 @@ class NodeClassTest(unittest.TestCase):
 
     def test_node_class_parsing(self):
         # Arrange
-        expected_number_of_classes = 158
+        expected_number_of_classes = 163
 
         # Act
         node_classes = parse_node_classes("test/test_data/mff-muscima-classes-annot.xml")

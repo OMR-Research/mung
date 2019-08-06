@@ -19,7 +19,7 @@ to the specification.
 
 
 .. TODO::
-    create image:: ../document/_static/grammar_explainer.png
+    create image:: ../doc/_static/grammar_explainer.png
 
 """
 import codecs
@@ -28,6 +28,8 @@ import os
 import pprint
 
 import collections
+
+from typing import Tuple, List, Any, Set, Dict
 
 
 class DependencyGrammarParseError(ValueError):
@@ -50,18 +52,18 @@ class DependencyGrammar(object):
     dependency grammars. Dependency grammar rules specify which symbols
     are governing, and which symbols are governed::
 
-      notehead_full | stem
+      noteheadFull | stem
 
     There can be multiple left-hand side and right-hand side symbols,
     as a shortcut for a list of rules::
 
-        notehead_full | stem beam
-        notehead_full notehead_empty | ledger_line duration-dot tie grace_note
+        noteheadFull | stem beam
+        noteheadFull noteheadHalf | legerLine durationDot tie notehead*Small
 
     The asterisk works as a wildcard. Currently, only one wildcard per symbol
     is allowed::
 
-      time_signature | numeral_*
+      timeSignature | numeral*
 
     Lines starting with a ``#`` are regarded as comments and ignored.
     Empty lines are also ignored.
@@ -78,23 +80,23 @@ class DependencyGrammar(object):
 
     This would be expressed as::
 
-      notehead-*{,2} | stem{1,}
+      notehead*{,2} | stem{1,}
 
     The relationship of noteheads to ledger lines is generally ``m:n``::
 
-      noteheadFull | ledger_line
+      noteheadFull | legerLine
 
     A time signature may consist of multiple numerals, but only one
     other symbol::
 
-      time_signature{1,} | numeral_*{1}
-      time_signature{1} | whole-time_mark alla_breve other_time_signature
+      timeSignature{1,} | numeral*{1}
+      timeSignature{1} | timeSigCommon timeSigCutCommon
 
     A key signature may have any number of sharps and flats.
     A sharp or flat can only belong to one key signature. However,
     not every sharp belongs to a key signature::
 
-      key_signature | sharp{,1} flat{,1} natural{,1} double_sharp{,1} double_flat{,1}
+      keySignature | accidentalSharp{,1} accidentalFlat{,1} accidentalNatural{,1} accidentalDoubleSharp{,1} accidentalDoubleFlat{,1}
 
     For the left-hand side of the rule, the cardinality restrictions apply to
     outlinks towards symbols of classes on the right-hand side of the rule.
@@ -104,27 +106,28 @@ class DependencyGrammar(object):
     It is also possible to specify that regardless of where outlinks
     lead, a symbol should always have at least some::
 
-      time_signature{1,} |
+      timeSignature{1,} |
       repeat{2,} |
 
     And analogously for inlinks::
 
-      | letter_*{1,}
-      | numeral_*{1,}
-      | ledger_line{1,}
-      | grace-notehead-*{1,}
+      | letter*{1,}
+      | numeral*{1,}
+      | legerLine{1,}
+      | noteheadFullSmall{1,}
 
     **Interface**
 
     The basic role of the dependency grammar is to provide the list of rules:
 
     >>> from mung.io import parse_node_classes
-    >>> fpath = os.path.dirname(os.path.dirname(__file__)) + u'/test/test_data/mff-muscima-classes-annot.deprules'
+    >>> filepath = os.path.dirname(os.path.dirname(__file__)) + u'/test/test_data/mff-muscima-classes-annot.deprules'
     >>> node_classes_path = os.path.dirname(os.path.dirname(__file__)) + u'/test/test_data/mff-muscima-classes-annot.xml'
-    >>> node_classes_dict = {m.name for m in parse_node_classes(node_classes_path)}
-    >>> g = DependencyGrammar(grammar_filename=fpath, alphabet=node_classes_dict)
-    >>> len(g.rules)
-    551
+    >>> node_classes = parse_node_classes(node_classes_path)
+    >>> node_classes_dict = {node_class.name for node_class in node_classes}
+    >>> dependency_graph = DependencyGrammar(grammar_filename=filepath, alphabet=node_classes_dict)
+    >>> len(dependency_graph.rules)
+    646
 
     The grammar can validate against these rules. The workhorse of this
     functionality is the ``find_invalid_in_graph()`` method, which finds
@@ -134,7 +137,7 @@ class DependencyGrammar(object):
     If we have the following notation objects ``0``, ``1``, ``2``, and ``3``,
     with the following symbol classes:
 
-    >>> vertices = {0: 'noteheadFull', 1: 'stem', 2: '8th_flag', 3: 'notehead_empty'}
+    >>> vertices = {0: 'noteheadFull', 1: 'stem', 2: 'flag8thUp', 3: 'noteheadHalf'}
 
     And the following relationships were recorded:
 
@@ -144,18 +147,18 @@ class DependencyGrammar(object):
     grammar:
 
     >>> wrong_vertices, wrong_inlinks, wrong_outlinks = \
-            g.find_invalid_in_graph(vertices=vertices, edges=edges)
+            dependency_graph.find_invalid_in_graph(vertices=vertices, edges=edges)
 
     Because the edge ``(0, 3)`` connects a full notehead to an empty notehead,
     the method should report the objects ``0`` and ``3`` as wrong, as well
     as the corresponding inlink of ``3`` and outlink of ``0``:
 
     >>> wrong_vertices
-    [3, 0, 1]
+    [0, 3]
     >>> wrong_inlinks
-    [(0, 1), (0, 3)]
+    [(0, 3)]
     >>> wrong_outlinks
-    [(0, 1), (0, 3)]
+    [(0, 3)]
 
     (Note that both the inlinks and outlinks are recorded in a ``(from, to)``
     format.)
@@ -172,7 +175,7 @@ class DependencyGrammar(object):
 
     **Grammar file formats**
 
-    The alphabet is stored by means of a ``CropObjectClassList`` XML file with
+    The alphabet is stored by means of a ``NodeClassList`` XML file with
     :class:`NodeClass` elements, as described in the :mod:`mung.io` module.
 
     The rules are stored in *rule files*, with the suffix ``.deprules``.
@@ -186,39 +189,39 @@ class DependencyGrammar(object):
     minimum and maximum cardinality in the rule (defaults are ``(0, 10000)``
     if no cardinality is provided).
 
-    >>> g.parse_token('notehead-*')
-    ('notehead-*', 0, 10000)
-    >>> g.parse_token('notehead-*{1,5}')
-    ('notehead-*', 1, 5)
-    >>> g.parse_token('notehead-*{1,}')
-    ('notehead-*', 1, 10000)
-    >>> g.parse_token('notehead-*{,5}')
-    ('notehead-*', 0, 5)
-    >>> g.parse_token('notehead-*{1}')
-    ('notehead-*', 1, 1)
+    >>> dependency_graph.parse_token('notehead*')
+    ('notehead*', 0, 10000)
+    >>> dependency_graph.parse_token('notehead*{1,5}')
+    ('notehead*', 1, 5)
+    >>> dependency_graph.parse_token('notehead*{1,}')
+    ('notehead*', 1, 10000)
+    >>> dependency_graph.parse_token('notehead*{,5}')
+    ('notehead*', 0, 5)
+    >>> dependency_graph.parse_token('notehead*{1}')
+    ('notehead*', 1, 1)
 
     The wildcards are expanded at the level of a line.
 
     >>> l = 'notehead*{,2} | stem'
-    >>> rules, inlink_cards, outlink_cards, _, _ = g.parse_dependency_grammar_line(l)
+    >>> rules, inlink_cards, outlink_cards, _, _ = dependency_graph.parse_dependency_grammar_line(l)
     >>> rules
-    [('notehead-empty', 'stem'), ('noteheadFull', 'stem')]
-    >>> outlink_cards['notehead-empty'] == {'stem': (0, 2)}
+    [('noteheadFull', 'stem'), ('noteheadFullSmall', 'stem'), ('noteheadHalf', 'stem'), ('noteheadHalfSmall', 'stem'), ('noteheadWhole', 'stem')]
+    >>> outlink_cards['noteheadHalf'] == {'stem': (0, 2)}
     True
-    >>> inlink_cards['stem'] == {'notehead-empty': (0, 10000), 'noteheadFull': (0, 10000)}
+    >>> inlink_cards['stem'] == {'noteheadHalf': (0, 10000), 'noteheadFull': (0, 10000), 'noteheadWhole': (0, 10000), 'noteheadFullSmall': (0, 10000), 'noteheadHalfSmall': (0, 10000)}
     True
 
 
     A key signature can have any number of sharps, flats, or naturals,
     but if a given symbol is part of a key signature, it can only be part of one.
 
-    >>> l = 'key-signature | sharp{1} flat{1} natural{1}'
-    >>> rules, inlink_cards, _, _, _ = g.parse_dependency_grammar_line(l)
+    >>> l = 'keySignature | accidentalSharp{1} accidentalFlat{1} accidentalNatural{1}'
+    >>> rules, inlink_cards, _, _, _ = dependency_graph.parse_dependency_grammar_line(l)
     >>> rules
-    [('key-signature', 'flat'), ('key-signature', 'natural'), ('key-signature', 'sharp')]
-    >>> inlink_cards == {'natural': {'key-signature': (1, 1)},
-    ...                  'sharp': {'key-signature': (1, 1)},
-    ...                  'flat': {'key-signature': (1, 1)}}
+    [('keySignature', 'accidentalFlat'), ('keySignature', 'accidentalNatural'), ('keySignature', 'accidentalSharp')]
+    >>> inlink_cards == {'accidentalNatural': {'keySignature': (1, 1)},
+    ...                  'accidentalSharp': {'keySignature': (1, 1)},
+    ...                  'accidentalFlat': {'keySignature': (1, 1)}}
     True
 
 
@@ -227,17 +230,17 @@ class DependencyGrammar(object):
     (If no maximum is specified, the value of ``DependencyGrammar._MAX_CARD``
     is used, which is by default 10000).
 
-    >>> l = 'key-signature{1,} |'
-    >>> _, _, _, _, out_aggregate_cards = g.parse_dependency_grammar_line(l)
-    >>> out_aggregate_cards == {'key-signature': (1, 10000)}
+    >>> l = 'keySignature{1,} |'
+    >>> _, _, _, _, out_aggregate_cards = dependency_graph.parse_dependency_grammar_line(l)
+    >>> out_aggregate_cards == {'keySignature': (1, 10000)}
     True
-    >>> l = 'grace-notehead*{1,} |'
-    >>> _, _, _, _, out_aggregate_cards = g.parse_dependency_grammar_line(l)
-    >>> out_aggregate_cards == {'grace-notehead-empty': (1, 10000), 'grace-notehead-full': (1, 10000)}
+    >>> l = 'notehead*Small{1,} |'
+    >>> _, _, _, _, out_aggregate_cards = dependency_graph.parse_dependency_grammar_line(l)
+    >>> out_aggregate_cards == {'noteheadFullSmall': (1, 10000), 'noteheadHalfSmall': (1, 10000)}
     True
-    >>> l = '| beam{1,} stem{1,} flat{1,}'
-    >>> _, _, _, in_aggregate_cards, _ = g.parse_dependency_grammar_line(l)
-    >>> in_aggregate_cards == {'stem': (1, 10000), 'beam': (1, 10000), 'flat': (1, 10000)}
+    >>> l = '| beam{1,} stem{1,} accidentalFlat{1,}'
+    >>> _, _, _, in_aggregate_cards, _ = dependency_graph.parse_dependency_grammar_line(l)
+    >>> in_aggregate_cards == {'stem': (1, 10000), 'beam': (1, 10000), 'accidentalFlat': (1, 10000)}
     True
 
     """
@@ -246,7 +249,7 @@ class DependencyGrammar(object):
 
     _MAX_CARD = 10000
 
-    def __init__(self, grammar_filename, alphabet):
+    def __init__(self, grammar_filename: str, alphabet: Set[str]):
         """Initialize the Grammar: fill in alphabet and parse rules.
 
         :param grammar_filename: Path to a file that contains deprules
@@ -258,43 +261,38 @@ class DependencyGrammar(object):
         self.alphabet = set(alphabet)
         # logging.info('DependencyGrammar: got alphabet:\n{0}'
         #              ''.format(pprint.pformat(self.alphabet)))
-        self.rules = []
-        self.inlink_cardinalities = {}
-        '''Keys: classes, values: dict of {from: (min, max)}'''
+        self.rules = []  # type: List[Tuple[str, str]]
+        self.inlink_cardinalities = {}  # type: Dict[str, Dict[str, Tuple[int, int]]]
+        self.outlink_cardinalities = {}  # type: Dict[str, Dict[str, Tuple[int, int]]]
+        self.inlink_aggregated_cardinalities = {}  # type: Dict[str, Tuple[int, int]]
+        self.outlink_aggregated_cardinalities = {}  # type: Dict[str, Tuple[int, int]]
 
-        self.outlink_cardinalities = {}
-        '''Keys: classes, values: dict of {to: (min, max)}'''
+        rules, inlink_cardinalities, outlink_cardinalities, inlink_aggregated_cardinalitites, \
+        outlink_aggregated_cardinalitites = self.parse_dependency_grammar_rules(grammar_filename)
 
-        self.inlink_aggregated_cardinalities = {}
-        '''Keys: classes, values: (min, max)'''
-
-        self.outlink_aggregated_cardinalities = {}
-        '''Keys: classes, values: (min, max)'''
-
-        rules, ic, oc, iac, oac = self.parse_dependency_grammar_rules(grammar_filename)
-        if self._validate_rules(rules):
+        if self.__validate_rules(rules):
             self.rules = rules
             logging.info('DependencyGrammar: Imported {0} rules'
                          ''.format(len(self.rules)))
-            self.inlink_cardinalities = ic
-            self.outlink_cardinalities = oc
-            self.inlink_aggregated_cardinalities = iac
-            self.outlink_aggregated_cardinalities = oac
+            self.inlink_cardinalities = inlink_cardinalities
+            self.outlink_cardinalities = outlink_cardinalities
+            self.inlink_aggregated_cardinalities = inlink_aggregated_cardinalitites
+            self.outlink_aggregated_cardinalities = outlink_aggregated_cardinalitites
             logging.debug('DependencyGrammar: Inlink aggregated cardinalities: {0}'
-                          ''.format(pprint.pformat(iac)))
+                          ''.format(pprint.pformat(inlink_aggregated_cardinalitites)))
             logging.debug('DependencyGrammar: Outlink aggregated cardinalities: {0}'
-                          ''.format(pprint.pformat(oac)))
+                          ''.format(pprint.pformat(outlink_aggregated_cardinalitites)))
         else:
             raise DependencyGrammarParseError(
                 'Not able to parse dependency grammar file {0}.'
                 ''.format(grammar_filename))
 
-    def validate_edge(self, head_name, child_name):
+    def validate_edge(self, head_name: str, child_name: str) -> bool:
         """Check whether a given ``head --> child`` edge conforms
         with this grammar."""
         return (head_name, child_name) in self.rules
 
-    def validate_graph(self, vertices, edges):
+    def validate_graph(self, vertices: Dict[int, str], edges: List[Tuple[int, int]]):
         """Checks whether the given graph complies with the grammar.
 
         :param vertices: A dict with any keys and values corresponding
@@ -305,10 +303,12 @@ class DependencyGrammar(object):
 
         :returns: ``True`` if the graph is valid, ``False`` otherwise.
         """
-        v, i, o = self.find_invalid_in_graph(vertices=vertices, edges=edges)
+        v, i, o, _, _, _ = self.find_invalid_in_graph(vertices=vertices, edges=edges)
         return len(v) == 0
 
-    def find_invalid_in_graph(self, vertices, edges, provide_reasons=False):
+    def find_invalid_in_graph(self, vertices: Dict[int, str], edges: List[Tuple[int, int]]) \
+            -> Tuple[List[int], List[Tuple[int, int]], List[Tuple[int, int]], Dict[int, str], Dict[
+                Tuple[int, int], str], Dict[Tuple[int, int], str]]:
         """Finds vertices and edges where the given object graph does
         not comply with the grammar.
 
@@ -347,51 +347,50 @@ class DependencyGrammar(object):
             of each error and return them.
 
         :returns: A list of vertices, a list of inlinks and a list of outlinks
-            that do not comply with the grammar. If ``provide_reasons`` is set,
-            also returns three more: dicts of written reasons for each error
-            (vertex, inlink, outlink).
+            that do not comply with the grammar as well as three dictionaries with reasons
+            for each list respectively.
         """
         logging.info('DependencyGrammar: looking for errors.')
 
-        wrong_vertices = []
-        wrong_inlinks = []
-        wrong_outlinks = []
+        wrong_vertices = []  # type: List[int]
+        wrong_inlinks = []  # type: List[Tuple[int,int]]
+        wrong_outlinks = []  # type: List[Tuple[int,int]]
 
-        reasons_v = {}
-        reasons_i = {}
-        reasons_o = {}
+        reasons_incorrect_vertices = {}  # type: Dict[int, str]
+        reasons_incorrect_inlinks = {}  # type: Dict[Tuple[int,int], str]
+        reasons_incorrect_outlinks = {}  # type: Dict[Tuple[int,int], str]
 
         # Check that vertices have labels that are in the alphabet
-        for v, clsname in list(vertices.items()):
-            if clsname not in self.alphabet:
+        for v, class_name in list(vertices.items()):
+            if class_name not in self.alphabet:
                 wrong_vertices.append(v)
-                reasons_v[v] = 'Symbol {0} not in alphabet: class {1}.' \
-                               ''.format(v, clsname)
+                reasons_incorrect_vertices[v] = 'Symbol {0} not in alphabet: class {1}.' \
+                                                ''.format(v, class_name)
 
         # Check that all edges are allowed
         for f, t in edges:
             nf, nt = str(vertices[f]), str(vertices[t])
             if (nf, nt) not in self.rules:
                 logging.debug('Wrong edge: {0} --> {1}, rules:\n{2}'
-                                ''.format(nf, nt, pprint.pformat(self.rules)))
+                              ''.format(nf, nt, pprint.pformat(self.rules)))
 
                 wrong_inlinks.append((f, t))
-                reasons_i[(f, t)] = 'Outlink {0} ({1}) -> {2} ({3}) not in ' \
-                                    'alphabet.'.format(nf, f, nt, t)
+                reasons_incorrect_inlinks[(f, t)] = 'Outlink {0} ({1}) -> {2} ({3}) not in ' \
+                                                    'alphabet.'.format(nf, f, nt, t)
 
                 wrong_outlinks.append((f, t))
-                reasons_o[(f, t)] = 'Outlink {0} ({1}) -> {2} ({3}) not in ' \
-                                    'alphabet.'.format(nf, f, nt, t)
+                reasons_incorrect_outlinks[(f, t)] = 'Outlink {0} ({1}) -> {2} ({3}) not in ' \
+                                                     'alphabet.'.format(nf, f, nt, t)
                 if f not in wrong_vertices:
                     wrong_vertices.append(f)
-                    reasons_v[f] = 'Symbol {0} (class: {1}) participates ' \
-                                   'in wrong outlink: {2} ({3}) --> {4} ({5})' \
-                                   ''.format(f, vertices[f], nf, f, nt, t)
+                    reasons_incorrect_vertices[f] = 'Symbol {0} (class: {1}) participates ' \
+                                                    'in wrong outlink: {2} ({3}) --> {4} ({5})' \
+                                                    ''.format(f, vertices[f], nf, f, nt, t)
                 if t not in wrong_vertices:
                     wrong_vertices.append(t)
-                    reasons_v[t] = 'Symbol {0} (class: {1}) participates ' \
-                                   'in wrong inlink: {2} ({3}) --> {4} ({5})' \
-                                   ''.format(t, vertices[t], nf, f, nt, t)
+                    reasons_incorrect_vertices[t] = 'Symbol {0} (class: {1}) participates ' \
+                                                    'in wrong inlink: {2} ({3}) --> {4} ({5})' \
+                                                    ''.format(t, vertices[t], nf, f, nt, t)
 
         # Check aggregate cardinality rules
         #  - build inlink and outlink dicts
@@ -417,43 +416,39 @@ class DependencyGrammar(object):
         logging.info('DependencyGrammar: checking outlink aggregate cardinalities'
                      '\n{0}'.format(pprint.pformat(outlinks)))
         for f in outlinks:
-            f_clsname = vertices[f]
-            if f_clsname not in self.outlink_aggregated_cardinalities:
+            from_class_name = vertices[f]
+            if from_class_name not in self.outlink_aggregated_cardinalities:
                 # Given vertex has no aggregate cardinality restrictions
                 continue
-            cmin, cmax = self.outlink_aggregated_cardinalities[f_clsname]
+            cmin, cmax = self.outlink_aggregated_cardinalities[from_class_name]
             logging.info('DependencyGrammar: checking outlink cardinality'
                          ' rule fulfilled for vertex {0} ({1}): should be'
                          ' within {2} -- {3}'.format(f, vertices[f], cmin, cmax))
             if not (cmin <= len(outlinks[f]) <= cmax):
                 wrong_vertices.append(f)
-                reasons_v[f] = 'Symbol {0} (class: {1}) has {2} outlinks,' \
-                               ' but grammar specifies {3} -- {4}.' \
-                               ''.format(f, vertices[f], len(outlinks[f]),
-                                         cmin, cmax)
+                reasons_incorrect_vertices[f] = 'Symbol {0} (class: {1}) has {2} outlinks,' \
+                                                ' but grammar specifies {3} -- {4}.' \
+                                                ''.format(f, vertices[f], len(outlinks[f]),
+                                                          cmin, cmax)
 
         for t in inlinks:
-            t_clsname = vertices[t]
-            if t_clsname not in self.inlink_aggregated_cardinalities:
+            to_class_name = vertices[t]
+            if to_class_name not in self.inlink_aggregated_cardinalities:
                 continue
-            cmin, cmax = self.inlink_aggregated_cardinalities[t_clsname]
+            cmin, cmax = self.inlink_aggregated_cardinalities[to_class_name]
             if not (cmin <= len(inlinks[t]) <= cmax):
                 wrong_vertices.append(t)
-                reasons_v[t] = 'Symbol {0} (class: {1}) has {2} inlinks,' \
-                               ' but grammar specifies {3} -- {4}.' \
-                               ''.format(f, vertices[f], len(inlinks[f]),
-                                         cmin, cmax)
+                reasons_incorrect_vertices[t] = 'Symbol {0} (class: {1}) has {2} inlinks,' \
+                                                ' but grammar specifies {3} -- {4}.' \
+                                                ''.format(f, vertices[f], len(inlinks[f]),
+                                                          cmin, cmax)
 
-        # Now check for rule-based inlinks and outlinks.
-        #for f in outlinks:
-        #    oc = self.outlink_cardinalities[f]
-        if provide_reasons:
-            return wrong_vertices, wrong_inlinks, wrong_outlinks, \
-                   reasons_v, reasons_i, reasons_o
+        return wrong_vertices, wrong_inlinks, wrong_outlinks, reasons_incorrect_vertices, reasons_incorrect_inlinks, reasons_incorrect_outlinks
 
-        return wrong_vertices, wrong_inlinks, wrong_outlinks
-
-    def parse_dependency_grammar_rules(self, filename):
+    def parse_dependency_grammar_rules(self, filename: str) -> Tuple[
+        List[Tuple[str, str]], Dict[str, Dict[str, Tuple[int, int]]], Dict[
+            str, Dict[str, Tuple[int, int]]],
+        Dict[str, Tuple[int, int]], Dict[str, Tuple[int, int]]]:
         """Returns the rules stored in the given rule file.
 
         A dependency grammar rule file contains grammar lines,
@@ -496,9 +491,10 @@ class DependencyGrammar(object):
         _invalid_lines = []
         with codecs.open(filename, 'r', 'utf-8') as hdl:
             for line_no, line in enumerate(hdl):
-                l_rules, in_card, out_card, in_agg_card, out_agg_card = self.parse_dependency_grammar_line(line)
+                l_rules, in_card, out_card, in_agg_card, out_agg_card = self.parse_dependency_grammar_line(
+                    line)
 
-                if not self._validate_rules(l_rules):
+                if not self.__validate_rules(l_rules):
                     _invalid_lines.append((line_no, line))
 
                 rules.extend(l_rules)
@@ -521,10 +517,12 @@ class DependencyGrammar(object):
             logging.warning('DependencyGrammar.parse_rules(): Invalid lines'
                             ' {0}'.format(pprint.pformat(_invalid_lines)))
 
-        return rules, inlink_cardinalities, outlink_cardinalities, \
-               inlink_aggregated_cardinalities, outlink_aggregated_cardinalities
+        return rules, inlink_cardinalities, outlink_cardinalities, inlink_aggregated_cardinalities, outlink_aggregated_cardinalities
 
-    def parse_dependency_grammar_line(self, line):
+    def parse_dependency_grammar_line(self, line: str) -> Tuple[
+        List[Tuple[str, str]], Dict[str, Dict[str, Tuple[int, int]]], Dict[
+            str, Dict[str, Tuple[int, int]]], Dict[str, Tuple[int, int]], Dict[
+            str, Tuple[int, int]]]:
         """Parse one dependency grammar line. See DependencyGrammar
         I/O documentation for the full format description of valid
         grammar lines.
@@ -541,7 +539,6 @@ class DependencyGrammar(object):
         (See :class:`DependencyGramamr` documentation for examples.)
 
         :param line: One line of a dependency grammar rule file.
-        :type line: str
 
         :returns: A quintuplet of:
 
@@ -568,8 +565,8 @@ class DependencyGrammar(object):
         out_agg_cards = collections.OrderedDict()
         in_agg_cards = collections.OrderedDict()
 
-        _no_rule_line_output = [], collections.OrderedDict(), collections.OrderedDict(),\
-                   collections.OrderedDict(), collections.OrderedDict()
+        _no_rule_line_output = [], collections.OrderedDict(), collections.OrderedDict(), \
+                               collections.OrderedDict(), collections.OrderedDict()
         if line.strip().startswith('#'):
             return _no_rule_line_output
         if len(line.strip()) == 0:
@@ -583,7 +580,7 @@ class DependencyGrammar(object):
         lhs_tokens = lhs.strip().split()
         rhs_tokens = rhs.strip().split()
 
-        #logging.info('DependencyGrammar: tokens lhs={0}, rhs={1}'
+        # logging.info('DependencyGrammar: tokens lhs={0}, rhs={1}'
         #             ''.format(lhs_tokens, rhs_tokens))
 
         # Normal rule line? Aggregate cardinality line?
@@ -599,7 +596,7 @@ class DependencyGrammar(object):
             rhs_tokens = rhs.strip().split()
             for rt in rhs_tokens:
                 token, rhs_cmin, rhs_cmax = self.parse_token(rt)
-                for t in self._matching_names(token):
+                for t in self.__matching_names(token):
                     in_agg_cards[t] = (rhs_cmin, rhs_cmax)
             logging.debug('DependencyGrammar: found inlinks: {0}'
                           ''.format(pprint.pformat(in_agg_cards)))
@@ -609,7 +606,7 @@ class DependencyGrammar(object):
             lhs_tokens = lhs.strip().split()
             for lt in lhs_tokens:
                 token, lhs_cmin, lhs_cmax = self.parse_token(lhs.strip())
-                for t in self._matching_names(token):
+                for t in self.__matching_names(token):
                     out_agg_cards[t] = (lhs_cmin, lhs_cmax)
             logging.debug('DependencyGrammar: found outlinks: {0}'
                           ''.format(pprint.pformat(out_agg_cards)))
@@ -623,7 +620,7 @@ class DependencyGrammar(object):
         lhs_cards = collections.OrderedDict()
         for l in lhs_tokens:
             token, lhs_cmin, lhs_cmax = self.parse_token(l)
-            all_tokens = self._matching_names(token)
+            all_tokens = self.__matching_names(token)
             lhs_symbols.extend(all_tokens)
             for t in all_tokens:
                 lhs_cards[t] = (lhs_cmin, lhs_cmax)
@@ -632,13 +629,10 @@ class DependencyGrammar(object):
         rhs_cards = collections.OrderedDict()
         for r in rhs_tokens:
             token, rhs_cmin, rhs_cmax = self.parse_token(r)
-            all_tokens = self._matching_names(token)
+            all_tokens = self.__matching_names(token)
             rhs_symbols.extend(all_tokens)
             for t in all_tokens:
                 rhs_cards[t] = (rhs_cmin, rhs_cmax)
-
-        # logging.info('DependencyGrammar: symbols lhs={0}, rhs={1}'
-        #              ''.format(lhs_symbols, rhs_symbols))
 
         # Build the outputs from the cartesian product
         # of left-hand and right-hand tokens.
@@ -653,32 +647,25 @@ class DependencyGrammar(object):
                 out_cards[l][r] = lhs_cards[l]
                 in_cards[r][l] = rhs_cards[r]
 
-        # logging.info('DependencyGramamr: got rules:\n{0}'
-        #              ''.format(pprint.pformat(rules)))
-        # logging.info('DependencyGrammar: got inlink cardinalities:\n{0}'
-        #              ''.format(pprint.pformat(in_cards)))
-        # logging.info('DependencyGrammar: got outlink cardinalities:\n{0}'
-        #              ''.format(pprint.pformat(out_cards)))
-
         # Fixed rule ordering
         rules = sorted(rules)
 
         return rules, in_cards, out_cards, in_agg_cards, out_agg_cards
 
-    def parse_token(self, l):
+    def parse_token(self, token: str):
         """Parse one ``*.deprules`` file token. See class documentation for
         examples.
 
-        :param l: One token of a ``*.deprules`` file.
+        :param token: One token of a ``*.deprules`` file.
 
         :return: token, cmin, cmax
         """
-        l = str(l)
+        token = str(token)
         cmin, cmax = 0, self._MAX_CARD
-        if '{' not in l:
-            token = l
+        if '{' not in token:
+            token = token
         else:
-            token, cardinality = l[:-1].split('{')
+            token, cardinality = token[:-1].split('{')
             if ',' not in cardinality:
                 cmin, cmax = int(cardinality), int(cardinality)
             else:
@@ -689,7 +676,7 @@ class DependencyGrammar(object):
                     cmax = int(cmax_string)
         return token, cmin, cmax
 
-    def _matching_names(self, token):
+    def __matching_names(self, token):
         """Returns the list of alphabet symbols that match the given
         name (regex, currently can process one '*' wildcard).
 
@@ -699,18 +686,15 @@ class DependencyGrammar(object):
         :rtype: list
         :returns: A list of matching names. Empty list if no name matches.
         """
-        if not self._has_wildcard(token):
+        if not self.__has_wildcard(token):
             return [token]
 
         wildcard_idx = token.index(self.WILDCARD)
         prefix = token[:wildcard_idx]
         if wildcard_idx < len(token) - 1:
-            suffix = token[wildcard_idx+1:]
+            suffix = token[wildcard_idx + 1:]
         else:
             suffix = ''
-
-        # logging.info('DependencyGrammar._matching_names: token {0}, pref={1}, suff={2}'
-        #              ''.format(token, prefix, suffix))
 
         matching_names = list(self.alphabet)
         if len(prefix) > 0:
@@ -720,7 +704,7 @@ class DependencyGrammar(object):
 
         return matching_names
 
-    def _validate_rules(self, rules):
+    def __validate_rules(self, rules: List[Tuple[str, str]]) -> bool:
         """Check that all the rules are valid under the current alphabet."""
         missing_heads = set()
         missing_children = set()
@@ -738,12 +722,8 @@ class DependencyGrammar(object):
         else:
             return True
 
-    def _has_wildcard(self, name):
+    def __has_wildcard(self, name):
         return self.WILDCARD in name
 
     def is_head(self, head, child):
         return (head, child) in self.rules
-
-
-##############################################################################
-
