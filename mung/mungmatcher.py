@@ -70,7 +70,7 @@ class MungMatcher(object):
         2. Within pools that share connectivity signatures:
 
         This is what we want to resolve with EMD. Note that these groups will be
-        fairly small - at most 4 or 5 flags/beams or ledger lines.
+        fairly small - at most 4 or 5 flags/beams or leger lines.
 
         """
         # TODO: factorize compatibility sets by object class!

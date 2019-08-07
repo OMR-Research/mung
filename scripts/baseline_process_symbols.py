@@ -15,7 +15,7 @@ from sklearn.feature_extraction import DictVectorizer
 from typing import List, Dict
 
 from mung.graph import find_beams_incoherent_with_stems, NotationGraph
-from mung.graph import find_contained_nodes, remove_contained_cropobjects
+from mung.graph import find_contained_nodes, remove_contained_nodes
 from mung.graph import find_misdirected_leger_line_edges
 from mung.inference.inference import OnsetsInferenceEngine, MIDIBuilder
 from mung.inference.inference import PitchInferenceEngine
@@ -62,13 +62,13 @@ def add_key_signatures(cropobjects):
     for s in staffs:
 
         # Take the leftmost clef C.
-        clefs = _g.parents(s.objid, classes=_CONST.CLEF_CLSNAMES)
+        clefs = _g.parents(s.objid, class_filter=_CONST.CLEF_CLSNAMES)
         if len(clefs) == 0:
             continue
         leftmost_clef = min(clefs, key=lambda x: x.left)
 
         # Take the leftmost notehead (incl. grace notes) N.
-        noteheads = _g.parents(s.objid, classes=_CONST.NOTEHEAD_CLSNAMES)
+        noteheads = _g.parents(s.objid, class_filter=_CONST.NOTEHEAD_CLSNAMES)
         if len(noteheads) == 0:
             continue
         leftmost_notehead = min(noteheads, key=lambda x: x.left)
@@ -147,7 +147,7 @@ class DependencyGrammar(object):
     as a shortcut for a list of rules::
 
         noteheadFull | stem beam
-        noteheadFull noteheadHalf | ledger_line duration-dot tie grace_note
+        noteheadFull noteheadHalf | legerLine durationDot tie notehead*Small
 
     The asterisk works as a wildcard. Currently, only one wildcard per symbol
     is allowed::
@@ -182,9 +182,9 @@ class DependencyGrammar(object):
 
       ``notehead-*{,2} | stem{1,}``
 
-    The relationship of noteheads to ledger lines is generally ``m:n``::
+    The relationship of noteheads to leger lines is generally ``m:n``::
 
-      ``noteheadFull | ledger_line``
+      ``noteheadFull | legerLine``
 
     A time signature may consist of multiple numerals, but only one
     other symbol::
@@ -986,13 +986,13 @@ def process_stafflines(cropobjects,
     add staffspaces, and add the various obligatory relationships of other
     objects to the staff objects. Required before attempting to export MIDI."""
     if len([c for c in cropobjects if c.clsname == 'staff']) > 0:
-        logging.warn('Some stafflines have already been processed. Reprocessing'
+        logging.warning('Some stafflines have already been processed. Reprocessing'
                      ' is not certain to work.')
 
     try:
         new_cropobjects = merge_staffline_segments(cropobjects)
     except ValueError as e:
-        logging.warn('Model: Staffline merge failed:\n\t\t'
+        logging.warning('Model: Staffline merge failed:\n\t\t'
                      '{0}'.format(e.message))
         raise
 
@@ -1001,7 +1001,7 @@ def process_stafflines(cropobjects,
             staffs = build_staff_cropobjects(new_cropobjects)
             new_cropobjects = new_cropobjects + staffs
     except Exception as e:
-        logging.warn('Building staffline cropobjects from merged segments failed:'
+        logging.warning('Building staffline cropobjects from merged segments failed:'
                      ' {0}'.format(e.message))
         raise
 
@@ -1010,7 +1010,7 @@ def process_stafflines(cropobjects,
             staffspaces = build_staffspace_cropobjects(new_cropobjects)
             new_cropobjects = new_cropobjects + staffspaces
     except Exception as e:
-        logging.warn('Building staffspace cropobjects from stafflines failed:'
+        logging.warning('Building staffspace cropobjects from stafflines failed:'
                      ' {0}'.format(e.message))
         raise
 
@@ -1018,7 +1018,7 @@ def process_stafflines(cropobjects,
         if do_add_staff_relationships:
             new_cropobjects = add_staff_relationships(new_cropobjects)
     except Exception as e:
-        logging.warn('Adding staff relationships failed:'
+        logging.warning('Adding staff relationships failed:'
                      ' {0}'.format(e.message))
         raise
 
@@ -1030,7 +1030,7 @@ def find_wrong_edges(nodes: List[Node], grammar):
     graph = NotationGraph(nodes)
 
     incoherent_beam_pairs = find_beams_incoherent_with_stems(nodes)
-    # Switching off misdirected ledger lines: there is something wrong with them
+    # Switching off misdirected leger lines: there is something wrong with them
     misdirected_leger_lines = find_misdirected_leger_line_edges(nodes)
 
     wrong_edges = [(n.objid, b.objid)
@@ -1347,8 +1347,8 @@ def main(args):
             _contained_counts[c.clsname] += 1
         logging.info('Found {} contained cropobjects'.format(len(contained)))
         logging.info('Contained counts:\n{0}'.format(pprint.pformat(dict(_contained_counts))))
-        cropobjects = remove_contained_cropobjects(cropobjects,
-                                                   contained)
+        cropobjects = remove_contained_nodes(cropobjects,
+                                             contained)
         logging.info('Removed contained cropobjects: {}...'.format([m.objid for m in contained]))
 
     logging.info('Inferring staffline & staff objects, staff relationships')

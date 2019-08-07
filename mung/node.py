@@ -572,7 +572,7 @@ class Node(object):
         >>> node.height, node.width
         (10, 5)
 
-        Assumes integer bounds, which is ensured during CropObject initialization.
+        Assumes integer bounds, which is ensured during Node initialization.
         """
         if self.__mask is None:
             return
@@ -624,7 +624,7 @@ class Node(object):
         logging.debug('Node.crop: Old mask shape {0}, new mask shape {1}'
                       ''.format(self.__mask.shape, new_mask.shape))
 
-        # new bounding box, relative to image -- used to compute the CropObject's position and size
+        # new bounding box, relative to image -- used to compute the Node's position and size
         abs_t = self.top + trim_top
         abs_l = self.left + trim_left
         abs_b = self.bottom - trim_bottom
@@ -638,7 +638,7 @@ class Node(object):
         self.set_mask(new_mask)
 
     def __str__(self):
-        """Format the CropObject as string representation. See the documentation
+        """Format the Node as string representation. See the documentation
         of :module:`mung.io` for details."""
         lines = []
         lines.append('<Node>')
@@ -764,16 +764,18 @@ class Node(object):
         output = ' '.join(output_strings)
         return output
 
-    def decode_mask(self, mask_string: str, shape) -> Optional[numpy.ndarray]:
+    @staticmethod
+    def decode_mask(mask_string: str, shape) -> Optional[numpy.ndarray]:
         """Decodes a Node mask string into a binary
         numpy array of the given shape."""
-        mode = self._determine_mask_mode(mask_string)
+        mode = Node.__determine_mask_mode(mask_string)
         if mode == 'rle':
-            return self.decode_mask_rle(mask_string, shape=shape)
+            return Node.decode_mask_rle(mask_string, shape=shape)
         elif mode == 'bitmap':
-            return self.decode_mask_bitmap(mask_string, shape=shape)
+            return Node.decode_mask_bitmap(mask_string, shape=shape)
 
-    def _determine_mask_mode(self, mask_string: str):
+    @staticmethod
+    def __determine_mask_mode(mask_string: str):
         """If the mask string starts with '0:' or '1:', or generally
         if it contains a non-0 or 1 symbol, assume it is RLE."""
         mode = 'bitmap'
@@ -818,7 +820,7 @@ class Node(object):
     def join(self, other):
         """Node "addition": performs an OR on this
         and the ``other`` Nodes' masks and bounding boxes,
-        and assigns to this CropObject the result. Merges
+        and assigns to this Node the result. Merges
         also the inlinks and outlinks.
 
         Works only if the document spaces for both Nodes
@@ -950,7 +952,7 @@ class Node(object):
         Their minimum vertical and horizontal distances are each taken
         separately, and the euclidean norm is computed from them."""
         if self.document != node.document:
-            logging.warning('Cannot compute distances between CropObjects'
+            logging.warning('Cannot compute distances between Nodes'
                             ' from different documents! ({0} vs. {1})'
                             ''.format(self.document, node.document))
 
@@ -1075,7 +1077,7 @@ def merge_nodes(first_node: Node, second_node: Node, class_name: str, id_: int) 
 def merge_multiple_nodes(nodes: List[Node], class_name: str, id_: int) -> Node:
     """Merge multiple nodes. Does not modify any of the inputs."""
     if len(set([c.document for c in nodes])) > 1:
-        raise ValueError('Cannot merge CropObjects from different documents!')
+        raise ValueError('Cannot merge Nodes from different documents!')
     merged_top, merged_left, merged_bottom, merged_right = compute_unifying_bounding_box(nodes)
     merged_height, merged_width = merged_bottom - merged_top, merged_right - merged_left
     merged_mask = compute_unifying_mask(nodes)
@@ -1240,9 +1242,9 @@ def link_nodes(from_node: Node, to_node: Node, check_that_nodes_have_the_same_do
     """
     if from_node.document != to_node.document:
         if check_that_nodes_have_the_same_document:
-            raise ValueError('Cannot link two CropObjects that are')
+            raise ValueError('Cannot link two Nodes that are')
         else:
-            logging.warning('Attempting to link CropObjects from two different'
+            logging.warning('Attempting to link Nodes from two different'
                             ' docments. From: {0}, to: {1}'
                             ''.format(from_node.document, to_node.document))
 

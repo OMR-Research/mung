@@ -171,23 +171,23 @@ def add_staff_relationships(nodes: List[Node],
             ################
             # Add relationship to given staffline or staffspace.
 
-            # If notehead has ledger lines, skip it for now.
+            # If notehead has leger lines, skip it for now.
             has_leger_line = False
             for o in c.outlinks:
-                if id_to_node_mapping[o].clsname == 'ledger_line':
+                if id_to_node_mapping[o].clsname == _CONST.LEGER_LINE_CLASS_NAME:
                     has_leger_line = True
                     break
 
             if has_leger_line:
                 # Attach to the appropriate staff:
-                # meaning, staff closest to the innermost ledger line.
+                # meaning, staff closest to the innermost leger line.
                 lls = [id_to_node_mapping[o] for o in c.outlinks
-                       if id_to_node_mapping[o].clsname == 'ledger_line']
+                       if id_to_node_mapping[o].clsname == _CONST.LEGER_LINE_CLASS_NAME]
                 # Furthest from notehead's top is innermost.
                 # (If notehead is below staff and crosses a ll., one
                 #  of these numbers will be negative. But that doesn't matter.)
                 ll_max_dist = max(lls, key=lambda ll: ll.top - c.top)
-                # Find closest staff to max-dist ledger ine
+                # Find closest staff to max-dist leger ine
                 staff_min_dist = min(staves,
                                      key=lambda ss: min((ll_max_dist.bottom - ss.top) ** 2,
                                                         (ll_max_dist.top - ss.bottom) ** 2))
@@ -277,7 +277,7 @@ def add_staff_relationships(nodes: List[Node],
                         overlapped_staffspaces[_ss_i] = s.bottom - max(c.top, s.top)
 
                 if len(overlapped_staffspaces) == 0:
-                    logging.warn('Notehead {0}: no overlapped staffline object, no ledger line!'
+                    logging.warning('Notehead {0}: no overlapped staffline object, no leger line!'
                                  ''.format(c.uid))
                 _ss_i_max = max(list(overlapped_staffspaces.keys()),
                                 key=lambda x: overlapped_staffspaces[x])

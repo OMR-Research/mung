@@ -9,8 +9,8 @@ class InferenceEngineConstants(object):
     """This class stores the constants used for pitch inference."""
 
     ON_STAFFLINE_RATIO_THRESHOLD = 0.2
-    '''Magic number for determining whether a notehead is *on* a ledger
-    line, or *next* to a ledger line: if the ratio between the smaller
+    '''Magic number for determining whether a notehead is *on* a leger
+    line, or *next* to a leger line: if the ratio between the smaller
     and larger vertical difference of (top, bottom) vs. l.l. (top, bottom)
     is smaller than this, it means the notehead is most probably *NOT*
     on the l.l. and is next to it.'''
@@ -18,11 +18,12 @@ class InferenceEngineConstants(object):
     STAFFLINE_CLASS_NAME = 'staffLine'
     STAFFSPACE_CLASS_NAME = 'staffSpace'
     STAFF_CLASS_NAME = 'staff'
+    LEGER_LINE_CLASS_NAME = 'legerLine'
 
     STAFF_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME, STAFF_CLASS_NAME]
     STAFFLINE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME]
 
-    STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, 'legerLine']
+    STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, LEGER_LINE_CLASS_NAME]
 
     STAFF_RELATED_CLASS_NAMES = {
         'staffGrouping',
@@ -32,7 +33,7 @@ class InferenceEngineConstants(object):
         'gClef', 'cClef', 'fClef',
     }
 
-    STYSTEM_LEVEL_CLASS_NAMES = {
+    SYSTEM_LEVEL_CLASS_NAMES = {
         'staff_grouping',
         'measure_separator',
     }
@@ -44,6 +45,7 @@ class InferenceEngineConstants(object):
         'noteheadFullSmall',
         'noteheadHalfSmall',
     }
+
 
     NONGRACE_NOTEHEAD_CLASS_NAMES = {
         'noteheadFull',

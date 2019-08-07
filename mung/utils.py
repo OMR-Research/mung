@@ -57,12 +57,12 @@ def compute_connected_components(image: numpy.ndarray) -> \
 
 def resolve_notehead_wrt_staffline(notehead, staffline_or_leger_line):
     """Resolves the relative vertical position of the notehead with respect
-    to the given staff_line or ledgerLine object. Returns -1 if notehead
+    to the given staff_line or legerLine object. Returns -1 if notehead
     is *below* staffline, 0 if notehead is *on* staffline, and 1 if notehead
     is *above* staffline."""
     ll = staffline_or_leger_line
 
-    # Determining whether the notehead is on a ledger
+    # Determining whether the notehead is on a leger
     # line or in the adjacent temp staffspace.
     # This uses a magic number, ON_STAFFLINE_RATIO_THRESHOLD.
     output_position = 0
@@ -71,7 +71,7 @@ def resolve_notehead_wrt_staffline(notehead, staffline_or_leger_line):
     dtop, dbottom = 1, 1
 
     # Weird situation with notehead vertically *inside* bbox
-    # of ledger line (could happen with slanted LLs and very small
+    # of leger line (could happen with slanted LLs and very small
     # noteheads).
     if ll.top <= notehead.top <= notehead.bottom <= ll.bottom:
         output_position = 0
@@ -84,7 +84,7 @@ def resolve_notehead_wrt_staffline(notehead, staffline_or_leger_line):
 
     # Complicated situations: overlap
     else:
-        # Notehead "around" ledger line.
+        # Notehead "around" leger line.
         if notehead.top < ll.top <= ll.bottom < notehead.bottom:
             dtop = ll.top - notehead.top
             dbottom = notehead.bottom - ll.bottom
@@ -96,7 +96,7 @@ def resolve_notehead_wrt_staffline(notehead, staffline_or_leger_line):
                 else:
                     output_position = -1
 
-        # Notehead interlaced with ledger line, notehead on top
+        # Notehead interlaced with leger line, notehead on top
         elif notehead.top < ll.top <= notehead.bottom <= ll.bottom:
             # dtop = closest_ll.top - notehead.top
             # dbottom = max(notehead.bottom - closest_ll.top, 1)
@@ -104,7 +104,7 @@ def resolve_notehead_wrt_staffline(notehead, staffline_or_leger_line):
             #         < InferenceEngineConstants.ON_STAFFLINE_RATIO_TRHESHOLD:
             output_position = 1
 
-        # Notehead interlaced with ledger line, ledger line on top
+        # Notehead interlaced with leger line, ledger line on top
         elif ll.top <= notehead.top <= ll.bottom < notehead.bottom:
             # dtop = max(closest_ll.bottom - notehead.top, 1)
             # dbottom = notehead.bottom - closest_ll.bottom
@@ -113,7 +113,7 @@ def resolve_notehead_wrt_staffline(notehead, staffline_or_leger_line):
             output_position = -1
 
         else:
-            logging.warn('Strange notehead {0} vs. ledger line {1}'
+            logging.warning('Strange notehead {0} vs. leger line {1}'
                          ' situation: bbox notehead {2}, LL {3}.'
                          ' Note that the output position is unusable;'
                          ' pleasre re-do this attachment manually.'

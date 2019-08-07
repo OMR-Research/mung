@@ -82,7 +82,7 @@ class DependencyGrammar(object):
 
       notehead*{,2} | stem{1,}
 
-    The relationship of noteheads to ledger lines is generally ``m:n``::
+    The relationship of noteheads to leger lines is generally ``m:n``::
 
       noteheadFull | legerLine
 
@@ -247,7 +247,7 @@ class DependencyGrammar(object):
 
     WILDCARD = '*'
 
-    _MAX_CARD = 10000
+    _MAX_CARDINALITY = 10000
 
     def __init__(self, grammar_filename: str, alphabet: Set[str]):
         """Initialize the Grammar: fill in alphabet and parse rules.
@@ -368,29 +368,33 @@ class DependencyGrammar(object):
                                                 ''.format(v, class_name)
 
         # Check that all edges are allowed
-        for f, t in edges:
-            nf, nt = str(vertices[f]), str(vertices[t])
-            if (nf, nt) not in self.rules:
+        for from_id, to_id in edges:
+            from_class_name, to_class_name = str(vertices[from_id]), str(vertices[to_id])
+            if (from_class_name, to_class_name) not in self.rules:
                 logging.debug('Wrong edge: {0} --> {1}, rules:\n{2}'
-                              ''.format(nf, nt, pprint.pformat(self.rules)))
+                              ''.format(from_class_name, to_class_name, pprint.pformat(self.rules)))
 
-                wrong_inlinks.append((f, t))
-                reasons_incorrect_inlinks[(f, t)] = 'Outlink {0} ({1}) -> {2} ({3}) not in ' \
-                                                    'alphabet.'.format(nf, f, nt, t)
+                wrong_inlinks.append((from_id, to_id))
+                reasons_incorrect_inlinks[(from_id, to_id)] = 'Outlink {0} ({1}) -> {2} ({3}) not in alphabet.'.format(
+                    from_class_name, from_id, to_class_name, to_id)
 
-                wrong_outlinks.append((f, t))
-                reasons_incorrect_outlinks[(f, t)] = 'Outlink {0} ({1}) -> {2} ({3}) not in ' \
-                                                     'alphabet.'.format(nf, f, nt, t)
-                if f not in wrong_vertices:
-                    wrong_vertices.append(f)
-                    reasons_incorrect_vertices[f] = 'Symbol {0} (class: {1}) participates ' \
-                                                    'in wrong outlink: {2} ({3}) --> {4} ({5})' \
-                                                    ''.format(f, vertices[f], nf, f, nt, t)
-                if t not in wrong_vertices:
-                    wrong_vertices.append(t)
-                    reasons_incorrect_vertices[t] = 'Symbol {0} (class: {1}) participates ' \
-                                                    'in wrong inlink: {2} ({3}) --> {4} ({5})' \
-                                                    ''.format(t, vertices[t], nf, f, nt, t)
+                wrong_outlinks.append((from_id, to_id))
+                reasons_incorrect_outlinks[(from_id, to_id)] = 'Outlink {0} ({1}) -> {2} ({3}) not in alphabet.'.format(
+                    from_class_name, from_id, to_class_name, to_id)
+                if from_id not in wrong_vertices:
+                    wrong_vertices.append(from_id)
+                    reasons_incorrect_vertices[from_id] = 'Symbol {0} (class: {1}) participates ' \
+                                                          'in wrong outlink: {2} ({3}) --> {4} ({5})' \
+                                                          ''.format(from_id, vertices[from_id],
+                                                                    from_class_name, from_id,
+                                                                    to_class_name, to_id)
+                if to_id not in wrong_vertices:
+                    wrong_vertices.append(to_id)
+                    reasons_incorrect_vertices[to_id] = 'Symbol {0} (class: {1}) participates ' \
+                                                        'in wrong inlink: {2} ({3}) --> {4} ({5})' \
+                                                        ''.format(to_id, vertices[to_id],
+                                                                  from_class_name, from_id,
+                                                                  to_class_name, to_id)
 
         # Check aggregate cardinality rules
         #  - build inlink and outlink dicts
@@ -399,9 +403,9 @@ class DependencyGrammar(object):
         for v in vertices:
             outlinks[v] = set()
             inlinks[v] = set()
-        for f, t in edges:
-            outlinks[f].add(t)
-            inlinks[t].add(f)
+        for from_id, to_id in edges:
+            outlinks[from_id].add(to_id)
+            inlinks[to_id].add(from_id)
 
         # If there are not enough edges, the vertex itself is wrong
         # (and none of the existing edges are wrong).
@@ -415,40 +419,41 @@ class DependencyGrammar(object):
         # again).
         logging.info('DependencyGrammar: checking outlink aggregate cardinalities'
                      '\n{0}'.format(pprint.pformat(outlinks)))
-        for f in outlinks:
-            from_class_name = vertices[f]
+        for from_id in outlinks:
+            from_class_name = vertices[from_id]
             if from_class_name not in self.outlink_aggregated_cardinalities:
                 # Given vertex has no aggregate cardinality restrictions
                 continue
             cmin, cmax = self.outlink_aggregated_cardinalities[from_class_name]
             logging.info('DependencyGrammar: checking outlink cardinality'
                          ' rule fulfilled for vertex {0} ({1}): should be'
-                         ' within {2} -- {3}'.format(f, vertices[f], cmin, cmax))
-            if not (cmin <= len(outlinks[f]) <= cmax):
-                wrong_vertices.append(f)
-                reasons_incorrect_vertices[f] = 'Symbol {0} (class: {1}) has {2} outlinks,' \
-                                                ' but grammar specifies {3} -- {4}.' \
-                                                ''.format(f, vertices[f], len(outlinks[f]),
-                                                          cmin, cmax)
+                         ' within {2} -- {3}'.format(from_id, vertices[from_id], cmin, cmax))
+            if not (cmin <= len(outlinks[from_id]) <= cmax):
+                wrong_vertices.append(from_id)
+                reasons_incorrect_vertices[from_id] = 'Symbol {0} (class: {1}) has {2} outlinks,' \
+                                                      ' but grammar specifies {3} -- {4}.' \
+                                                      ''.format(from_id, vertices[from_id],
+                                                                len(outlinks[from_id]),
+                                                                cmin, cmax)
 
-        for t in inlinks:
-            to_class_name = vertices[t]
+        for to_id in inlinks:
+            to_class_name = vertices[to_id]
             if to_class_name not in self.inlink_aggregated_cardinalities:
                 continue
             cmin, cmax = self.inlink_aggregated_cardinalities[to_class_name]
-            if not (cmin <= len(inlinks[t]) <= cmax):
-                wrong_vertices.append(t)
-                reasons_incorrect_vertices[t] = 'Symbol {0} (class: {1}) has {2} inlinks,' \
-                                                ' but grammar specifies {3} -- {4}.' \
-                                                ''.format(f, vertices[f], len(inlinks[f]),
-                                                          cmin, cmax)
+            if not (cmin <= len(inlinks[to_id]) <= cmax):
+                wrong_vertices.append(to_id)
+                reasons_incorrect_vertices[to_id] = 'Symbol {0} (class: {1}) has {2} inlinks,' \
+                                                    ' but grammar specifies {3} -- {4}.' \
+                                                    ''.format(to_id, vertices[to_id],
+                                                              len(inlinks[to_id]),
+                                                              cmin, cmax)
 
         return wrong_vertices, wrong_inlinks, wrong_outlinks, reasons_incorrect_vertices, reasons_incorrect_inlinks, reasons_incorrect_outlinks
 
-    def parse_dependency_grammar_rules(self, filename: str) -> Tuple[
-        List[Tuple[str, str]], Dict[str, Dict[str, Tuple[int, int]]], Dict[
-            str, Dict[str, Tuple[int, int]]],
-        Dict[str, Tuple[int, int]], Dict[str, Tuple[int, int]]]:
+    def parse_dependency_grammar_rules(self, filename: str) -> \
+            Tuple[List[Tuple[str, str]], Dict[str, Dict[str, Tuple[int, int]]], Dict[str, Dict[str, Tuple[int, int]]],
+                  Dict[str, Tuple[int, int]], Dict[str, Tuple[int, int]]]:
         """Returns the rules stored in the given rule file.
 
         A dependency grammar rule file contains grammar lines,
@@ -519,10 +524,9 @@ class DependencyGrammar(object):
 
         return rules, inlink_cardinalities, outlink_cardinalities, inlink_aggregated_cardinalities, outlink_aggregated_cardinalities
 
-    def parse_dependency_grammar_line(self, line: str) -> Tuple[
-        List[Tuple[str, str]], Dict[str, Dict[str, Tuple[int, int]]], Dict[
-            str, Dict[str, Tuple[int, int]]], Dict[str, Tuple[int, int]], Dict[
-            str, Tuple[int, int]]]:
+    def parse_dependency_grammar_line(self, line: str) -> \
+            Tuple[List[Tuple[str, str]], Dict[str, Dict[str, Tuple[int, int]]], Dict[
+                str, Dict[str, Tuple[int, int]]], Dict[str, Tuple[int, int]], Dict[str, Tuple[int, int]]]:
         """Parse one dependency grammar line. See DependencyGrammar
         I/O documentation for the full format description of valid
         grammar lines.
@@ -605,7 +609,7 @@ class DependencyGrammar(object):
         if _line_type == 'aggregate_outlinks':
             lhs_tokens = lhs.strip().split()
             for lt in lhs_tokens:
-                token, lhs_cmin, lhs_cmax = self.parse_token(lhs.strip())
+                token, lhs_cmin, lhs_cmax = self.parse_token(lt.strip())
                 for t in self.__matching_names(token):
                     out_agg_cards[t] = (lhs_cmin, lhs_cmax)
             logging.debug('DependencyGrammar: found outlinks: {0}'
@@ -661,7 +665,7 @@ class DependencyGrammar(object):
         :return: token, cmin, cmax
         """
         token = str(token)
-        cmin, cmax = 0, self._MAX_CARD
+        cmin, cmax = 0, self._MAX_CARDINALITY
         if '{' not in token:
             token = token
         else:

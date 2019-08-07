@@ -638,37 +638,37 @@ class PitchInferenceEngine(object):
         """Computes the staffline delta (distance from middle stafflines,
         measured in stafflines and staffspaces) for the given notehead
         (or any other symbol connected to a staffline/staffspace).
-        Accounts for ledger lines.
+        Accounts for leger lines.
         """
         current_staff = self.__children(notehead, ['staff'])[0]
         staffline_objects = self.__children(notehead,
                                             self._CONST.STAFFLINE_CLASS_NAMES)
 
-        # Ledger lines
+        # Leger lines
         # ------------
         if len(staffline_objects) == 0:
 
-            # Processing ledger lines:
-            #  - count ledger lines
-            lls = self.__children(notehead, 'ledger_line')
+            # Processing leger lines:
+            #  - count leger lines
+            lls = self.__children(notehead, _CONST.LEGER_LINE_CLASS_NAME)
             n_lls = len(lls)
             if n_lls == 0:
                 raise ValueError('Notehead with no staffline or staffspace,'
-                                 ' but also no ledger lines: {0}'
+                                 ' but also no leger lines: {0}'
                                  ''.format(notehead.uid))
 
             #  Determine: is notehead above or below staff?
             is_above_staff = (notehead.top < current_staff.top)
 
-            #  Determine: is notehead on/next to (closest) ledger line?
+            #  Determine: is notehead on/next to (closest) leger line?
             #    This needs to be done *after* we know whether the notehead
             #    is above/below staff: if the notehead is e.g. above,
             #    then it would be weird to find out it is in the
-            #    mini-staffspace *below* the closest ledger line,
+            #    mini-staffspace *below* the closest leger line,
             #    signalling a mistake in the data.
             closest_ll = min(lls, key=lambda x: (x.top - notehead.top)**2 + (x.bottom - notehead.bottom)**2)
 
-            # Determining whether the notehead is on a ledger
+            # Determining whether the notehead is on a leger
             # line or in the adjacent temp staffspace.
             # This uses a magic number, ON_STAFFLINE_RATIO_THRESHOLD.
             on_leger_line = True
@@ -677,7 +677,7 @@ class PitchInferenceEngine(object):
             dtop, dbottom = 1, 1
 
             # Weird situation with notehead vertically *inside* bbox
-            # of ledger line (could happen with slanted LLs and very small
+            # of leger line (could happen with slanted LLs and very small
             # noteheads).
             if closest_ll.top <= notehead.top <= notehead.bottom <= closest_ll.bottom:
                 on_leger_line = True
@@ -690,7 +690,7 @@ class PitchInferenceEngine(object):
 
             # Complicated situations: overlap
             else:
-                # Notehead "around" ledger line.
+                # Notehead "around" leger line.
                 if notehead.top < closest_ll.top <= closest_ll.bottom < notehead.bottom:
                     dtop = closest_ll.top - notehead.top
                     dbottom = notehead.bottom - closest_ll.bottom
@@ -714,7 +714,7 @@ class PitchInferenceEngine(object):
                                           'w.r.t. staff:'
                                           ' {0}'.format(notehead.uid))
 
-                # Notehead interlaced with ledger line, notehead on top
+                # Notehead interlaced with leger line, notehead on top
                 elif notehead.top < closest_ll.top <= notehead.bottom <= closest_ll.bottom:
                     # dtop = closest_ll.top - notehead.top
                     # dbottom = max(notehead.bottom - closest_ll.top, 1)
@@ -722,7 +722,7 @@ class PitchInferenceEngine(object):
                     #         < InferenceEngineConstants.ON_STAFFLINE_RATIO_TRHESHOLD:
                     on_leger_line = False
 
-                # Notehead interlaced with ledger line, ledger line on top
+                # Notehead interlaced with leger line, ledger line on top
                 elif closest_ll.top <= notehead.top <= closest_ll.bottom < notehead.bottom:
                     # dtop = max(closest_ll.bottom - notehead.top, 1)
                     # dbottom = notehead.bottom - closest_ll.bottom
@@ -731,7 +731,7 @@ class PitchInferenceEngine(object):
                     on_leger_line = False
 
                 else:
-                    raise ValueError('Strange notehead {0} vs. ledger line {1}'
+                    raise ValueError('Strange notehead {0} vs. leger line {1}'
                                      ' situation: bbox notehead {2}, LL {3}'
                                      ''.format(notehead.uid, closest_ll.uid,
                                                notehead.bounding_box,
@@ -743,16 +743,6 @@ class PitchInferenceEngine(object):
 
             if not is_above_staff:
                 delta *= -1
-
-            ### DEBUG
-            # if notehead.id in [178]:
-            #     logging.info('Notehead {0}: bbox {1}'.format(notehead.id, notehead.bounding_box))
-            #     logging.info('Closest LL id: {0}'.format(closest_ll.id))
-            #     logging.info('no. of LLs: {0}'.format(n_lls))
-            #     logging.info('Is above staff: {0}'.format(is_above_staff))
-            #     logging.info('On ledger line: {0}'.format(on_leger_line))
-            #     logging.info('Dtop: {0}, Dbottom: {1}'.format(dtop, dbottom))
-            #     logging.info('Delta: {0}'.format(delta))
 
             return delta
 
@@ -822,13 +812,13 @@ class PitchInferenceEngine(object):
         self.clefs = [c for c in cropobjects
                       if c.clsname in self._CONST.CLEF_CLASS_NAMES]
         if ignore_nonstaff:
-            self.clefs = [c for c in self.clefs if graph.has_child(c, ['staff'])]
+            self.clefs = [c for c in self.clefs if graph.has_children(c, ['staff'])]
 
         self.key_signatures = [c for c in cropobjects
                                if c.clsname == 'key_signature']
         if ignore_nonstaff:
             self.key_signatures = [c for c in self.key_signatures
-                                   if graph.has_child(c, ['staff'])]
+                                   if graph.has_children(c, ['staff'])]
 
         self.clef_to_staff_map = {}
         # There may be more than one clef per staff.
@@ -838,7 +828,7 @@ class PitchInferenceEngine(object):
             try:
                 s = self.__children(c, ['staff'])[0]
             except (KeyError, ValueError):
-                logging.warn('Clef {0} has no staff attached! Will not be'
+                logging.warning('Clef {0} has no staff attached! Will not be'
                              ' part of pitch inference.'.format(c.uid))
                 continue
             self.clef_to_staff_map[c.objid] = s
@@ -851,7 +841,7 @@ class PitchInferenceEngine(object):
             try:
                 s = self.__children(k, ['staff'])[0]
             except KeyError:
-                logging.warn('Key signature {0} has no staff attached! Will not be'
+                logging.warning('Key signature {0} has no staff attached! Will not be'
                              ' part of pitch inference.'.format(k.uid))
                 continue
             self.key_to_staff_map[k.objid] = s
@@ -862,7 +852,7 @@ class PitchInferenceEngine(object):
                               if c.clsname == 'measure_separator']
         if ignore_nonstaff:
             self.measure_separators = [c for c in self.measure_separators
-                                       if graph.has_child(c, ['staff'])]
+                                       if graph.has_children(c, ['staff'])]
 
         self.staff_to_msep_map = collections.defaultdict(list)
         for m in self.measure_separators:
@@ -877,7 +867,7 @@ class PitchInferenceEngine(object):
                           if c.clsname in self._CONST.NOTEHEAD_CLASS_NAMES]
         if ignore_nonstaff:
             self.noteheads = [c for c in self.noteheads
-                              if graph.has_child(c, ['staff'])]
+                              if graph.has_children(c, ['staff'])]
 
         self.staff_to_noteheads_map = collections.defaultdict(list)
         for n in self.noteheads:
@@ -898,7 +888,7 @@ class PitchInferenceEngine(object):
 
     def __warning_or_error(self, message):
         if self.strategy.permissive:
-            logging.warn(message)
+            logging.warning(message)
         else:
             raise ValueError(message)
 
@@ -974,12 +964,12 @@ class OnsetsInferenceEngine(object):
             InferenceEngineConstants.FLAGS_AND_BEAMS)
 
         if notehead.clsname.startswith('grace-notehead'):
-            logging.warn('Notehead {0}: Grace notes get zero duration!'
+            logging.warning('Notehead {0}: Grace notes get zero duration!'
                          ''.format(notehead.uid))
             beat = [0]
 
         elif len(stems) > 1:
-            logging.warn('Inferring duration for multi-stem notehead: {0}'
+            logging.warning('Inferring duration for multi-stem notehead: {0}'
                          ''.format(notehead.uid))
             beat = self.process_multistem_notehead(notehead)
             if len(beat) > 1:
@@ -1063,15 +1053,15 @@ class OnsetsInferenceEngine(object):
                 # or 8 / 7 (7 32nds in a beat).
                 # In the same vein, we cannot resolve higher
                 # tuples unless we establish precedence/simultaneity.
-                logging.warn('Cannot really deal with higher tuples than 6.')
+                logging.warning('Cannot really deal with higher tuples than 6.')
                 # For MUSCIMA++ specifically, we can cheat: there is only one
                 # septuple, which consists of 7 x 32rd in 1 beat, so they
                 # get 8 / 7.
-                logging.warn('MUSCIMA++ cheat: we know there is only 7 x 32rd in 1 beat'
+                logging.warning('MUSCIMA++ cheat: we know there is only 7 x 32rd in 1 beat'
                              ' in page 14.')
                 duration_modifier = 8 / 7
             elif tuple_number == 10:
-                logging.warn('MUSCIMA++ cheat: we know there is only 10 x 32rd in 1 beat'
+                logging.warning('MUSCIMA++ cheat: we know there is only 10 x 32rd in 1 beat'
                              ' in page 04.')
                 duration_modifier = 4 / 5
             else:
@@ -1160,7 +1150,7 @@ class OnsetsInferenceEngine(object):
         graph = NotationGraph(list(self._cdict.values()))
 
         # Find current time signature
-        staffs = graph.children(cropobject, classes=[_CONST.STAFF_CLASS_NAME])
+        staffs = graph.children(cropobject, class_filter=[_CONST.STAFF_CLASS_NAME])
 
         if len(staffs) == 0:
             logging.warning('Interpreting object {0} as measure-lasting, but'
@@ -1178,7 +1168,7 @@ class OnsetsInferenceEngine(object):
         logging.info('Found staffs: {0}'.format([s.uid for s in staffs]))
 
         staff = staffs[0]
-        time_signatures = graph.ancestors(staff, classes=_CONST.TIME_SIGNATURES)
+        time_signatures = graph.ancestors(staff, class_filter=_CONST.TIME_SIGNATURES)
 
         logging.info('Time signatures: {0}'.format([t.uid for t in time_signatures]))
 
@@ -2204,7 +2194,7 @@ class OnsetsInferenceEngine(object):
 
     def __warning_or_error(self, message):
         if self.strategy.permissive:
-            logging.warn(message)
+            logging.warning(message)
         else:
             raise ValueError(message)
 
@@ -2221,7 +2211,7 @@ class OnsetsInferenceEngine(object):
         g = NotationGraph(nodes=cropobjects)
 
         def _get_tie_notes(_tie, graph):
-            notes = graph.parents(_tie, classes=['noteheadFull', 'notehead-empty'])
+            notes = graph.parents(_tie, class_filter=['noteheadFull', 'notehead-empty'])
             if len(notes) == 0:
                 raise NotationGraphError('No notes from tie {0}'.format(_tie.uid))
             if len(notes) == 1:
@@ -2247,7 +2237,7 @@ class OnsetsInferenceEngine(object):
         # the new onsets dict by the time we process the note on the left
         # of the leftward tie (its predecessor).
         for k in sorted(onsets, key=lambda x: onsets[x], reverse=True):
-            ties = g.children(k, classes=['tie'])
+            ties = g.children(k, class_filter=['tie'])
             if len(ties) == 0:
                 continue
 
@@ -2438,7 +2428,7 @@ def play_midi(midi,
     with open(tmp_midi_path, 'wb') as hdl:
         midi.writeFile(hdl)
     if not os.path.isfile(tmp_midi_path):
-        logging.warn('Could not write MIDI data to temp file {0}!'.format(tmp_midi_path))
+        logging.warning('Could not write MIDI data to temp file {0}!'.format(tmp_midi_path))
         return
 
     fs = FluidSynth(soundfont)
