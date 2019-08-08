@@ -117,14 +117,14 @@ Individual elements of a ``<Node>``
   below.
 * ``<Inlinks>``: whitespace-separate ``id`` list, representing Nodes
   **from** which a relationship leads to this Node. (Relationships are
-  directed edges, forming a directed graph of Nodes.) The objids are
+  directed edges, forming a directed graph of Nodes.) The ids are
   valid in the same scope as the Node's ``id``: don't mix
   Nodes from multiple scopes (e.g., multiple documents)!
   If you are using Nodes from multiple documents at the same
   time, make sure to check against the ``unique_id``s.
 * ``<Outlinks>``: whitespace-separate ``id`` list, representing Nodes
   **to** which a relationship leads to this Node. (Relationships are
-  directed edges, forming a directed graph of Nodes.) The objids are
+  directed edges, forming a directed graph of Nodes.) The ids are
   valid in the same scope as the Node's ``id``: don't mix
   Nodes from multiple scopes (e.g., multiple documents)!
   If you are using Nodes from multiple documents at the same
@@ -170,7 +170,7 @@ This is what a single NodeClass element might look like::
         <Name>notehead-empty</Name>
         <GroupName>note-primitive/notehead-empty</GroupName>
         <Color>#FF7566</Color>
-        </NodeClass>
+    </NodeClass>
 
 See e.g. ``test/test_data/mff-muscima-classes-annot.xml``,
 which is incidentally the real NodeClass list used
@@ -342,40 +342,39 @@ def read_nodes_from_file(filename: str) -> List[Node]:
     return nodes
 
 
-def validate_nodes_graph_structure(nodes: List[Node]):
+def validate_nodes_graph_structure(nodes: List[Node]) -> bool:
     """Check that the graph defined by the ``inlinks`` and ``outlinks``
-    in the given list of CropObjects is valid: no relationships
+    in the given list of Nodes is valid: no relationships
     leading from or to objects with non-existent ``id``s.
 
-    Can deal with ``cropobjects`` coming from a combination
-    of documents, through the CropObject ``document`` property.
+    Can deal with ``Nodes`` coming from a combination
+    of documents, through the Node ``document`` property.
     Warns about documents which are found inconsistent.
 
-    :param nodes: A list of :class:`CropObject` instances.
+    :param nodes: A list of :class:`Node` instances.
 
     :returns: ``True`` if graph is valid, ``False`` otherwise.
     """
     # Split into lists by document
-    cropobjects_by_doc = collections.defaultdict(list)
-    for c in nodes:
-        cropobjects_by_doc[c.document].append(c)
+    nodes_by_document = collections.defaultdict(list)
+    for node in nodes:
+        nodes_by_document[node.document].append(node)
 
     is_valid = True
-    for doc, doc_cropobjects in list(cropobjects_by_doc.items()):
-        doc_is_valid = validate_document_graph_structure(doc_cropobjects)
-        if not doc_is_valid:
-            logging.warning('Document {0} has invalid cropobject graph!'
-                            ''.format(doc))
+    for doc, document_nodes in list(nodes_by_document.items()):
+        document_is_valid = validate_document_graph_structure(document_nodes)
+        if not document_is_valid:
+            logging.warning('Document {0} has invalid Node graph!'.format(doc))
             is_valid = False
     return is_valid
 
 
 def validate_document_graph_structure(nodes: List[Node]) -> bool:
     """Check that the graph defined by the ``inlinks`` and ``outlinks``
-    in the given list of CropObjects is valid: no relationships
+    in the given list of Nodes is valid: no relationships
     leading from or to objects with non-existent ``id``s.
 
-    Checks that all the CropObjects come from one document. (Raises
+    Checks that all the Nodes come from one document. (Raises
     a ``ValueError`` otherwise.)
 
     :param nodes: A list of :class:`Node` instances.
@@ -384,7 +383,7 @@ def validate_document_graph_structure(nodes: List[Node]) -> bool:
     """
     docs = [node.document for node in nodes]
     if len(set(docs)) != 1:
-        raise ValueError('Got CropObjects from multiple documents!')
+        raise ValueError('Got Nodes from multiple documents!')
 
     is_valid = True
     node_ids = frozenset([node.id for node in nodes])
@@ -392,7 +391,7 @@ def validate_document_graph_structure(nodes: List[Node]) -> bool:
         inlinks = c.inlinks
         for i in inlinks:
             if i not in node_ids:
-                logging.warning('Invalid graph structure in CropObjectList:'
+                logging.warning('Invalid graph structure in NodeList:'
                                 ' object {0} has inlink from non-existent'
                                 ' object {1}'.format(c, i))
                 is_valid = False
@@ -400,7 +399,7 @@ def validate_document_graph_structure(nodes: List[Node]) -> bool:
         outlinks = c.outlinks
         for o in outlinks:
             if o not in node_ids:
-                logging.warning('Invalid graph structure in CropObjectList:'
+                logging.warning('Invalid graph structure in NodeList:'
                                 ' object {0} has outlink to non-existent'
                                 ' object {1}'.format(c, o))
                 is_valid = False
@@ -408,19 +407,19 @@ def validate_document_graph_structure(nodes: List[Node]) -> bool:
     return is_valid
 
 
-def export_node_graph(nodes:List[Node], validate:bool=True) -> List[Tuple[int,int]]:
-    """Collects the inlink/outlink CropObject graph
+def export_node_graph(nodes: List[Node], validate: bool = True) -> List[Tuple[int, int]]:
+    """Collects the inlink/outlink Node graph
     and returns it as a list of ``(from, to)`` edges.
 
-    :param nodes: A list of CropObject instances.
+    :param nodes: A list of Node instances.
         All are expected to be within one document.
 
     :param validate: If set, will raise a ValueError
-        if the graph defined by the CropObjects is
+        if the graph defined by the Nodes is
         invalid.
 
     :returns: A list of ``(from, to)`` id pairs
-        that represent edges in the CropObject graph.
+        that represent edges in the Node graph.
     """
     if validate:
         validate_nodes_graph_structure(nodes)
@@ -432,8 +431,8 @@ def export_node_graph(nodes:List[Node], validate:bool=True) -> List[Tuple[int,in
     return edges
 
 
-def export_node_list(nodes:List[Node], document:str=None, dataset:str=None) -> str:
-    """Writes the CropObject data as a XML string. Does not write
+def export_node_list(nodes: List[Node], document: str = None, dataset: str = None) -> str:
+    """Writes the Node data as a XML string. Does not write
     to a file -- use ``with open(output_file) as out_stream:`` etc.
 
     """
@@ -445,7 +444,7 @@ def export_node_list(nodes:List[Node], document:str=None, dataset:str=None) -> s
     lines.append('<Nodes dataset={0} document={1}'
                  ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
                  ' xmlns:xsd="http://www.w3.org/2001/XMLSchema"'
-                 ' xsi:noNamespaceSchemaLocation="CVC-MUSCIMA_Schema.xsd">'.format(dataset,document))
+                 ' xsi:noNamespaceSchemaLocation="CVC-MUSCIMA_Schema.xsd">'.format(dataset, document))
     lines.append(nodes_string)
     lines.append('</Nodes>')
     return '\n'.join(lines)
@@ -454,7 +453,7 @@ def export_node_list(nodes:List[Node], document:str=None, dataset:str=None) -> s
 ##############################################################################
 # Parsing NodeClass lists, mostly for grammars.
 
-def parse_node_classes(filename:str) -> List[NodeClass]:
+def parse_node_classes(filename: str) -> List[NodeClass]:
     """ Extract the list of :class:`NodeClass` objects from
         an xml file with a NodeClasses as the top element and NodeClass children.
     """
@@ -472,8 +471,8 @@ def parse_node_classes(filename:str) -> List[NodeClass]:
     return node_classes
 
 
-def export_nodeclass_list(node_classes:List[NodeClass]) -> str:
-    """Writes the CropObject data as a XML string. Does not write
+def export_nodeclass_list(node_classes: List[NodeClass]) -> str:
+    """Writes the Node data as a XML string. Does not write
     to a file -- use ``with open(output_file) as out_stream:`` etc.
     """
     # This is the data string, the rest is formalities

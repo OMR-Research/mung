@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """The script ``add_staffline_symbols.py`` takes as input a CVC-MUSCIMA
 (page, writer) index and a corresponding CropObjectList file
 and adds to the CropObjectList staffline and staff objects."""
@@ -12,67 +11,14 @@ import numpy
 from skimage.io import imread
 from skimage.morphology import watershed
 from skimage.filters import gaussian
+from typing import Tuple
 
 from mung.dataset import CvcMuscimaDataset
 from mung.io import read_nodes_from_file, export_node_list
 from mung.node import Node
 from mung.utils import compute_connected_components
 
-
-STAFFLINE_CLSNAME = 'staff_line'
-STAFFSPACE_CLSNAME = 'staff_space'
-STAFF_CLSNAME = 'staff'
-
-#
-# def connected_components2bboxes(labels):
-#     """Returns a dictionary of bounding boxes (upper left c., lower right c.)
-#     for each label.
-#
-#     >>> labels = [[0, 0, 1, 1], [2, 0, 0, 1], [2, 0, 0, 0], [0, 0, 3, 3]]
-#     >>> bboxes = connected_components2bboxes(labels)
-#     >>> bboxes[0]
-#     [0, 0, 4, 4]
-#     >>> bboxes[1]
-#     [0, 2, 2, 4]
-#     >>> bboxes[2]
-#     [1, 0, 3, 1]
-#     >>> bboxes[3]
-#     [3, 2, 4, 4]
-#
-#
-#     :param labels: The output of cv2.connectedComponents().
-#
-#     :returns: A dict indexed by labels. The values are quadruplets
-#         (xmin, ymin, xmax, ymax) so that the component with the given label
-#         lies exactly within labels[xmin:xmax, ymin:ymax].
-#     """
-#     bboxes = {}
-#     for x, row in enumerate(labels):
-#         for y, l in enumerate(row):
-#             if l not in bboxes:
-#                 bboxes[l] = [x, y, x+1, y+1]
-#             else:
-#                 box = bboxes[l]
-#                 if x < box[0]:
-#                     box[0] = x
-#                 elif x + 1 > box[2]:
-#                     box[2] = x + 1
-#                 if y < box[1]:
-#                     box[1] = y
-#                 elif y + 1 > box[3]:
-#                     box[3] = y + 1
-#     return bboxes
-#
-#
-# def compute_connected_components(image):
-#     labels = label(image, background=0)
-#     cc = int(labels.max())
-#     bboxes = connected_components2bboxes(labels)
-#     return cc, labels, bboxes
-#
-
-##############################################################################
-
+from mung.constants import InferenceEngineConstants as _CONST
 
 def build_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__, add_help=True,
@@ -257,7 +203,7 @@ def main(args):
         logging.info('Creating cropobjects...')
         cropobjects = read_nodes_from_file(args.annot)
         logging.info('Non-staffline cropobjects: {0}'.format(len(cropobjects)))
-        next_objid = max([c.objid for c in cropobjects]) + 1
+        next_objid = max([c.id for c in cropobjects]) + 1
         dataset = cropobjects[0].dataset
         document = cropobjects[0].document
 
@@ -266,7 +212,7 @@ def main(args):
     for sl_bb, sl_m in zip(staffline_bboxes, staffline_masks):
         t, l, b, r = sl_bb
         c = Node(id_=next_objid,
-                 class_name=STAFFLINE_CLSNAME,
+                 class_name=_CONST.STAFFLINE_CLASS_NAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=sl_m,
                  dataset=dataset, document=document)
@@ -280,7 +226,7 @@ def main(args):
         for s_bb, s_m in zip(staff_bboxes, staff_masks):
             t, l, b, r = s_bb
             c = Node(id_=next_objid,
-                     class_name=STAFF_CLSNAME,
+                     class_name=_CONST.STAFF_CLASS_NAME,
                      top=t, left=l, height=b - t, width=r - l,
                      mask=s_m,
                      dataset=dataset, document=document)
@@ -333,8 +279,8 @@ def main(args):
                 # of the top staffline is above the bottom of the bottom
                 # staffline. This may not hold in very weird situations,
                 # but it's good for now.
-                logging.debug(s1.bounding_box, s1.__mask.shape)
-                logging.debug(s2.bounding_box, s2.__mask.shape)
+                logging.debug(s1.bounding_box, s1.mask.shape)
+                logging.debug(s2.bounding_box, s2.mask.shape)
                 logging.debug(canvas.shape)
                 logging.debug('l={0}, dl1={1}, dl2={2}, r={3}, dr1={4}, dr2={5}'
                               ''.format(l, dl1, dl2, r, dr1, dr2))
@@ -353,10 +299,10 @@ def main(args):
                 # that intersect with the staffspace bounding box, in terms
                 # of the staffline bounding box.
                 s1_t, s1_l, s1_b, s1_r = 0, dl1, \
-                                         s1.__height, s1.__width - dr1
+                                         s1.height, s1.width - dr1
                 s1_h, s1_w = s1_b - s1_t, s1_r - s1_l
-                s2_t, s2_l, s2_b, s2_r = canvas.shape[0] - s2.__height, dl2, \
-                                         canvas.shape[0], s2.__width - dr2
+                s2_t, s2_l, s2_b, s2_r = canvas.shape[0] - s2.height, dl2, \
+                                         canvas.shape[0], s2.width - dr2
                 s2_h, s2_w = s2_b - s2_t, s2_r - s2_l
 
                 logging.debug(s1_t, s1_l, s1_b, s1_r, (s1_h, s1_w))
@@ -364,15 +310,15 @@ def main(args):
                 # We now take the intersection of s1_below and s2_above.
                 # If there is empty space in the middle, we fill it in.
                 staffspace_mask = numpy.ones(canvas.shape)
-                staffspace_mask[s1_t:s1_b, :] -= (1 - s1_below[:, dl1:s1.__width - dr1])
-                staffspace_mask[s2_t:s2_b, :] -= (1 - s2_above[:, dl2:s2.__width - dr2])
+                staffspace_mask[s1_t:s1_b, :] -= (1 - s1_below[:, dl1:s1.width - dr1])
+                staffspace_mask[s2_t:s2_b, :] -= (1 - s2_above[:, dl2:s2.width - dr2])
 
                 ss_top = s1.top
                 ss_bottom = s2.bottom
                 ss_left = l
                 ss_right = r
 
-                staffspace = Node(next_objid, STAFFSPACE_CLSNAME,
+                staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
                                   top=ss_top, left=ss_left,
                                   height=ss_bottom - ss_top,
                                   width=ss_right - ss_left,
@@ -394,21 +340,21 @@ def main(args):
 
             # Upper staffspace
             tsl = sorted_stafflines[0]
-            tsl_heights = tsl.__mask.sum(axis=0)
+            tsl_heights = tsl.mask.sum(axis=0)
             tss = current_staffspace_cropobjects[0]
-            tss_heights = tss.__mask.sum(axis=0)
+            tss_heights = tss.mask.sum(axis=0)
 
             uss_top = max(0, tss.top - max(tss_heights))
             uss_left = tss.left
-            uss_width = tss.__width
+            uss_width = tss.width
             # We use 1.5, so that large noteheads
             # do not "hang out" of the staffspace.
-            uss_height = int(tss.__height / 1.2)
+            uss_height = int(tss.height / 1.2)
             # Shift because of height downscaling:
-            uss_top += tss.__height - uss_height
-            uss_mask = tss.__mask[:uss_height, :] * 1
+            uss_top += tss.height - uss_height
+            uss_mask = tss.mask[:uss_height, :] * 1
 
-            staffspace = Node(next_objid, STAFFSPACE_CLSNAME,
+            staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
                               top=uss_top, left=uss_left,
                               height=uss_height,
                               width=uss_width,
@@ -421,17 +367,17 @@ def main(args):
 
             # Lower staffspace
             bss = current_staffspace_cropobjects[-1]
-            bss_heights = bss.__mask.sum(axis=0)
+            bss_heights = bss.mask.sum(axis=0)
             bsl = sorted_stafflines[-1]
-            bsl_heights = bsl.__mask.sum(axis=0)
+            bsl_heights = bsl.mask.sum(axis=0)
 
             lss_top = bss.bottom # + max(bsl_heights)
             lss_left = bss.left
-            lss_width = bss.__width
-            lss_height = int(bss.__height / 1.2)
-            lss_mask = bss.__mask[:lss_height, :] * 1
+            lss_width = bss.width
+            lss_height = int(bss.height / 1.2)
+            lss_mask = bss.mask[:lss_height, :] * 1
 
-            staffspace = Node(next_objid, STAFFSPACE_CLSNAME,
+            staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
                               top=lss_top, left=lss_left,
                               height=lss_height,
                               width=lss_width,
@@ -471,7 +417,7 @@ def main(args):
                     ''.format(_end_time - _start_time))
 
 
-def staffline_surroundings_mask(staffline_cropobject):
+def staffline_surroundings_mask(staffline: Node) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """Find the parts of the staffline's bounding box which lie
     above or below the actual staffline.
 
@@ -480,14 +426,14 @@ def staffline_surroundings_mask(staffline_cropobject):
     """
     # We segment both masks into "above staffline" and "below staffline"
     # areas.
-    elevation = staffline_cropobject.mask * 255
+    elevation = staffline.mask * 255
     # Blur, to plug small holes somewhat:
     elevation = gaussian(elevation, sigma=1.0)
     # Prepare the segmentation markers: 1 is ABOVE, 2 is BELOW
-    markers = numpy.zeros(staffline_cropobject.mask.shape)
+    markers = numpy.zeros(staffline.mask.shape)
     markers[0, :] = 1
     markers[-1, :] = 2
-    markers[staffline_cropobject.mask != 0] = 0
+    markers[staffline.mask != 0] = 0
     seg = watershed(elevation, markers)
 
     bmask = numpy.ones(seg.shape)

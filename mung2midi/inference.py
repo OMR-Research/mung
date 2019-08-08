@@ -713,7 +713,7 @@ class PitchInferenceEngine(object):
                     #         < _CONST.ON_STAFFLINE_RATIO_TRHESHOLD:
                     on_leger_line = False
 
-                # Notehead interlaced with leger line, ledger line on top
+                # Notehead interlaced with leger line, leger line on top
                 elif closest_ll.top <= notehead.top <= closest_ll.bottom < notehead.bottom:
                     # dtop = max(closest_ll.bottom - notehead.top, 1)
                     # dbottom = notehead.bottom - closest_ll.bottom

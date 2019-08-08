@@ -1,7 +1,11 @@
-"""This module implements a class that..."""
 import collections
 import copy
+
+from typing import List, Dict, Tuple, Iterable, Any
+
 from mung.constants import InferenceEngineConstants as _CONST
+from mung.graph import NotationGraph
+from mung.node import Node
 
 
 class MungMatcher(object):
@@ -11,11 +15,7 @@ class MungMatcher(object):
     It relies on the semantics being present.
     """
 
-    def __init__(self):
-        """Initialize MungMatcher."""
-        pass
-
-    def run(self, g1, g2):
+    def run(self, g1: NotationGraph, g2: NotationGraph):
         """Runs the MuNG graph matching algorithm.
 
         Assumes noteheads have pitches, durations and onsets filled in.
@@ -52,7 +52,8 @@ class MungMatcher(object):
 
         return partial_matching
 
-    def grow_iteration(self, g1, g2, matching):
+    def grow_iteration(self, g1: NotationGraph, g2: NotationGraph, matching: Dict[Tuple[int, int], float]) -> \
+            Dict[Tuple[int, int], float]:
         """One iteration of graph isomorphism growing.
         Algorithm:
 
@@ -76,8 +77,8 @@ class MungMatcher(object):
         # TODO: factorize compatibility sets by object class!
         anchor_mapping_1_to_2 = {k[0]: k[1] for k in matching.keys()}
 
-        csigs_1 = self.compute_connectivity_signatures(g1, anchors=[k[0] for k in matching.keys()])
-        csigs_2 = self.compute_connectivity_signatures(g2, anchors=[k[1] for k in matching.keys()])
+        csigs_1 = self.compute_connectivity_signatures(g1, anchors=[g1[k[0]] for k in matching.keys()])
+        csigs_2 = self.compute_connectivity_signatures(g2, anchors=[g2[k[1]] for k in matching.keys()])
 
         # csigs contains for each vertex with a non-empty connectivity signature
         # to the current anchors the list of anchor point outlinks and inlinks.
@@ -122,22 +123,17 @@ class MungMatcher(object):
         # larger than one.
         for csig_2 in compatible_sets:
             compatible_set_objids = compatible_sets[csig_2]
-            # print('Resolving csig_2={0}: compatible set objids [{1}, {2}]'
-            #       ''.format(csig_2,
-            #                 [o for o in compatible_set_objids[0]],
-            #                 [o for o in compatible_set_objids[1]]))
-            compatible_vertices_1 = [g1._cdict[objid]
-                                         for objid in compatible_set_objids[0]]
-            compatible_vertices_2 = [g2._cdict[objid]
-                                         for objid in compatible_set_objids[1]]
-            cset_matching = self.resolve_compatible_set_matching(compatible_vertices_1,
-                                                                 compatible_vertices_2)
+            compatible_vertices_1 = [g1[node_id]
+                                     for node_id in compatible_set_objids[0]]
+            compatible_vertices_2 = [g2[node_id]
+                                     for node_id in compatible_set_objids[1]]
+            cset_matching = self.resolve_compatible_set_matching(compatible_vertices_1, compatible_vertices_2)
             # Update output matching dict
             output_matching.update(cset_matching)
 
         return output_matching
 
-    def resolve_compatible_set_matching(self, vs1, vs2):
+    def resolve_compatible_set_matching(self, vs1: List[Node], vs2: List[Node]) -> Dict[Tuple[int, int], float]:
         """Given two sets of vertices that have isomorphic
         connectivity signatures, resolves how they should actually
         be matched against each other.
@@ -149,60 +145,56 @@ class MungMatcher(object):
         :return: A matching of these two Node lists. The matching
             is a dict of ``(n1.id, n2.id) --> weight``.
         """
-        # logging.warning('Compatibilityre sets: {0}, {1}. Matching is currently very stupid!'
-        #                 ''.format(vs1, vs2))
         output = {}
 
-        _clsnames = set([c.clsname for c in vs1 + vs2])
+        class_names = set([c.class_name for c in vs1 + vs2])
 
-        ### DEBUG
-        # _suspicious_objids = set(map(int, '469 470 471 472 476 477 491 492 493 494 495 496 497 498 499 500 501 502 503 504 512 513 520 522 599 600 606 608 609 610 619 624 625 626 627 630 631 632 633 634 657 658 659 660 661 662 663 664 665 666 667 668 669 670 671 672 673 674 744 748 751 752 753 754 757 758 759 760 761 762 763 764 767 768 783 785 789 790 793 794 796 803 804 807 828 829 831 833 834 835 836 838'.split()))
-
-        for _clsname in _clsnames:
-            vs1_by_class = [c for c in vs1 if c.clsname == _clsname]
-            vs2_by_class = [c for c in vs2 if c.clsname == _clsname]
-
+        for class_name in class_names:
+            vs1_by_class = [c for c in vs1 if c.class_name == class_name]
+            vs2_by_class = [c for c in vs2 if c.class_name == class_name]
 
             for v1, v2 in zip(sorted(vs1_by_class, key=lambda x: x.top),
                               sorted(vs2_by_class, key=lambda y: y.top)):
-                output[(v1.objid, v2.objid)] = 1.0
+                output[(v1.id, v2.id)] = 1.0
         return output
 
-    def compute_connectivity_signatures(self, g, anchors):
+    def compute_connectivity_signatures(self, g: NotationGraph, anchors: Iterable[Node]) -> \
+            Dict[int, Tuple[Tuple[int, ...], Tuple[int, ...]]]:
         """Computes connectivity signatures for vertices in ``g`` to the given
         ``anchors``.
 
         :returns: Connectivity signature dict: ``v.id --> (inlinks_tuple, outlinks_tuple)``
         """
         output = dict()
-        _anchor_set = set(anchors)
-        for c in g.cropobjects:
-            if c.objid in _anchor_set:
+        anchor_set = set(anchors)
+        for c in g.vertices:
+            if c.id in anchor_set:
                 continue
-            anchor_outlinks = tuple([o for o in c.outlinks if o in _anchor_set])
-            anchor_inlinks = tuple([i for i in c.inlinks if i in _anchor_set])
+            anchor_outlinks = tuple([o for o in c.outlinks if o in anchor_set])
+            anchor_inlinks = tuple([i for i in c.inlinks if i in anchor_set])
             if len(anchor_inlinks) + len(anchor_outlinks) > 0:
                 csig = (anchor_inlinks, anchor_outlinks)
-                output[c.objid] = csig
+                output[c.id] = csig
         return output
 
-    def collect_fully_defined_noteheads(self, graph):
-        return [c for c in graph.cropobjects if self._is_fully_defined_notehead(c)]
+    def collect_fully_defined_noteheads(self, graph: NotationGraph) -> List[Node]:
+        return [c for c in graph.vertices if self.__is_fully_defined_notehead(c)]
 
     @staticmethod
-    def _is_fully_defined_notehead(c):
+    def __is_fully_defined_notehead(node: Node) -> bool:
         isdef = False
-        if (c.clsname in _CONST.NONGRACE_NOTEHEAD_CLASS_NAMES) \
-                and ('onset_beats' in c.data) \
-                and ('midi_pitch_code' in c.data):
+        if (node.class_name in _CONST.NONGRACE_NOTEHEAD_CLASS_NAMES) \
+                and ('onset_beats' in node.data) \
+                and ('midi_pitch_code' in node.data):
             isdef = True
         return isdef
 
     @staticmethod
-    def _notehead_signature(c):
+    def _notehead_signature(c: Node) -> Tuple[Any, Any, Any]:
         return c.data['onset_beats'], c.data['midi_pitch_code'], c.data['duration_beats']
 
-    def match_fully_defined_noteheads(self,  noteheads_1, noteheads_2):
+    def match_fully_defined_noteheads(self, noteheads_1: List[Node], noteheads_2: List[Node]) -> \
+            Dict[Tuple[int, int], float]:
         """Matches two lists of fully defined noteheads. Only matches those
         that exactly share pitch, duration, and onset.
 
@@ -224,8 +216,6 @@ class MungMatcher(object):
             n2 = ns2[j]
             # Make ns2 pointer catch up with the current note
             while onset_1 > n2.data['onset_beats']:
-                # print('onset 1 ({0}) is behind onset 2 ({1}): n1={2}, n2={3}'
-                #       ''.format(onset_1, n2.data['onset_beats'], n1.id, n2.id))
                 j += 1
                 if j >= len(ns2):
                     # We will not match anything anymore: noteheads_2 are exhausted.
@@ -234,31 +224,21 @@ class MungMatcher(object):
 
             if onset_1 == n2.data['onset_beats']:
                 if self._notehead_signature(n1) == self._notehead_signature(n2):
-                    # print('matched signature: {0} in noteheads n1={1}, n2={2}'
-                    #       ''.format(self._notehead_signature(n1), n1.id, n2.id))
-                    output[(n1.objid, n2.objid)] = 1.0
+                    output[(n1.id, n2.id)] = 1.0
                     j += 1
                     continue
-                # else:
-                #     pass# print('matched onset, but not signature: n1={0}, n2={1}'.format(onset_1, n1.id, n2.id))
 
             elif onset_1 < n2.data['onset_beats']:
-                # print('onset 1 ({0}) is ahead of onset 2 ({1}): n1={2}, n2={3}'
-                #       ''.format(onset_1, n2.data['onset_beats'], n1.id, n2.id))
                 continue
 
         return output
 
 
-def show_matching(g1, g2, matching):
-    raise NotImplementedError()
-
-
 if __name__ == '__main__':
-
     import os
     from mung.io import read_nodes_from_file
-    from mung.graph import NotationGraph
+    from mung.graph import NotationGraph, NotationGraph, NotationGraph, NotationGraph
+
     test_data_root = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                   '..', 'test',
                                   'test_data',

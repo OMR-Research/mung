@@ -21,8 +21,8 @@ from mung2midi.inference import OnsetsInferenceEngine, MIDIBuilder, PitchInferen
 from mung.constants import InferenceEngineConstants as _CONST
 from mung.io import parse_node_classes, read_nodes_from_file, export_node_list
 from mung.node import bounding_box_intersection, merge_multiple_nodes, link_nodes, Node
-from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, \
-    build_staffspace_cropobjects, \
+from mung.stafflines import merge_staffline_segments, build_staff_nodes, \
+    build_staffspace_nodes, \
     add_staff_relationships
 
 
@@ -997,7 +997,7 @@ def process_stafflines(cropobjects,
 
     try:
         if do_build_staffs:
-            staffs = build_staff_cropobjects(new_cropobjects)
+            staffs = build_staff_nodes(new_cropobjects)
             new_cropobjects = new_cropobjects + staffs
     except Exception as e:
         logging.warning('Building staffline cropobjects from merged segments failed:'
@@ -1006,7 +1006,7 @@ def process_stafflines(cropobjects,
 
     try:
         if do_build_staffspaces:
-            staffspaces = build_staffspace_cropobjects(new_cropobjects)
+            staffspaces = build_staffspace_nodes(new_cropobjects)
             new_cropobjects = new_cropobjects + staffspaces
     except Exception as e:
         logging.warning('Building staffspace cropobjects from stafflines failed:'

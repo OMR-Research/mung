@@ -266,11 +266,6 @@ def add_staff_relationships(nodes: List[Node],
                 raise ValueError('Really weird notehead overlapping more than 2 stafflines:'
                                  ' {0}'.format(c.uid))
 
-    ##########################################################################
-    logging.info('Attaching clefs to stafflines [NOT IMPLEMENTED].')
-    clefs = [c for c in nodes if c.clsname in ['g-clef', 'c-clef', 'f-clef']]
-
-    ##########################################################################
     return nodes
 
 

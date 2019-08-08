@@ -243,11 +243,11 @@ class Node(object):
 
         if inlinks is None:
             inlinks = []
-        self.inlinks = inlinks
+        self.inlinks = inlinks  # type: List[int]
 
         if outlinks is None:
             outlinks = []
-        self.outlinks = outlinks
+        self.outlinks = outlinks  # type: List[int]
 
         if dataset is None:
             dataset = self.DEFAULT_DATASET

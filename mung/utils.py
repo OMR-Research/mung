@@ -7,7 +7,7 @@ from typing import Tuple, Dict, Any, List
 from mung.constants import InferenceEngineConstants as _CONST
 
 
-def connected_components2bboxes(labels):
+def connected_components2bboxes(labels: List[List[int]]) -> Dict[int, List[int]]:
     """Returns a dictionary of bounding boxes (upper left c., lower right c.)
     for each label.
 
@@ -54,81 +54,3 @@ def compute_connected_components(image: numpy.ndarray) -> \
     bboxes = connected_components2bboxes(labels)
     return number_of_connected_components, labels, bboxes
 
-
-def resolve_notehead_wrt_staffline(notehead, staffline_or_leger_line):
-    """Resolves the relative vertical position of the notehead with respect
-    to the given staff_line or legerLine object. Returns -1 if notehead
-    is *below* staffline, 0 if notehead is *on* staffline, and 1 if notehead
-    is *above* staffline."""
-    ll = staffline_or_leger_line
-
-    # Determining whether the notehead is on a leger
-    # line or in the adjacent temp staffspace.
-    # This uses a magic number, ON_STAFFLINE_RATIO_THRESHOLD.
-    output_position = 0
-
-    ### DEBUG!!!
-    dtop, dbottom = 1, 1
-
-    # Weird situation with notehead vertically *inside* bbox
-    # of leger line (could happen with slanted LLs and very small
-    # noteheads).
-    if ll.top <= notehead.top <= notehead.bottom <= ll.bottom:
-        output_position = 0
-
-    # No vertical overlap between LL and notehead
-    elif ll.top > notehead.bottom:
-        output_position = 1
-    elif notehead.top > ll.bottom:
-        output_position = -1
-
-    # Complicated situations: overlap
-    else:
-        # Notehead "around" leger line.
-        if notehead.top < ll.top <= ll.bottom < notehead.bottom:
-            dtop = ll.top - notehead.top
-            dbottom = notehead.bottom - ll.bottom
-
-            if min(dtop, dbottom) / max(dtop, dbottom) \
-                    < _CONST.ON_STAFFLINE_RATIO_THRESHOLD:
-                if dtop > dbottom:
-                    output_position = 1
-                else:
-                    output_position = -1
-
-        # Notehead interlaced with leger line, notehead on top
-        elif notehead.top < ll.top <= notehead.bottom <= ll.bottom:
-            # dtop = closest_ll.top - notehead.top
-            # dbottom = max(notehead.bottom - closest_ll.top, 1)
-            # if float(dbottom) / float(dtop) \
-            #         < InferenceEngineConstants.ON_STAFFLINE_RATIO_TRHESHOLD:
-            output_position = 1
-
-        # Notehead interlaced with leger line, ledger line on top
-        elif ll.top <= notehead.top <= ll.bottom < notehead.bottom:
-            # dtop = max(closest_ll.bottom - notehead.top, 1)
-            # dbottom = notehead.bottom - closest_ll.bottom
-            # if float(dtop) / float(dbottom) \
-            #         < InferenceEngineConstants.ON_STAFFLINE_RATIO_TRHESHOLD:
-            output_position = -1
-
-        else:
-            logging.warning('Strange notehead {0} vs. leger line {1}'
-                         ' situation: bbox notehead {2}, LL {3}.'
-                         ' Note that the output position is unusable;'
-                         ' pleasre re-do this attachment manually.'
-                         ''.format(notehead.uid, ll.uid,
-                                   notehead.bounding_box,
-                                   ll.bounding_box))
-    return output_position
-
-
-def is_notehead_on_line(notehead, line_obj):
-    """Check whether given notehead is positioned on the line object."""
-    if line_obj.clsname not in _CONST.STAFFLINE_LIKE_CLASS_NAMES:
-        raise ValueError('Cannot resolve relative position of notehead'
-                         ' {0} to non-staffline-like object {1}'
-                         ''.format(notehead.uid, line_obj.uid))
-
-    position = resolve_notehead_wrt_staffline(notehead, line_obj)
-    return position == 0
