@@ -22,8 +22,8 @@ from typing import Optional
 
 def _get_cvc_muscima_root() -> Optional[str]:
     if 'CVC_MUSCIMA_ROOT' in os.environ:
-        CVC_MUSCIMA_ROOT = os.environ['CVC_MUSCIMA_ROOT']
-        return CVC_MUSCIMA_ROOT
+        cvc_muscima_root = os.environ['CVC_MUSCIMA_ROOT']
+        return cvc_muscima_root
     else:
         logging.info('muscima.dataset: environmental variable CVC_MUSCIMA_ROOT not defined.')
         return None
@@ -37,8 +37,8 @@ CVC_MUSCIMA_ROOT = _get_cvc_muscima_root()
 
 def _get_mff_muscima_root() -> Optional[str]:
     if 'MUSCIMA_PLUSPLUS_ROOT' in os.environ:
-        MUSCIMA_PLUSPLUS_ROOT = os.environ['MUSCIMA_PLUSPLUS_ROOT']
-        return MUSCIMA_PLUSPLUS_ROOT
+        muscima_plusplus_root = os.environ['MUSCIMA_PLUSPLUS_ROOT']
+        return muscima_plusplus_root
     else:
         logging.info('muscima.dataset: environmental variable MUSCIMA_PLUSPLUS_ROOT not defined.')
         return None

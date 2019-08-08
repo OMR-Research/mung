@@ -1,7 +1,7 @@
 """This module implements a class that..."""
 import collections
 import copy
-from mung.inference.constants import InferenceEngineConstants as _CONST
+from mung.constants import InferenceEngineConstants as _CONST
 
 
 class MungMatcher(object):

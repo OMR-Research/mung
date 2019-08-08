@@ -10,7 +10,7 @@ import time
 
 from typing import List
 
-from mung.inference.constants import InferenceEngineConstants as _CONST
+from mung.constants import InferenceEngineConstants as _CONST
 from mung.io import read_nodes_from_file, export_node_list
 from mung.node import link_nodes, Node
 

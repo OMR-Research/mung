@@ -29,7 +29,7 @@ import pprint
 
 import collections
 
-from typing import Tuple, List, Any, Set, Dict
+from typing import Tuple, List, Set, Dict
 
 
 class DependencyGrammarParseError(ValueError):
@@ -208,7 +208,8 @@ class DependencyGrammar(object):
     [('noteheadFull', 'stem'), ('noteheadFullSmall', 'stem'), ('noteheadHalf', 'stem'), ('noteheadHalfSmall', 'stem'), ('noteheadWhole', 'stem')]
     >>> outlink_cards['noteheadHalf'] == {'stem': (0, 2)}
     True
-    >>> inlink_cards['stem'] == {'noteheadHalf': (0, 10000), 'noteheadFull': (0, 10000), 'noteheadWhole': (0, 10000), 'noteheadFullSmall': (0, 10000), 'noteheadHalfSmall': (0, 10000)}
+    >>> inlink_cards['stem'] == {'noteheadHalf': (0, 10000), 'noteheadFull': (0, 10000),
+    ...    'noteheadWhole': (0, 10000), 'noteheadFullSmall': (0, 10000), 'noteheadHalfSmall': (0, 10000)}
     True
 
 

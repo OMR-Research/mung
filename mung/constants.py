@@ -2,8 +2,6 @@
 duration and onset inference algorithm."""
 import operator
 
-from typing import List
-
 
 class InferenceEngineConstants(object):
     """This class stores the constants used for pitch inference."""
@@ -51,7 +49,6 @@ class InferenceEngineConstants(object):
         'noteheadFullSmall',
         'noteheadHalfSmall',
     }
-
 
     NONGRACE_NOTEHEAD_CLASS_NAMES = {
         'noteheadFull',
@@ -158,7 +155,7 @@ class InferenceEngineConstants(object):
             F_CLEF: 6,
         },
         F_CLEF: {
-             G_CLEF: -12,
+            G_CLEF: -12,
             C_CLEF: -6,
             F_CLEF: 0,
         }

@@ -9,7 +9,7 @@ from typing import List, Union, Dict, Set, Tuple, Iterable, Optional
 
 from mung.node import Node
 from mung.utils import resolve_notehead_wrt_staffline
-from mung.inference.constants import InferenceEngineConstants as _CONST
+from mung.constants import InferenceEngineConstants as _CONST
 
 class NotationGraphError(ValueError):
     pass

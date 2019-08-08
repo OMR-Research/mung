@@ -10,15 +10,13 @@ import time
 import numpy
 
 from skimage.io import imread
-from skimage.measure import label
 from skimage.morphology import watershed
 from skimage.filters import gaussian
-import matplotlib.pyplot as plt
 
 from mung.dataset import CvcMuscimaDataset
 from mung.io import read_nodes_from_file, export_node_list
 from mung.node import Node
-from mung.utils import connected_components2bboxes, compute_connected_components
+from mung.utils import compute_connected_components
 
 
 STAFFLINE_CLSNAME = 'staff_line'

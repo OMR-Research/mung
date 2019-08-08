@@ -4,7 +4,7 @@ import numpy
 from skimage.measure import label
 from typing import Tuple, Dict, Any, List
 
-from mung.inference.constants import InferenceEngineConstants as _CONST
+from mung.constants import InferenceEngineConstants as _CONST
 
 
 def connected_components2bboxes(labels):

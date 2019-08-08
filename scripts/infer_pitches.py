@@ -27,7 +27,7 @@ import logging
 import os
 import time
 
-from mung.inference.inference import PitchInferenceEngine, OnsetsInferenceEngine,  MIDIBuilder
+from mung2midi.inference import PitchInferenceEngine, OnsetsInferenceEngine, MIDIBuilder
 from mung.io import read_nodes_from_file, export_node_list
 
 
@@ -64,49 +64,48 @@ def main(args):
     if not os.path.isfile(args.annot):
         raise ValueError('Annotation file {0} not found!'
                          ''.format(args.annot))
-    cropobjects = read_nodes_from_file(args.annot)
+    nodes = read_nodes_from_file(args.annot)
 
     pitch_inference_engine = PitchInferenceEngine()
-    time_inference_engine = OnsetsInferenceEngine(nodes=cropobjects)
+    time_inference_engine = OnsetsInferenceEngine(nodes=nodes)
 
     logging.info('Running pitch inference.')
-    pitches, pitch_names = pitch_inference_engine.infer_pitches(cropobjects,
-                                                                with_names=True)
+    pitches, pitch_names = pitch_inference_engine.infer_pitches(nodes, with_names=True)
 
     # Export
     logging.info('Adding pitch information to <Data> attributes.')
-    for c in cropobjects:
-        if c.objid in pitches:
-            midi_pitch_code = pitches[c.objid]
-            pitch_step, pitch_octave = pitch_names[c.objid]
-            if c.data is None:
-                c.data = dict()
-            c.data['midi_pitch_code'] = midi_pitch_code
-            c.data['normalized_pitch_step'] = pitch_step
-            c.data['pitch_octave'] = pitch_octave
+    for node in nodes:
+        if node.id in pitches:
+            midi_pitch_code = pitches[node.id]
+            pitch_step, pitch_octave = pitch_names[node.id]
+            if node.data is None:
+                node.data = dict()
+            node.data['midi_pitch_code'] = midi_pitch_code
+            node.data['normalized_pitch_step'] = pitch_step
+            node.data['pitch_octave'] = pitch_octave
 
     logging.info('Adding duration info to <Data> attributes.')
-    durations = time_inference_engine.durations(cropobjects)
+    durations = time_inference_engine.durations(nodes)
     logging.info('Total durations: {0}'.format(len(durations)))
-    for c in cropobjects:
-        if c.objid in durations:
-            c.data['duration_beats'] = durations[c.objid]
+    for node in nodes:
+        if node.id in durations:
+            node.data['duration_beats'] = durations[node.id]
 
     logging.info('Some durations: {0}'.format(sorted(durations.items())[:10]))
 
     logging.info('Adding onset info to <Data> attributes.')
-    onsets = time_inference_engine.onsets(cropobjects)
+    onsets = time_inference_engine.onsets(nodes)
     logging.info('Total onsets: {0}'.format(len(onsets)))
-    for c in cropobjects:
-        if c.objid in onsets:
-            c.data['onset_beats'] = onsets[c.objid]
+    for node in nodes:
+        if node.id in onsets:
+            node.data['onset_beats'] = onsets[node.id]
 
     if args.export is not None:
         with open(args.export, 'w') as hdl:
-            hdl.write(export_node_list(cropobjects))
+            hdl.write(export_node_list(nodes))
             hdl.write('\n')
     else:
-        print(export_node_list(cropobjects))
+        print(export_node_list(nodes))
 
     if args.midi is not None:
         midi_builder = MIDIBuilder()
@@ -116,9 +115,6 @@ def main(args):
 
     _end_time = time.clock()
     logging.info('infer_pitches.py done in {0:.3f} s'.format(_end_time - _start_time))
-
-
-##############################################################################
 
 
 if __name__ == '__main__':

@@ -7,7 +7,7 @@ import os
 from typing import List, Dict
 
 from mung.graph import group_staffs_into_systems, NotationGraph, NotationGraphError
-from mung.inference.constants import InferenceEngineConstants as _CONST
+from mung.constants import InferenceEngineConstants as _CONST
 from mung.node import bounding_box_dice_coefficient, Node
 
 

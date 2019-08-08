@@ -1,12 +1,7 @@
-#!/usr/bin/env python
-# -*-coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
+from setuptools import setup
 import io
 import logging
 import os
-import sys
 
 import mung
 
@@ -40,6 +35,7 @@ def get_long_description():
                            ' CHANGES.md not found]'
     return long_description
 
+
 setup(
     name='mung',
     version=mung.__version__,
@@ -72,5 +68,5 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator',
-        ],
+    ],
 )

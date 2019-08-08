@@ -200,7 +200,6 @@ primitives: notehead plus stem plus flags...), and the grammar
 file is a reference for doing that.
 
 """
-import copy
 import logging
 import os
 

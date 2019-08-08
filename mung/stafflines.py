@@ -12,7 +12,7 @@ from skimage.morphology import watershed
 from typing import List
 
 from mung.graph import NotationGraph, find_noteheads_on_staff_linked_to_leger_line
-from mung.inference.constants import InferenceEngineConstants as _CONST
+from mung.constants import InferenceEngineConstants as _CONST
 from mung.node import Node, draw_nodes_on_empty_canvas, link_nodes
 from mung.utils import compute_connected_components
 
