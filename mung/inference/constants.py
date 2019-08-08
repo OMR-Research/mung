@@ -25,12 +25,18 @@ class InferenceEngineConstants(object):
 
     STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, LEGER_LINE_CLASS_NAME]
 
+    G_CLEF = 'gClef'
+    C_CLEF = 'cClef'
+    F_CLEF = 'fClef'
+
     STAFF_RELATED_CLASS_NAMES = {
         'staffGrouping',
         'measureSeparator',
         'keySignature',
         'timeSignature',
-        'gClef', 'cClef', 'fClef',
+        G_CLEF,
+        C_CLEF,
+        F_CLEF
     }
 
     SYSTEM_LEVEL_CLASS_NAMES = {
@@ -54,9 +60,9 @@ class InferenceEngineConstants(object):
     }
 
     CLEF_CLASS_NAMES = {
-        'gClef',
-        'cClef',
-        'fClef',
+        G_CLEF,
+        C_CLEF,
+        F_CLEF
     }
 
     KEY_SIGNATURE_CLASS_NAMES = {
@@ -141,20 +147,20 @@ class InferenceEngineConstants(object):
 
     # FROM clef --> TO clef. Imagine this on inline accidental delta
     CLEF_CHANGE_DELTA = {
-        'gClef': {
-            'gClef': 0,
-            'cClef': 6,
-            'fClef': 12,
+        G_CLEF: {
+            G_CLEF: 0,
+            C_CLEF: 6,
+            F_CLEF: 12,
         },
-        'cClef': {
-            'gClef': -6,
-            'cClef': 0,
-            'fClef': 6,
+        C_CLEF: {
+            G_CLEF: -6,
+            C_CLEF: 0,
+            F_CLEF: 6,
         },
-        'fClef': {
-            'gClef': -12,
-            'cClef': -6,
-            'fClef': 0,
+        F_CLEF: {
+             G_CLEF: -12,
+            C_CLEF: -6,
+            F_CLEF: 0,
         }
     }
 
@@ -246,6 +252,3 @@ class InferenceEngineConstants(object):
         n_str = ''.join([n.clsname[-1]
                          for n in sorted(numerals, key=operator.attrgetter('left'))])
         return int(n_str)
-
-
-_CONST = InferenceEngineConstants()

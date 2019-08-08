@@ -19,8 +19,8 @@ from mung.graph import find_contained_nodes, remove_contained_nodes
 from mung.graph import find_misdirected_leger_line_edges
 from mung.inference.inference import OnsetsInferenceEngine, MIDIBuilder
 from mung.inference.inference import PitchInferenceEngine
-from mung.inference.constants import _CONST
-from mung.io import parse_node_classes, read_nodes_from_file, export_cropobject_list
+from mung.inference.constants import InferenceEngineConstants as _CONST
+from mung.io import parse_node_classes, read_nodes_from_file, export_node_list
 from mung.node import bounding_box_intersection, merge_multiple_nodes, link_nodes, Node
 from mung.stafflines import merge_staffline_segments, build_staff_cropobjects, \
     build_staffspace_cropobjects, \
@@ -954,9 +954,9 @@ class PairwiseClassificationParser(object):
         self.grammar = grammar
 
 
-def do_parse(cropobjects, parser):
+def do_parse(nodes: List[Node], parser):
     # names = [c.class_name for c in cropobjects]
-    non_staff_cropobjects = [c for c in cropobjects
+    non_staff_cropobjects = [c for c in nodes
                              if c.clsname not in \
                              _CONST.STAFF_CROPOBJECT_CLSNAMES]
     edges = parser.parse(non_staff_cropobjects)
@@ -964,15 +964,15 @@ def do_parse(cropobjects, parser):
                  ''.format(len(edges)))
 
     # Add edges
-    _cdict = {c.objid: c for c in cropobjects}
+    id_to_node_mapping = {c.objid: c for c in nodes}
     for f, t in edges:
-        cf, ct = _cdict[f], _cdict[t]
+        cf, ct = id_to_node_mapping[f], id_to_node_mapping[t]
         if t not in cf.outlinks:
             if f not in ct.inlinks:
                 cf.outlinks.append(t)
                 ct.inlinks.append(f)
 
-    return [c for c in list(_cdict.values())]
+    return [c for c in list(id_to_node_mapping.values())]
 
 
 ##############################################################################
@@ -1026,7 +1026,7 @@ def process_stafflines(cropobjects,
 
 
 def find_wrong_edges(nodes: List[Node], grammar):
-    _cdict = {node.id: node for node in nodes}
+    id_to_node_mapping = {node.id: node for node in nodes}
     graph = NotationGraph(nodes)
 
     incoherent_beam_pairs = find_beams_incoherent_with_stems(nodes)
@@ -1037,8 +1037,8 @@ def find_wrong_edges(nodes: List[Node], grammar):
                    for n, b in incoherent_beam_pairs + misdirected_leger_lines]
 
     disallowed_symbol_class_pairs = [(f, t) for f, t in graph.edges
-                                     if not grammar.validate_edge(_cdict[f].clsname,
-                                                                  _cdict[t].clsname)]
+                                     if not grammar.validate_edge(id_to_node_mapping[f].clsname,
+                                                                  id_to_node_mapping[t].clsname)]
     wrong_edges += disallowed_symbol_class_pairs
     return wrong_edges
 
@@ -1061,13 +1061,13 @@ def find_very_small_cropobjects(cropobjects,
 ##############################################################################
 # Precedence edges
 
-def infer_precedence_edges(cropobjects, factor_by_staff=True):
+def infer_precedence_edges(nodes: List[Node], factor_by_staff=True):
     """Returns a list of (from_objid, to_objid) parirs. They
     then need to be added to the cropobjects as precedence edges."""
-    _cdict = {c.objid: c for c in cropobjects}
+    id_to_node_mapping = {c.id: c for c in nodes}
     _relevant_clsnames = set(list(_CONST.NONGRACE_NOTEHEAD_CLSNAMES)
                              + list(_CONST.REST_CLSNAMES))
-    prec_cropobjects = [c for c in cropobjects
+    prec_cropobjects = [c for c in nodes
                         if c.clsname in _relevant_clsnames]
     logging.info('_infer_precedence: {0} total prec. cropobjects'
                  ''.format(len(prec_cropobjects)))
@@ -1075,7 +1075,7 @@ def infer_precedence_edges(cropobjects, factor_by_staff=True):
     # Group the objects according to the staff they are related to
     # and infer precedence on these subgroups.
     if factor_by_staff:
-        staffs = [c for c in cropobjects
+        staffs = [c for c in nodes
                   if c.clsname == _CONST.STAFF_CLSNAME]
         logging.info('_infer_precedence: got {0} staffs'.format(len(staffs)))
         staff_objids = {c.objid: i for i, c in enumerate(staffs)}
@@ -1106,10 +1106,10 @@ def infer_precedence_edges(cropobjects, factor_by_staff=True):
     _stems_to_noteheads_map = collections.defaultdict(list)
     for c in prec_cropobjects:
         for o in c.outlinks:
-            if o not in _cdict:
+            if o not in id_to_node_mapping:
                 logging.warning('Dangling outlink: {} --> {}'.format(c.objid, o))
                 continue
-            c_o = _cdict[o]
+            c_o = id_to_node_mapping[o]
             if c_o.clsname == 'stem':
                 _stems_to_noteheads_map[c_o.objid].append(c.objid)
 
@@ -1123,7 +1123,7 @@ def infer_precedence_edges(cropobjects, factor_by_staff=True):
         if c.objid not in _stemmed_noteheads_objids:
             _prec_equiv_objids.append([c.objid])
 
-    equiv_objs = [[_cdict[objid] for objid in equiv_objids]
+    equiv_objs = [[id_to_node_mapping[objid] for objid in equiv_objids]
                   for equiv_objids in _prec_equiv_objids]
 
     # Order the equivalence classes left to right
@@ -1141,14 +1141,14 @@ def infer_precedence_edges(cropobjects, factor_by_staff=True):
     return edges
 
 
-def add_precedence_edges(cropobjects, edges):
+def add_precedence_edges(nodes: List[Node], edges):
     """Adds precedence edges to CropObjects."""
     # Ensure unique
     edges = set(edges)
-    _cdict = {c.objid: c for c in cropobjects}
+    id_to_node_mapping = {c.objid: c for c in nodes}
 
     for f, t in edges:
-        cf, ct = _cdict[f], _cdict[t]
+        cf, ct = id_to_node_mapping[f], id_to_node_mapping[t]
 
         if cf.data is None:
             cf.data = dict()
@@ -1162,14 +1162,14 @@ def add_precedence_edges(cropobjects, edges):
             ct.data['precedence_inlinks'] = []
         ct.data['precedence_inlinks'].append(f)
 
-    return cropobjects
+    return nodes
 
 
 ##############################################################################
 # Build the MIDI
 
 
-def build_midi(cropobjects, selected_cropobjects=None,
+def build_midi(nodes: List[Node], selected_cropobjects=None,
                retain_pitches=True,
                retain_durations=True,
                retain_onsets=True,
@@ -1186,14 +1186,14 @@ def build_midi(cropobjects, selected_cropobjects=None,
 
     :returns: A single-track ``midiutil.MidiFile.MIDIFile`` object. It can be
         written to a stream using its ``mf.writeFile()`` method."""
-    _cdict = {c.objid: c for c in cropobjects}
+    id_to_node_mapping = {c.objid: c for c in nodes}
 
     pitch_inference_engine = PitchInferenceEngine()
-    time_inference_engine = OnsetsInferenceEngine(cropobjects=list(_cdict.values()))
+    time_inference_engine = OnsetsInferenceEngine(nodes=list(id_to_node_mapping.values()))
 
     try:
         logging.info('Running pitch inference.')
-        pitches, pitch_names = pitch_inference_engine.infer_pitches(list(_cdict.values()),
+        pitches, pitch_names = pitch_inference_engine.infer_pitches(list(id_to_node_mapping.values()),
                                                                     with_names=True)
     except Exception as e:
         logging.warning('Model: Pitch inference failed!')
@@ -1202,7 +1202,7 @@ def build_midi(cropobjects, selected_cropobjects=None,
 
     if retain_pitches:
         for objid in pitches:
-            c = _cdict[objid]
+            c = id_to_node_mapping[objid]
             pitch_step, pitch_octave = pitch_names[objid]
             c.data['midi_pitch_code'] = pitches[objid]
             c.data['normalized_pitch_step'] = pitch_step
@@ -1210,7 +1210,7 @@ def build_midi(cropobjects, selected_cropobjects=None,
 
     try:
         logging.info('Running durations inference.')
-        durations = time_inference_engine.durations(list(_cdict.values()))
+        durations = time_inference_engine.durations(list(id_to_node_mapping.values()))
     except Exception as e:
         logging.warning('Model: Duration inference failed!')
         logging.exception(traceback.format_exc(e))
@@ -1218,12 +1218,12 @@ def build_midi(cropobjects, selected_cropobjects=None,
 
     if retain_durations:
         for objid in durations:
-            c = _cdict[objid]
+            c = id_to_node_mapping[objid]
             c.data['duration_beats'] = durations[objid]
 
     try:
         logging.info('Running onsets inference.')
-        onsets = time_inference_engine.onsets(list(_cdict.values()))
+        onsets = time_inference_engine.onsets(list(id_to_node_mapping.values()))
     except Exception as e:
         logging.warning('Model: Onset inference failed!')
         logging.exception(traceback.format_exc(e))
@@ -1231,16 +1231,16 @@ def build_midi(cropobjects, selected_cropobjects=None,
 
     if retain_onsets:
         for objid in onsets:
-            c = _cdict[objid]
+            c = id_to_node_mapping[objid]
             c.data['onset_beats'] = onsets[objid]
 
     # Process ties
-    durations, onsets = time_inference_engine.process_ties(list(_cdict.values()),
+    durations, onsets = time_inference_engine.process_ties(list(id_to_node_mapping.values()),
                                                            durations, onsets)
 
     # Prepare selection subset
     if selected_cropobjects is None:
-        selected_cropobjects = list(_cdict.values())
+        selected_cropobjects = list(id_to_node_mapping.values())
     selection_objids = [c.objid for c in selected_cropobjects]
 
     # Build the MIDI data
@@ -1378,9 +1378,9 @@ def main(args):
 
     logging.info('Save output')
     docname = os.path.splitext(os.path.basename(args.output_mung))[0]
-    xml = export_cropobject_list(cropobjects,
-                                 docname=docname,
-                                 dataset_name='FNOMR_results')
+    xml = export_node_list(cropobjects,
+                           document=docname,
+                           dataset='FNOMR_results')
     with open(args.output_mung, 'wb') as out_stream:
         out_stream.write(xml)
         out_stream.write('\n')

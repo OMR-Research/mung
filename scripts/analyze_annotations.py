@@ -26,7 +26,7 @@ import time
 
 import operator
 
-from mung.io import read_nodes_from_file, export_cropobject_graph
+from mung.io import read_nodes_from_file, export_node_graph
 from mung.node import merge_node_lists_from_multiple_documents
 
 
@@ -137,7 +137,7 @@ def main(args):
     # at once, without id clashes.
     cropobjects = merge_node_lists_from_multiple_documents(cropobject_lists)
 
-    edges = export_cropobject_graph(cropobjects)
+    edges = export_node_graph(cropobjects)
 
     _parse_end_time = time.clock()
     logging.info('Parsing took {0:.2f} s'.format(_parse_end_time - _start_time))

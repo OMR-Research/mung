@@ -7,7 +7,7 @@ import logging
 import os
 import time
 
-from mung.io import read_nodes_from_file, export_cropobject_list
+from mung.io import read_nodes_from_file, export_node_list
 
 STAFF_CLSNAMES = ['staff', 'staff_line', 'staff_space']
 
@@ -61,7 +61,7 @@ def main(args):
 
     ##########################################################################
     logging.info('Export the stripped list.')
-    cropobject_string = export_cropobject_list(output_cropobjects)
+    cropobject_string = export_node_list(output_cropobjects)
 
     if args.export is not None:
         with open(args.export, 'w') as hdl:

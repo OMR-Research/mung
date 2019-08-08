@@ -1,15 +1,5 @@
-#!/usr/bin/env python
 """The ``add_staff_relationships.py`` script automates adding
 the relationships of some staff-related symbols to staffs.
-The symbols in question are:
-
-* ``staff_grouping``
-* ``measure_separator``
-* ``repeat``
-* ``key_signature``
-* ``time_signature``
-* ``g-clef``, ``c-clef``, ``f-clef``
-
 """
 import argparse
 import collections
@@ -21,40 +11,8 @@ import time
 from typing import List
 
 from mung.inference.constants import InferenceEngineConstants as _CONST
-from mung.io import read_nodes_from_file, export_cropobject_list
+from mung.io import read_nodes_from_file, export_node_list
 from mung.node import link_nodes, Node
-
-ON_STAFFLINE_RATIO_TRHESHOLD = 0.15
-
-STAFFLINE_CLSNAME = 'staff_line'
-STAFFSPACE_CLSNAME = 'staff_space'
-STAFF_CLSNAME = 'staff'
-
-STAFF_RELATED_CLSNAMES = {
-    'staff_grouping',
-    'measure_separator',
-    'key_signature',
-    'time_signature',
-    'g-clef', 'c-clef', 'f-clef', 'other-clef',
-}
-
-NOTEHEAD_CLSNAMES = {
-    'noteheadFull',
-    'notehead-empty',
-    'grace-notehead-full',
-    'grace-notehead-empty',
-}
-
-REST_CLSNAMES = {
-    'whole_rest',
-    'half_rest',
-    'quarter_rest',
-    '8th_rest',
-    '16th_rest',
-    '32th_rest',
-    '64th_and_higher_rest',
-    'multi-measure_rest',
-}
 
 
 # Notes will get added separately.
@@ -362,7 +320,7 @@ def main(args):
 
     ##########################################################################
     logging.info('Export the combined list.')
-    cropobject_string = export_cropobject_list(output_cropobjects)
+    cropobject_string = export_node_list(output_cropobjects)
 
     if args.export is not None:
         with open(args.export, 'w') as hdl:

@@ -656,7 +656,7 @@ class DependencyGrammar(object):
 
         return rules, in_cards, out_cards, in_agg_cards, out_agg_cards
 
-    def parse_token(self, token: str):
+    def parse_token(self, token: str) -> Tuple[str, int, int]:
         """Parse one ``*.deprules`` file token. See class documentation for
         examples.
 
@@ -680,14 +680,12 @@ class DependencyGrammar(object):
                     cmax = int(cmax_string)
         return token, cmin, cmax
 
-    def __matching_names(self, token):
+    def __matching_names(self, token: str) -> List[str]:
         """Returns the list of alphabet symbols that match the given
         name (regex, currently can process one '*' wildcard).
 
-        :type token: str
         :param token: The symbol name (pattern) to expand.
 
-        :rtype: list
         :returns: A list of matching names. Empty list if no name matches.
         """
         if not self.__has_wildcard(token):
@@ -726,8 +724,5 @@ class DependencyGrammar(object):
         else:
             return True
 
-    def __has_wildcard(self, name):
+    def __has_wildcard(self, name: str) -> bool:
         return self.WILDCARD in name
-
-    def is_head(self, head, child):
-        return (head, child) in self.rules

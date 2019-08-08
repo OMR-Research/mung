@@ -16,7 +16,7 @@ from skimage.filters import gaussian
 import matplotlib.pyplot as plt
 
 from mung.dataset import CvcMuscimaDataset
-from mung.io import read_nodes_from_file, export_cropobject_list
+from mung.io import read_nodes_from_file, export_node_list
 from mung.node import Node
 from mung.utils import connected_components2bboxes, compute_connected_components
 
@@ -461,7 +461,7 @@ def main(args):
     logging.info('Exporting the new cropobject list: {0} objects'
                     ''.format(len(cropobjects_with_staffs)))
     # - Export the combined list.
-    cropobject_string = export_cropobject_list(cropobjects_with_staffs)
+    cropobject_string = export_node_list(cropobjects_with_staffs)
     if args.export is not None:
         with open(args.export, 'w') as hdl:
             hdl.write(cropobject_string)

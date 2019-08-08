@@ -17,9 +17,10 @@ these layers of MUSCIMA++.
 """
 import logging
 import os
+from typing import Optional
 
 
-def _get_cvc_muscima_root():
+def _get_cvc_muscima_root() -> Optional[str]:
     if 'CVC_MUSCIMA_ROOT' in os.environ:
         CVC_MUSCIMA_ROOT = os.environ['CVC_MUSCIMA_ROOT']
         return CVC_MUSCIMA_ROOT
@@ -34,7 +35,7 @@ CVC_MUSCIMA_ROOT = _get_cvc_muscima_root()
 ##############################################################################
 
 
-def _get_mff_muscima_root():
+def _get_mff_muscima_root() -> Optional[str]:
     if 'MUSCIMA_PLUSPLUS_ROOT' in os.environ:
         MUSCIMA_PLUSPLUS_ROOT = os.environ['MUSCIMA_PLUSPLUS_ROOT']
         return MUSCIMA_PLUSPLUS_ROOT
@@ -76,7 +77,7 @@ class CvcMuscimaDataset(object):
 
     MODES = ['full', 'symbol', 'staff_only']
 
-    def __init__(self, root=_get_cvc_muscima_root(), validate=False):
+    def __init__(self, root: str = _get_cvc_muscima_root(), validate: bool = False):
         """The dataset is instantiated by providing the path to its root
         directory. If the ``CVC_MUSCIMA_ROOT`` variable is set, you do not
         have to provide anything."""
@@ -96,7 +97,7 @@ class CvcMuscimaDataset(object):
 
         self.root = root
 
-    def imfile(self, page, writer, distortion='ideal', mode='full'):
+    def imfile(self, page: int, writer: int, distortion: str = 'ideal', mode: str = 'full') -> str:
         """Construct the path leading to the file of the CVC-MUSCIMA image
         with the specified page (1 - 20), writer (1 - 50), distortion
         (see ``CVC_MUSCIMA_DISTORTIONS``), and mode (``full``, ``symbol``,
@@ -124,7 +125,7 @@ class CvcMuscimaDataset(object):
                             ''.format(filename, self.root))
         return filename
 
-    def __number2page_file(self, n):
+    def __number2page_file(self, n: int) -> str:
         if (n < 1) or (n > 20):
             raise ValueError('Invalid CVC-MUSCIMA score number {0}.'
                              ' Valid only between 1 and 20.'.format(n))
@@ -133,7 +134,7 @@ class CvcMuscimaDataset(object):
         else:
             return 'p0' + str(n) + '.png'
 
-    def __number2writer_dir(self, n):
+    def __number2writer_dir(self, n: int) -> str:
         if (n < 1) or (n > 50):
             raise ValueError('Invalid MUSCIMA writer number {0}.'
                              ' Valid only between 1 and 50.'.format(n))
@@ -142,7 +143,7 @@ class CvcMuscimaDataset(object):
         else:
             return 'w-' + str(n)
 
-    def __mode2dir(self, mode):
+    def __mode2dir(self, mode: str) -> str:
         if mode == 'full':
             return 'image'
         elif mode == 'symbol':

@@ -1,7 +1,7 @@
 """This module implements a class that..."""
 import collections
 import copy
-from mung.inference.constants import _CONST
+from mung.inference.constants import InferenceEngineConstants as _CONST
 
 
 class MungMatcher(object):
@@ -192,7 +192,7 @@ class MungMatcher(object):
     @staticmethod
     def _is_fully_defined_notehead(c):
         isdef = False
-        if (c.clsname in _CONST.NONGRACE_NOTEHEAD_CLSNAMES) \
+        if (c.clsname in _CONST.NONGRACE_NOTEHEAD_CLASS_NAMES) \
                 and ('onset_beats' in c.data) \
                 and ('midi_pitch_code' in c.data):
             isdef = True

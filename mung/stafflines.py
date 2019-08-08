@@ -18,26 +18,26 @@ from mung.utils import compute_connected_components
 
 
 def __has_parent_staff(c, nodes: List[Node]):
-    _cdict = {c.id: c for c in nodes}
-    staff_inlinks = [_cdict[i] for i in c.inlinks
-                     if _cdict[i].class_name == _CONST.STAFF_CLASS_NAME]
+    id_to_node_mapping = {c.id: c for c in nodes}
+    staff_inlinks = [id_to_node_mapping[i] for i in c.inlinks
+                     if id_to_node_mapping[i].class_name == _CONST.STAFF_CLASS_NAME]
     return len(staff_inlinks) > 0
 
 
 def __has_child_staffspace(staff, nodes: List[Node]):
-    _cdict = {c.id: c for c in nodes}
-    staffline_outlinks = [_cdict[i] for i in staff.outlinks
-                          if _cdict[i].class_name == _CONST.STAFFSPACE_CLASS_NAME]
+    id_to_node_mapping = {c.id: c for c in nodes}
+    staffline_outlinks = [id_to_node_mapping[i] for i in staff.outlinks
+                          if id_to_node_mapping[i].class_name == _CONST.STAFFSPACE_CLASS_NAME]
     return len(staffline_outlinks) > 0
 
 
 def __has_neighbor_staffspace(staffline, nodes: List[Node]):
-    _cdict = {c.id: c for c in nodes}
+    id_to_node_mapping = {c.id: c for c in nodes}
     # Find parent staff
     if not __has_parent_staff(staffline, nodes):
         return False
-    parent_staffs = [_cdict[i] for i in staffline.inlinks
-                     if _cdict[i].class_name == _CONST.STAFF_CLASS_NAME]
+    parent_staffs = [id_to_node_mapping[i] for i in staffline.inlinks
+                     if id_to_node_mapping[i].class_name == _CONST.STAFF_CLASS_NAME]
     if len(parent_staffs) > 1:
         raise ValueError('More than one parent staff for staffline {0}!'
                          ''.format(staffline.uid))
@@ -855,7 +855,7 @@ def add_staff_relationships(nodes: List[Node],
 
     ##########################################################################
     logging.info('Attaching clefs to stafflines [NOT IMPLEMENTED].')
-    clefs = [c for c in nodes if c.class_name in ['g-clef', 'c-clef', 'f-clef']]
+    clefs = [c for c in nodes if c.class_name in [_CONST.G_CLEF, 'c-clef', 'f-clef']]
 
     ##########################################################################
     return nodes

@@ -28,7 +28,7 @@ import os
 import time
 
 from mung.inference.inference import PitchInferenceEngine, OnsetsInferenceEngine,  MIDIBuilder
-from mung.io import read_nodes_from_file, export_cropobject_list
+from mung.io import read_nodes_from_file, export_node_list
 
 
 def build_argument_parser():
@@ -67,7 +67,7 @@ def main(args):
     cropobjects = read_nodes_from_file(args.annot)
 
     pitch_inference_engine = PitchInferenceEngine()
-    time_inference_engine = OnsetsInferenceEngine(cropobjects=cropobjects)
+    time_inference_engine = OnsetsInferenceEngine(nodes=cropobjects)
 
     logging.info('Running pitch inference.')
     pitches, pitch_names = pitch_inference_engine.infer_pitches(cropobjects,
@@ -103,10 +103,10 @@ def main(args):
 
     if args.export is not None:
         with open(args.export, 'w') as hdl:
-            hdl.write(export_cropobject_list(cropobjects))
+            hdl.write(export_node_list(cropobjects))
             hdl.write('\n')
     else:
-        print(export_cropobject_list(cropobjects))
+        print(export_node_list(cropobjects))
 
     if args.midi is not None:
         midi_builder = MIDIBuilder()

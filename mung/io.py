@@ -205,7 +205,7 @@ import logging
 import os
 
 import collections
-from typing import List
+from typing import List, Tuple
 
 from lxml import etree
 
@@ -409,11 +409,11 @@ def validate_document_graph_structure(nodes: List[Node]) -> bool:
     return is_valid
 
 
-def export_cropobject_graph(cropobjects, validate=True):
+def export_node_graph(nodes:List[Node], validate:bool=True) -> List[Tuple[int,int]]:
     """Collects the inlink/outlink CropObject graph
     and returns it as a list of ``(from, to)`` edges.
 
-    :param cropobjects: A list of CropObject instances.
+    :param nodes: A list of CropObject instances.
         All are expected to be within one document.
 
     :param validate: If set, will raise a ValueError
@@ -424,69 +424,38 @@ def export_cropobject_graph(cropobjects, validate=True):
         that represent edges in the CropObject graph.
     """
     if validate:
-        validate_nodes_graph_structure(cropobjects)
+        validate_nodes_graph_structure(nodes)
 
     edges = []
-    for c in cropobjects:
+    for c in nodes:
         for o in c.outlinks:
-            edges.append((c.objid, o))
+            edges.append((c.id, o))
     return edges
 
 
-def export_cropobject_list(cropobjects, docname=None, dataset_name=None):
+def export_node_list(nodes:List[Node], document:str=None, dataset:str=None) -> str:
     """Writes the CropObject data as a XML string. Does not write
     to a file -- use ``with open(output_file) as out_stream:`` etc.
 
-    :param cropobjects: A list of CropObject instances.
-
-    :param docname: Set the document name for all the CropObject
-        unique IDs to this. If not given, no docname is applied.
-        This means that either the old document identification
-        stays (in case the CropObjects are loaded from a file
-        with document IDs set), or the default is used (if the
-        CropObjects have been newly created). If given,
-        the CropObjects are first deep-copied, so that the existing
-        objects' UID is not affected by the export.
-
-    :param dataset_name: Analogous to docname.
     """
-    if docname is not None:
-        new_cropobjects = []
-        for c in cropobjects:
-            new_c = copy.deepcopy(c)
-            new_c.set_doc(docname)
-            new_cropobjects.append(new_c)
-        cropobjects = new_cropobjects
-
-    if dataset_name is not None:
-        new_cropobjects = []
-        for c in cropobjects:
-            new_c = copy.deepcopy(c)
-            new_c.set_dataset(dataset_name)
-            new_cropobjects.append(new_c)
-        cropobjects = new_cropobjects
-
     # This is the data string, the rest is formalities
-    cropobj_string = '\n'.join([str(c) for c in cropobjects])
+    nodes_string = '\n'.join([str(c) for c in nodes])
 
     lines = list()
-
     lines.append('<?xml version="1.0" encoding="utf-8"?>')
-    lines.append('<CropObjectList'
+    lines.append('<Nodes dataset={0} document={1}'
                  ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
-                 ' xmlns:xsd="http://www.w3.org/2001/XMLSchema">')
-    lines.append('<CropObjects>')
-    lines.append(cropobj_string)
-    lines.append('</CropObjects>')
-    lines.append('</CropObjectList>')
+                 ' xmlns:xsd="http://www.w3.org/2001/XMLSchema"'
+                 ' xsi:noNamespaceSchemaLocation="CVC-MUSCIMA_Schema.xsd">'.format(dataset,document))
+    lines.append(nodes_string)
+    lines.append('</Nodes>')
     return '\n'.join(lines)
 
 
 ##############################################################################
 # Parsing NodeClass lists, mostly for grammars.
 
-def parse_node_classes(filename):
-    # type: (str) -> List[NodeClass]
+def parse_node_classes(filename:str) -> List[NodeClass]:
     """ Extract the list of :class:`NodeClass` objects from
         an xml file with a NodeClasses as the top element and NodeClass children.
     """
@@ -504,24 +473,17 @@ def parse_node_classes(filename):
     return node_classes
 
 
-def export_cropobject_class_list(cropobject_classes):
+def export_nodeclass_list(node_classes:List[NodeClass]) -> str:
     """Writes the CropObject data as a XML string. Does not write
     to a file -- use ``with open(output_file) as out_stream:`` etc.
-
-    :param cropobjects: A list of CropObject instances.
     """
     # This is the data string, the rest is formalities
-    cropobject_classes_string = '\n'.join([str(c) for c in cropobject_classes])
+    node_classes_string = '\n'.join([str(c) for c in node_classes])
 
     lines = list()
 
     lines.append('<?xml version="1.0" encoding="utf-8"?>')
-    lines.append('<CropObjectClassList'
-                 ' noNamespaceSchema="mff-muscima-cropobject-classes.xsd"'
-                 ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
-                 ' xmlns:xsd="http://www.w3.org/2001/XMLSchema">')
-    lines.append('<CropObjectClasses>')
-    lines.append(cropobject_classes_string)
-    lines.append('</CropObjectClasses>')
-    lines.append('</CropObjectClassList>')
+    lines.append('<NodeClasses noNamespaceSchema="mff-muscima-mlclasses.xsd">')
+    lines.append(node_classes_string)
+    lines.append('</NodeClasses>')
     return '\n'.join(lines)

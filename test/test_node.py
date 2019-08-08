@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from mung.io import read_nodes_from_file, export_cropobject_list
+from mung.io import read_nodes_from_file, export_node_list
 from mung.node import Node
 
 
@@ -53,7 +53,8 @@ class NodeTest(unittest.TestCase):
         nodes = read_nodes_from_file(file)
         self.assertEqual("G", nodes[0].data['pitch_step'])
         self.assertEqual(79, nodes[0].data['midi_pitch_code'])
-        self.assertEqual([8,17], nodes[0].data['precedence_outlinks'])
+        self.assertEqual([8, 17], nodes[0].data['precedence_outlinks'])
+
 
 if __name__ == '__main__':
     unittest.main()
