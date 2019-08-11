@@ -9,7 +9,7 @@ MuNG -- tools for the MUSCIMA++ dataset
 The ``mung`` package implements tools for easier manipulation of the MUSCIMA++
 dataset. Download the dataset here:
 
-`<https://ufal.mff.cuni.cz/muscima/download>`_
+`<https://github.com/OMR-Research/muscima-pp/>`_
 
 A description of the dataset is on the project's homepage:
 
