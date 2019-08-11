@@ -22,6 +22,7 @@ class InferenceEngineConstants(object):
     STAFFLINE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME]
 
     STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, LEGER_LINE_CLASS_NAME]
+    TIE_CLASS_NAME = 'tie'
 
     G_CLEF = 'gClef'
     C_CLEF = 'cClef'
@@ -240,12 +241,3 @@ class InferenceEngineConstants(object):
         output.update(self.REST_CLASS_NAMES)
         return output
 
-    @staticmethod
-    def interpret_numerals(numerals):
-        """Returns the given numeral Node as a number, left to right."""
-        for n in numerals:
-            if n.clsname not in InferenceEngineConstants.NUMERALS:
-                raise ValueError('Symbol {0} is not a numeral!'.format(n.uid))
-        n_str = ''.join([n.clsname[-1]
-                         for n in sorted(numerals, key=operator.attrgetter('left'))])
-        return int(n_str)

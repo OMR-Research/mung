@@ -37,9 +37,9 @@ def build_argument_parser():
 
     parser.add_argument('-a', '--annot', action='store', required=True,
                         help='The annotation file for which the staffline and staff'
-                             ' CropObject relationships should be added.')
+                             ' Node relationships should be added.')
     parser.add_argument('-e', '--export', action='store',
-                        help='A filename to which the output CropObjectList'
+                        help='A filename to which the output NodeList'
                              ' should be saved. If not given, will print to'
                              ' stdout.')
     parser.add_argument('-m', '--midi', action='store',

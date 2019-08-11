@@ -138,9 +138,9 @@ class MungMatcher(object):
         connectivity signatures, resolves how they should actually
         be matched against each other.
 
-        :param vs1: A list of CropObjects.
+        :param vs1: A list of Nodes.
 
-        :param vs2: A list of CropObjects.
+        :param vs2: A list of Nodes.
 
         :return: A matching of these two Node lists. The matching
             is a dict of ``(n1.id, n2.id) --> weight``.

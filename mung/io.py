@@ -407,7 +407,7 @@ def validate_document_graph_structure(nodes: List[Node]) -> bool:
     return is_valid
 
 
-def export_node_graph(nodes: List[Node], validate: bool = True) -> List[Tuple[int, int]]:
+def get_edges(nodes: List[Node], validate: bool = True) -> List[Tuple[int, int]]:
     """Collects the inlink/outlink Node graph
     and returns it as a list of ``(from, to)`` edges.
 

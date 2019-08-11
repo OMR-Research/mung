@@ -26,67 +26,68 @@ import time
 
 import operator
 
-from mung.io import read_nodes_from_file, export_node_graph
-from mung.node import merge_node_lists_from_multiple_documents
+from typing import List, Tuple, Dict, Any
+
+from mung.io import read_nodes_from_file, get_edges
+from mung.node import merge_node_lists_from_multiple_documents, Node
 
 
-def compute_cropobject_stats(cropobjects, edges=None):
+def compute_node_statistics(nodes: List[Node], edges: List[Tuple[int, int]] = None) -> Dict[str, Any]:
     stats = collections.OrderedDict()
 
-    # Count cropobjects
-    stats['n_cropobjects'] = len(cropobjects)
+    # Count Nodes
+    stats['number_of_nodes'] = len(nodes)
 
-    # Count cropobjects by class
-    n_cropobjects_by_class = collections.defaultdict(int)
-    for c in cropobjects:
-        n_cropobjects_by_class[c.clsname] += 1
-    stats['n_cropobjects_by_class'] = n_cropobjects_by_class
-    stats['n_cropobjects_distinct'] = len(n_cropobjects_by_class)
+    # Count Nodes by class
+    number_of_nodes_by_class = collections.defaultdict(int)
+    for node in nodes:
+        number_of_nodes_by_class[node.class_name] += 1
+    stats['number_of_nodes_by_class'] = number_of_nodes_by_class
+    stats['number_of_distinct_nodes'] = len(number_of_nodes_by_class)
 
     if edges is not None:
         # Count relationships
-        _cropobjects_dict = {c.objid: c for c in cropobjects}
-        stats['n_relationships'] = len(edges)
-        n_relationships_by_class = collections.defaultdict(int)
-        for e in edges:
-            fr, to = e
-            c_fr = _cropobjects_dict[fr].clsname
-            c_to = _cropobjects_dict[to].clsname
-            n_relationships_by_class[(c_fr, c_to)] += 1
-        stats['n_relationships_by_class'] = n_relationships_by_class
-        stats['n_relationships_distinct'] = len(n_relationships_by_class)
+        id_to_node_mapping = {node.id: node for node in nodes}
+        stats['number_of_relationships'] = len(edges)
+        number_of_relationships_by_class = collections.defaultdict(int)
+        for edge in edges:
+            from_node_id, to_node_id = edge
+            from_node = id_to_node_mapping[from_node_id].class_name
+            to_node = id_to_node_mapping[to_node_id].class_name
+            number_of_relationships_by_class[(from_node, to_node)] += 1
+        stats['number_of_relationships_by_class'] = number_of_relationships_by_class
+        stats['number_of_relationships_distinct'] = len(number_of_relationships_by_class)
 
     return stats
 
 
-def emit_stats_pprint(stats):
+def print_statistics(stats: Dict[str, Any]):
     # For now, just pretty-print. That means reformatting the insides
     # of the stats.
     print_stats = list()
 
-    if 'n_cropobjects' in stats:
-        print_stats.append(('n_cropobjects', stats['n_cropobjects']))
-    if 'n_cropobjects_by_class' in stats:
-        print_stats.append(('n_cropobjects_by_class',
-                            sorted(list(stats['n_cropobjects_by_class'].items()),
+    if 'number_of_nodes' in stats:
+        print_stats.append(('number_of_nodes', stats['number_of_nodes']))
+    if 'number_of_nodes_by_class' in stats:
+        print_stats.append(('number_of_nodes_by_class',
+                            sorted(list(stats['number_of_nodes_by_class'].items()),
                                    key=operator.itemgetter(1),
                                    reverse=True)
                             ))
-    if 'n_cropobjects_distinct' in stats:
-        print_stats.append(('n_cropobjects_distinct',
-                            stats['n_cropobjects_distinct']))
+    if 'number_of_distinct_nodes' in stats:
+        print_stats.append(('number_of_distinct_nodes',
+                            stats['number_of_distinct_nodes']))
 
-    if 'n_relationships' in stats:
-        print_stats.append(('n_relationships', stats['n_relationships']))
-    if 'n_relationships_by_class' in stats:
-        print_stats.append(('n_relationships_by_class',
-                            sorted(list(stats['n_relationships_by_class'].items()),
+    if 'number_of_relationships' in stats:
+        print_stats.append(('number_of_relationships', stats['number_of_relationships']))
+    if 'number_of_relationships_by_class' in stats:
+        print_stats.append(('number_of_relationships_by_class',
+                            sorted(list(stats['number_of_relationships_by_class'].items()),
                                    key=operator.itemgetter(1),
                                    reverse=True)))
-    if 'n_relationships_distinct' in stats:
-        print_stats.append(('n_relationships_distinct',
-                            stats['n_relationships_distinct']))
-
+    if 'number_of_relationships_distinct' in stats:
+        print_stats.append(('number_of_relationships_distinct',
+                            stats['number_of_relationships_distinct']))
 
     pprint.pprint(print_stats)
 
@@ -99,9 +100,9 @@ def build_argument_parser():
 
     parser.add_argument('-i', '--input', action='store', nargs='+',
                         required=True,
-                        help='List of input CropObjectList files.')
+                        help='List of input NodeList files.')
     parser.add_argument('-e', '--emit', action='store', default='print',
-                        choices=['print', 'latex', 'json'],
+                        choices=['print'],
                         help='How should the analysis results be presented?')
 
     parser.add_argument('-v', '--verbose', action='store_true',
@@ -110,56 +111,6 @@ def build_argument_parser():
                         help='Turn on DEBUG messages.')
 
     return parser
-
-
-def main(args):
-    logging.info('Starting main...')
-    _start_time = time.clock()
-
-    # Parse individual Node lists.
-    cropobject_lists = []
-    _n_parsed_cropobjects = 0
-    for i, f in enumerate(args.input):
-        cs = read_nodes_from_file(f)
-        cropobject_lists.append(cs)
-
-        # Logging progress
-        _n_parsed_cropobjects += len(cs)
-        if i % 10 == 0 and i > 0:
-            _time_parsing = time.clock() - _start_time
-            _cropobjects_per_second = _n_parsed_cropobjects / _time_parsing
-            logging.info('Parsed {0} cropobjects in {1:.2f} s ({2:.2f} objs/s)'
-                         ''.format(_n_parsed_cropobjects,
-                                   _time_parsing, _cropobjects_per_second))
-
-    # Merge the Node lists into one.
-    # This is done so that the resulting object graph can be manipulated
-    # at once, without id clashes.
-    cropobjects = merge_node_lists_from_multiple_documents(cropobject_lists)
-
-    edges = export_node_graph(cropobjects)
-
-    _parse_end_time = time.clock()
-    logging.info('Parsing took {0:.2f} s'.format(_parse_end_time - _start_time))
-
-    ##########################################################################
-    # Analysis
-
-    # Here's where the results are stored, for export into various
-    # formats. (Currently, we only print them.)
-    stats = compute_cropobject_stats(cropobjects, edges=edges)
-
-    ##########################################################################
-    # Export
-    if args.emit == 'print':
-        emit_stats_pprint(stats)
-    # More export options:
-    #  - json
-    #  - latex table
-
-    _end_time = time.clock()
-    logging.info('analyze_annotations.py done in {0:.3f} s'
-                 ''.format(_end_time - _start_time))
 
 
 if __name__ == '__main__':
@@ -171,4 +122,48 @@ if __name__ == '__main__':
     if args.debug:
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
-    main(args)
+    logging.info('Starting main...')
+    _start_time = time.clock()
+
+    # Parse individual Node lists.
+    node_lists = []
+    number_of_parsed_nodes = 0
+    for i, f in enumerate(args.input):
+        node_list = read_nodes_from_file(f)
+        node_lists.append(node_list)
+
+        # Logging progress
+        number_of_parsed_nodes += len(node_list)
+        if i % 10 == 0 and i > 0:
+            _time_parsing = time.clock() - _start_time
+            nodes_per_second = number_of_parsed_nodes / _time_parsing
+            logging.info('Parsed {0} Nodes in {1:.2f} s ({2:.2f} objs/s)'
+                         ''.format(number_of_parsed_nodes,
+                                   _time_parsing, nodes_per_second))
+
+    # Merge the Node lists into one.
+    # This is done so that the resulting object graph can be manipulated
+    # at once, without id clashes.
+    merged_node_list = merge_node_lists_from_multiple_documents(node_lists)
+
+    edges = get_edges(merged_node_list)
+
+    _parse_end_time = time.clock()
+    logging.info('Parsing took {0:.2f} s'.format(_parse_end_time - _start_time))
+
+    ##########################################################################
+    # Analysis
+
+    # Here's where the results are stored, for export into various
+    # formats. (Currently, we only print them.)
+    statistics = compute_node_statistics(merged_node_list, edges=edges)
+
+    ##########################################################################
+    # Export
+    if args.emit == 'print':
+        print_statistics(statistics)
+
+    _end_time = time.clock()
+    logging.info('analyze_annotations.py done in {0:.3f} s'
+                 ''.format(_end_time - _start_time))
+

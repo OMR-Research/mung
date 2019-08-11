@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """``analyze_tracking_log.py`` is a script that performs a quick and dirty analysis
 of a MUSCIMarker event log. It is not necessary for using the dataset,
 but you might want it running if you are annotating something with MUSCIMarker.
@@ -24,22 +23,22 @@ then: args dict, formatted as key=value,key=value
 import argparse
 import codecs
 import collections
-import io
 import itertools
 import json
 import logging
-import numpy
+import operator
 import os
 import pprint
 import time
 
 import matplotlib.pyplot as plt
-import operator
+import numpy
+from typing import Dict, Tuple
 
 from mung.io import read_nodes_from_file
 
 
-def freqdict(l, sort=True):
+def freqdict(l, sort=True) -> Dict:
     out = collections.defaultdict(int)
     for item in l:
         out[item] += 1
@@ -164,7 +163,7 @@ def unique_logs(event_logs):
         if '-time-' not in init_event:
             raise ValueError('Got a non-event log JSON list, file {0}! Supposed init event: {1}'
                              ''.format(log_file, init_event))
-        init_time  = init_event['-time-']
+        init_time = init_event['-time-']
         if init_time in unique:
             logging.info('Found non-unique event log {0} with timestamp {1} ({2} events)!'
                          ' Using first ({3} events).'
@@ -178,7 +177,7 @@ def unique_logs(event_logs):
 # Counting results
 
 
-def annotations_from_package(package):
+def annotations_from_package(package: str):
     """Collect all annotation XML files (with complete paths)
     from the given package."""
     logging.info('Collecting annotation files from package {0}'.format(package))
@@ -195,18 +194,17 @@ def annotations_from_package(package):
     return annotation_files
 
 
-def count_cropobjects(annot_file):
+def count_nodes(annot_file):
     return len(read_nodes_from_file(annot_file))
 
 
-def count_cropobjects_and_relationships(annot_file):
-    cropobjects = read_nodes_from_file(annot_file)
+def count_nodes_and_relationships(annot_file: str) -> Tuple[int, int]:
+    nodes = read_nodes_from_file(annot_file)
     n_inlinks = 0
-    for c in cropobjects:
-        if c.inlinks is not None:
-            n_inlinks += len(c.inlinks)
-    return len(cropobjects), n_inlinks
-
+    for node in nodes:
+        if node.inlinks is not None:
+            n_inlinks += len(node.inlinks)
+    return len(nodes), n_inlinks
 
 
 ##############################################################################
@@ -237,8 +235,8 @@ def plot_events_by_time(events, type_key='-fn-'):
     # Assign numbers to tracked fns
     fns_by_freq = {f: len([e for e in fns if e == f]) for f in set(fns)}
     fn_dict = {f: i for i, f in enumerate(sorted(list(fns_by_freq.keys()),
-                                          reverse=True,
-                                          key=lambda k: fns_by_freq[k]))}
+                                                 reverse=True,
+                                                 key=lambda k: fns_by_freq[k]))}
 
     min_time = float(events[0]['-time-'])
 
@@ -248,7 +246,7 @@ def plot_events_by_time(events, type_key='-fn-'):
         dataset[i][1] = fn_dict[e[type_key]]
 
     # Now visualize
-    plt.scatter(dataset[:,0], dataset[:,1])
+    plt.scatter(dataset[:, 0], dataset[:, 1])
 
 
 def format_as_timeflow_csv(events, delimiter='\t'):
@@ -272,11 +270,11 @@ def format_as_timeflow_csv(events, delimiter='\t'):
     output_fields = ['ID', 'Date'] + list(event_fields.keys())
     n_fields = len(output_fields)
 
-    field2idx = {f: i+2 for i, f in enumerate(event_fields.keys())}
+    field2idx = {f: i + 2 for i, f in enumerate(event_fields.keys())}
     event_table = [['' for _ in range(n_fields)] for _ in events]
     for i, e in enumerate(events):
         event_table[i][0] = str(i)
-        event_table[i][1] = format_date(e)#format_date(e['-time-human-'])
+        event_table[i][1] = format_date(e)  # format_date(e['-time-human-'])
         for k, v in e.items():
             event_table[i][field2idx[k]] = v
 
@@ -370,7 +368,7 @@ def main(args):
                         current_log_data = json.loads(corrected)
                     except ValueError:
                         logging.warning('Could not even parse corrected JSON, skipping file {0}.'.format(input_file))
-                        #raise
+                        # raise
                     logging.info('Success!')
                 else:
                     logging.info('Unable to correct JSON, skipping file.')
@@ -411,20 +409,19 @@ def main(args):
         if args.packages is None:
             raise ValueError('Cannot count annotations if no packages are given!')
 
-        n_cropobjects = 0
-        n_relationships = 0
+        number_of_nodes = 0
+        number_of_relationships = 0
         for package in args.packages:
             annot_files = annotations_from_package(package)
             for f in annot_files:
-                n_c, n_r = count_cropobjects_and_relationships(f)
-                n_cropobjects += n_c
-                n_relationships += n_r
+                n_c, n_r = count_nodes_and_relationships(f)
+                number_of_nodes += n_c
+                number_of_relationships += n_r
 
-        print('Total CropObjects: {0}'.format(n_cropobjects))
-        print('Total Relationships: {0}'.format(n_relationships))
+        print('Total Nodes: {0}'.format(number_of_nodes))
+        print('Total Relationships: {0}'.format(number_of_relationships))
         if n_minutes is not None:
-            print('Cropobjects per minute: {0:.2f}'.format(n_cropobjects / float(n_minutes)))
-
+            print('Nodes per minute: {0:.2f}'.format(number_of_nodes / float(n_minutes)))
 
     _end_time = time.clock()
     logging.info('analyze_tracking_log.py done in {0:.3f} s'.format(_end_time - _start_time))

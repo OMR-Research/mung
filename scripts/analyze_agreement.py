@@ -23,7 +23,7 @@ parallel beams).
 Each predicted symbol is then aligned to the ground truth symbol
 with the highest f-score. If the symbol classes of a ``(truth, prediction)``
 pair do not match, their score gets set to 0. (This can be turned
-off using the ``--no_strict_clsnames`` option.)
+off using the ``--no_strict_class_names`` option.)
 
 Next, the alignment is cleaned up: if multiple predictions are
 aligned to a single ground truth, the one with the highest f-score
@@ -47,11 +47,14 @@ import pprint
 import time
 
 import numpy
+from typing import List, Tuple, Optional
 
 from mung.io import read_nodes_from_file
+from mung.node import Node
 
 
-def bounding_box_intersection(origin, intersect):
+def bounding_box_intersection(origin: Tuple[int, int, int, int], intersect: Tuple[int, int, int, int]) \
+        -> Optional[Tuple[int, int, int, int]]:
     """Returns the coordinates of the origin bounding box that
     are intersected by the intersect bounding box.
 
@@ -89,10 +92,7 @@ def bounding_box_intersection(origin, intersect):
         return None
 
 
-##############################################################################
-
-
-def pixel_metrics(truth, prediction):
+def pixel_metrics(truth: Node, prediction: Node) -> Tuple[float, float, float]:
     """Computes the recall, precision and f-score for the prediction
     Node given the truth Node."""
     recall, precision, fscore = 0, 0, 0
@@ -100,7 +100,7 @@ def pixel_metrics(truth, prediction):
     intersection_truth = bounding_box_intersection(truth.bounding_box,
                                                    prediction.bounding_box)
     if intersection_truth is None:
-        logging.debug('No intersection for CropObjects: t={0},'
+        logging.debug('No intersection for Nodes: t={0},'
                       ' p={1}'.format(truth.bounding_box,
                                       prediction.bounding_box))
         return recall, precision, fscore
@@ -108,7 +108,7 @@ def pixel_metrics(truth, prediction):
     intersection_pred = bounding_box_intersection(prediction.bounding_box,
                                                   truth.bounding_box)
 
-    logging.debug('Found intersection for CropObjects: t={0},'
+    logging.debug('Found intersection for Nodes: t={0},'
                   ' p={1}'.format(truth.bounding_box,
                                   prediction.bounding_box))
 
@@ -142,16 +142,17 @@ def pixel_metrics(truth, prediction):
     return recall, precision, fscore
 
 
-def cropobjects_rpf(truth, prediction):
+def compute_recall_precision_fscore(truth: List[Node], prediction: List[Node]) \
+        -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]:
     """Computes Node pixel-level metrics.
 
-    :param truth: A list of the ground truth CropObjects.
+    :param truth: A list of the ground truth Nodes.
 
-    :param prediction: A list of the predicted CropObjects.
+    :param prediction: A list of the predicted Nodes.
 
     :returns: Three matrices with shape ``(len(truth), len(prediction)``:
         recall, precision, and f-score for each truth/prediction Node
-        pair. Truth cropobjects are rows, prediction columns.
+        pair. Truth Nodes are rows, prediction columns.
     """
     recall = numpy.zeros((len(truth), len(prediction)))
     precision = numpy.zeros((len(truth), len(prediction)))
@@ -167,19 +168,19 @@ def cropobjects_rpf(truth, prediction):
     return recall, precision, fscore
 
 
-def align_cropobjects(truth, prediction, fscore=None):
-    """Aligns prediction CropObjects to truth.
+def align_nodes(truth: List[Node], prediction: List[Node], fscore=None) -> List[Tuple[int, int]]:
+    """Aligns prediction Nodes to truth.
 
-    :param truth: A list of the ground truth CropObjects.
+    :param truth: A list of the ground truth Nodes.
 
-    :param prediction: A list of the predicted CropObjects.
+    :param prediction: A list of the predicted Nodes.
 
     :returns: A list of (t, p) pairs of Node indices into
         the truth and prediction lists. There will be one
         pair for each predicted symbol.
     """
     if fscore is None:
-        _, _, fscore = cropobjects_rpf(truth, prediction)
+        _, _, fscore = compute_recall_precision_fscore(truth, prediction)
 
     # For each prediction (column), pick the highest-scoring
     # True symbol.
@@ -198,69 +199,68 @@ def align_cropobjects(truth, prediction, fscore=None):
                                    if x == ct]
                                   for j, ct in enumerate(closest_truth_distance)]
 
-    clsname_aware_closest_truths = []
+    class_name_aware_closest_truths = []
     for j, ects in enumerate(equidistant_closest_truths):
         best_truth_i = int(ects[0])
 
         # If there is more than one tied best choice,
-        # try to choose the truth cropobject that has the same
-        # class as the predicted cropobject.
+        # try to choose the truth Node that has the same
+        # class as the predicted Node.
         if len(ects) > 1:
-            ects_c = {truth[int(i)].clsname: i for i in ects}
-            j_clsname = prediction[j].clsname
-            if j_clsname in ects_c:
-                best_truth_i = int(ects_c[j_clsname])
+            ects_c = {truth[int(i)].class_name: i for i in ects}
+            j_class_name = prediction[j].class_name
+            if j_class_name in ects_c:
+                best_truth_i = int(ects_c[j_class_name])
 
-        clsname_aware_closest_truths.append(best_truth_i)
+        class_name_aware_closest_truths.append(best_truth_i)
 
-    alignment = [(t, p) for p, t in enumerate(clsname_aware_closest_truths)]
+    alignment = [(t, p) for p, t in enumerate(class_name_aware_closest_truths)]
     return alignment
 
 
-def rpf_given_alignment(alignment, r, p,
-                        n_not_aligned=0,
-                        strict_clsnames=True,
-                        truths=None, predictions=None):
-    if strict_clsnames:
+def compute_recall_precision_fscore_given_an_alignment(alignment: List[Tuple[int, int]], individual_recalls,
+                                                       individual_precisions, n_not_aligned: int = 0,
+                                                       strict_classnames: bool = True,
+                                                       truths: List[Node] = None, predictions: List[Node] = None)\
+        -> Tuple[float, float, float]:
+    if strict_classnames:
         if not truths:
-            raise ValueError('If strict_clsnames is requested, must supply truths'
-                             ' CropObjects!')
+            raise ValueError('If strict_classnames is requested, must supply truths Nodes!')
         if not predictions:
-            raise ValueError('If strict_clsnames is requested, must supply predictions'
-                             ' CropObjects!')
+            raise ValueError('If strict_classnames is requested, must supply predictions Nodes!')
 
-    total_r, total_p = 0, 0
+    total_recall, total_precision = 0, 0
 
     for i, j in alignment:
 
-        # Check for strict clsnames only at this stage.
+        # Check for strict_classnames only at this stage.
         # The purpose is: if two people mark the same object
         # differently, we do want to know "it should be aligned
         # to each other, but the classes don't fit" -- we don't
         # want to maybe align it to an overlapping object of
         # the corresponding wrong class.
-        if strict_clsnames:
+        if strict_classnames:
             t_c = truths[i]
             p_c = predictions[j]
-            if t_c.clsname != p_c.clsname:
+            if t_c.class_name != p_c.class_name:
                 continue
 
-        total_r += r[i, j]
-        total_p += p[i, j]
+        total_recall += individual_recalls[i, j]
+        total_precision += individual_precisions[i, j]
 
     # This is not correct...? What about the zeros?
     #  - Prediction with no GT is in the alignment, so it counts towards
     #    the len(alignment) denominator.
     #  - GT with no prediction aligned to it contributes zero, but is
     #    not counted towards the denominator.
-    total_r /= len(alignment) + n_not_aligned
-    total_p /= len(alignment) + n_not_aligned
+    total_recall /= len(alignment) + n_not_aligned
+    total_precision /= len(alignment) + n_not_aligned
 
-    if (total_r == 0) or (total_p == 0):
-        total_f = 0.0
+    if (total_recall == 0) or (total_precision == 0):
+        total_fscore = 0.0
     else:
-        total_f = 2 * total_r * total_p / (total_r + total_p)
-    return total_r, total_p, total_f
+        total_fscore = 2 * total_recall * total_precision / (total_recall + total_precision)
+    return total_recall, total_precision, total_fscore
 
 
 ##############################################################################
@@ -271,25 +271,25 @@ def build_argument_parser():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('-t', '--true', action='store', required=True,
-                        help='The CropObjectList file you want to consider'
+                        help='The Nodes file you want to consider'
                              ' ground truth.')
     parser.add_argument('-p', '--prediction', action='store', required=True,
-                        help='The CropObjectList file you want to consider'
+                        help='The Nodes file you want to consider'
                              ' the prediction.')
 
     parser.add_argument('-e', '--export', action='store',
-                        help='If set, will export the problematic CropObjects'
+                        help='If set, will export the problematic Nodes'
                              ' to this file.')
 
     parser.add_argument('--analyze_alignment', action='store_true',
                         help='If set, will check whether the alignment is 1:1,'
                              ' and print out the irregularities.')
-    parser.add_argument('--analyze_clsnames', action='store_true',
-                        help='If set, will check whether the CropObjects aligned'
+    parser.add_argument('--analyze_classnames', action='store_true',
+                        help='If set, will check whether the Nodes aligned'
                              ' to each other have the same class labels'
                              ' and print out the irregularities.')
-    parser.add_argument('--no_strict_clsnames', action='store_true',
-                        help='If set, will not require aligned objects\' clsnames'
+    parser.add_argument('--no_strict_classnames', action='store_true',
+                        help='If set, will not require aligned objects\' classnames'
                              ' to match before computing pixel-wise overlap'
                              ' metrics.')
     parser.add_argument('--log_alignment', action='store_true',
@@ -313,7 +313,7 @@ def main(args):
     _start_time = time.clock()
 
     # The algorithm:
-    #  - build the cost function(s) for a pair of CropObjects
+    #  - build the cost function(s) for a pair of Nodes
     #  - align the objects, using the cost function
 
     # First alignment: try just matching a predicted object to the nearest
@@ -322,27 +322,27 @@ def main(args):
     # Rule: if two objects don't share a pixel, they cannot be considered related.
     # Object classes do not factor into this so far.
 
-    truth = read_nodes_from_file(args.true)
-    prediction = read_nodes_from_file(args.prediction)
+    ground_truth_nodes = read_nodes_from_file(args.true)
+    predicted_nodes = read_nodes_from_file(args.prediction)
 
     _parse_time = time.clock()
-    logging.info('Parsing {0} true and {1} prediction cropobjects took {2:.2f} s'
-                 ''.format(len(truth), len(prediction), _parse_time - _start_time))
+    logging.info('Parsing {0} true and {1} prediction Nodes took {2:.2f} s'
+                 ''.format(len(ground_truth_nodes), len(predicted_nodes), _parse_time - _start_time))
 
-    r, p, f = cropobjects_rpf(truth, prediction)
+    recall, precision, fscore = compute_recall_precision_fscore(ground_truth_nodes, predicted_nodes)
 
     _rpf_time = time.clock()
     logging.info('Computing {0} entries of r/p/f matrices took {1:.2f} s'
-                 ''.format(len(truth) * len(prediction), _rpf_time - _parse_time))
+                 ''.format(len(ground_truth_nodes) * len(predicted_nodes), _rpf_time - _parse_time))
 
-    alignment_tp = align_cropobjects(truth, prediction, fscore=f)
-    alignment_pt = align_cropobjects(prediction, truth, fscore=f.T)
+    alignment_tp = align_nodes(ground_truth_nodes, predicted_nodes, fscore=fscore)
+    alignment_pt = align_nodes(predicted_nodes, ground_truth_nodes, fscore=fscore.T)
 
     # Intersect alignments
     _aln_tp_set = frozenset(alignment_tp)
     alignment_tp_symmetric = [(t, p) for p, t in alignment_pt
                               if (t, p) in _aln_tp_set
-                              and (truth[t].clsname == prediction[p].clsname)]
+                              and (ground_truth_nodes[t].class_name == predicted_nodes[p].class_name)]
     truth_not_aligned = [t for p, t in alignment_pt
                          if (t, p) not in alignment_tp_symmetric]
     n_truth_not_aligned = len(truth_not_aligned)
@@ -356,20 +356,20 @@ def main(args):
                  ''.format(_aln_time - _rpf_time))
 
     # Now compute agreement: precision and recall on pixels
-    # of the aligned CropObjects.
+    # of the aligned Nodes.
 
-    # We apply strict clsnames only here, after the CropObjects have been
+    # We apply strict classnames only here, after the Nodes have been
     # aligned to each other using pixel metrics.
-    _strict_clsnames = (not args.no_strict_clsnames)
-    total_r, total_p, total_f = rpf_given_alignment(alignment_tp_symmetric, r, p,
-                                                    n_not_aligned=n_not_aligned,
-                                                    strict_clsnames=_strict_clsnames,
-                                                    truths=truth,
-                                                    predictions=prediction)
+    strict_classnames = (not args.no_strict_classnames)
+    total_r, total_p, total_f = compute_recall_precision_fscore_given_an_alignment(alignment_tp_symmetric, recall, precision,
+                                                                                   n_not_aligned=n_not_aligned,
+                                                                                   strict_classnames=strict_classnames,
+                                                                                   truths=ground_truth_nodes,
+                                                                                   predictions=predicted_nodes)
 
     if not args.print_fscore_only:
-        print('Truth objs.:\t{0}'.format(len(truth)))
-        print('Pred. objs.:\t{0}'.format(len(prediction)))
+        print('Truth objs.:\t{0}'.format(len(ground_truth_nodes)))
+        print('Pred. objs.:\t{0}'.format(len(predicted_nodes)))
         print('Aligned objs.:\t{0}'.format(len(alignment_tp_symmetric)))
         print('==============================================')
         print('Recall:\t\t{0:.3f}\nPrecision:\t{1:.3f}\nF-score:\t{2:.3f}'
@@ -382,14 +382,14 @@ def main(args):
     if args.log_alignment:
         print('==============================================')
         print('Alignments:\n{0}'.format('\n'.join([
-            '({0}: {1}) -- ({2}: {3})'.format(truth[t].objid, truth[t].clsname,
-                                              prediction[p].objid, prediction[p].clsname)
+            '({0}: {1}) -- ({2}: {3})'.format(ground_truth_nodes[t].id, ground_truth_nodes[t].class_name,
+                                              predicted_nodes[p].id, predicted_nodes[p].class_name)
             for t, p in alignment_tp_symmetric
         ])))
-        print('Truth, not aligned:\n{0}'.format('\n'.join(['({0}: {1})'.format(truth[t].objid, truth[t].clsname)
+        print('Truth, not aligned:\n{0}'.format('\n'.join(['({0}: {1})'.format(ground_truth_nodes[t].id, ground_truth_nodes[t].class_name)
                                                            for t in truth_not_aligned])))
         print(
-            'Preds, not aligned:\n{0}'.format('\n'.join(['({0}: {1})'.format(prediction[p].objid, prediction[p].clsname)
+            'Preds, not aligned:\n{0}'.format('\n'.join(['({0}: {1})'.format(predicted_nodes[p].id, predicted_nodes[p].class_name)
                                                          for p in preds_not_aligned])))
 
     ##########################################################################
@@ -398,9 +398,9 @@ def main(args):
     if args.analyze_alignment:
         t_aln_dict = collections.defaultdict(list)
         for i, j in alignment_tp_symmetric:
-            t_aln_dict[i].append(prediction[j])
+            t_aln_dict[i].append(predicted_nodes[j])
 
-        multiple_truths = [truth[i] for i in t_aln_dict
+        multiple_truths = [ground_truth_nodes[i] for i in t_aln_dict
                            if len(t_aln_dict[i]) > 1]
         multiple_truths_aln_dict = {t: t_aln_dict[t]
                                     for t in t_aln_dict
@@ -408,21 +408,21 @@ def main(args):
 
         print('Truth multi-aligned Node classes:\n{0}'
               ''.format(pprint.pformat(
-            {(truth[t].objid, truth[t].clsname): [(p.objid, p.clsname)
+            {(ground_truth_nodes[t].id, ground_truth_nodes[t].class_name): [(p.id, p.class_name)
                                                   for p in t_aln_dict[t]]
              for t in multiple_truths_aln_dict})))
 
     ##########################################################################
     # Check if the aligned objects have the same classes
-    if args.analyze_clsnames:
-        different_clsnames_pairs = []
+    if args.analyze_classnames:
+        different_classnames_pairs = []
         for i, j in alignment_tp_symmetric:
-            if truth[i].clsname != prediction[j].clsname:
-                different_clsnames_pairs.append((truth[i], prediction[j]))
-        print('Aligned pairs with different clsnames:\n{0}'
+            if ground_truth_nodes[i].class_name != predicted_nodes[j].class_name:
+                different_classnames_pairs.append((ground_truth_nodes[i], predicted_nodes[j]))
+        print('Aligned pairs with different class_names:\n{0}'
               ''.format('\n'.join(['{0}.{1}\t{2}.{3}'
-                                   ''.format(t.objid, t.clsname, p.objid, p.clsname)
-                                   for t, p in different_clsnames_pairs])))
+                                   ''.format(t.id, t.class_name, p.id, p.class_name)
+                                   for t, p in different_classnames_pairs])))
 
     _end_time = time.clock()
     logging.info('analyze_agreement.py done in {0:.3f} s'.format(_end_time - _start_time))

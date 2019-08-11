@@ -4,7 +4,7 @@ import logging
 import operator
 import os
 
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from mung.graph import group_staffs_into_systems, NotationGraph, NotationGraphError
 from mung.constants import InferenceEngineConstants as _CONST
@@ -184,7 +184,7 @@ class PitchInferenceEngineState(object):
         self.current_clef = clef
         self.current_delta_steps = new_delta_steps
 
-    def set_key(self, n_sharps:int=0, n_flats:int=0):
+    def set_key(self, number_of_sharps:int=0, number_of_flats:int=0):
         """Initialize the staffline delta --> key accidental map.
         Currently works only on standard key signatures, where
         there are no repeating accidentals, no double sharps/flats,
@@ -193,11 +193,11 @@ class PitchInferenceEngineState(object):
         However, we can deal at least with key signatures that combine
         sharps and flats (if not more than 7), as seen e.g. in harp music.
 
-        :param n_sharps: How many sharps are there in the key signature?
+        :param number_of_sharps: How many sharps are there in the key signature?
 
-        :param n_flats: How many flats are there in the key signature?
+        :param number_of_flats: How many flats are there in the key signature?
         """
-        if n_flats + n_sharps > 7:
+        if number_of_flats + number_of_sharps > 7:
             raise ValueError('Cannot deal with key signature that has'
                              ' more than 7 sharps + flats!')
 
@@ -220,9 +220,9 @@ class PitchInferenceEngineState(object):
         else:
             raise ValueError("Incorrect clef node set as current_clef {0}.".format(self.current_clef))
 
-        for d in deltas_sharp[:n_sharps]:
+        for d in deltas_sharp[:number_of_sharps]:
             new_key_accidentals[d] = 'sharp'
-        for d in deltas_flat[:n_flats]:
+        for d in deltas_flat[:number_of_flats]:
             new_key_accidentals[d] = 'flat'
 
         self.key_accidentals = new_key_accidentals
@@ -264,7 +264,7 @@ class PitchInferenceEngineState(object):
                 pitch_mod = -2
         return pitch_mod
 
-    def pitch(self, delta):
+    def pitch(self, delta:int) -> int:
         """Given a staffline delta, returns the current MIDI pitch code.
 
         (This method is the main interface of the PitchInferenceEngineState.)
@@ -296,7 +296,7 @@ class PitchInferenceEngineState(object):
 
         return pitch
 
-    def pitch_name(self, delta):
+    def pitch_name(self, delta:int) -> Tuple[str, int]:
         """Given a staffline delta, returns the name of the corrensponding pitch."""
         delta += self.current_clef_delta_shift
 
@@ -346,7 +346,7 @@ class PitchInferenceEngine(object):
 
     * Get measure separators.
     * Chain measure separators in precedence relationships.
-    * Group cropobjects by bins between measure separators.
+    * Group Nodes by bins between measure separators.
     * For each staff participating in the current measure
       (as defined by the relevant measure separator outlinks):
 
@@ -407,7 +407,7 @@ class PitchInferenceEngine(object):
 
     def infer_pitches(self, nodes: List[Node], with_names=False):
         """The main workhorse for pitch inference.
-        Gets a list of CropObjects and for each notehead-type
+        Gets a list of Nodes and for each notehead-type
         symbol, outputs a MIDI code corresponding to the pitch
         encoded by that notehead.
 
@@ -536,7 +536,7 @@ class PitchInferenceEngine(object):
         """
         # Processing ties
         # ---------------
-        ties = self.__children(notehead, 'tie')
+        ties = self.__children(notehead, [_CONST.TIE_CLASS_NAME])
         for t in ties:
             tied_noteheads = self.__parents(t, _CONST.NOTEHEAD_CLASS_NAMES)
 
@@ -893,9 +893,9 @@ class OnsetsInferenceEngine(object):
 
         self.strategy = strategy
 
-    def durations(self, nodes: List[Node], ignore_modifiers: bool = False):
+    def durations(self, nodes: List[Node], ignore_modifiers: bool = False) -> Dict[int, float]:
         """Returns a dict that contains the durations (in beats)
-        of all CropObjects that should be associated with a duration.
+        of all Nodes that should be associated with a duration.
         The dict keys are ``id``.
 
         :param ignore_modifiers: If set, will ignore duration dots,
@@ -925,7 +925,7 @@ class OnsetsInferenceEngine(object):
                              ' beats only available for notes and rests.'
                              ''.format(node.id, node.class_name))
 
-    def notehead_beats(self, notehead, ignore_modifiers=False):
+    def notehead_beats(self, notehead, ignore_modifiers=False) -> float:
         """Retrieves the duration for the given notehead, in beats.
 
         It is possible that the notehead has two stems.
@@ -1067,7 +1067,7 @@ class OnsetsInferenceEngine(object):
 
         return duration_modifier
 
-    def rest_beats(self, rest: Node, ignore_modifiers=False):
+    def rest_beats(self, rest: Node, ignore_modifiers=False) -> float:
         """Compute the duration of the given rest in beats.
 
         :param ignore_modifiers: If given, will ignore all duration
@@ -1235,44 +1235,44 @@ class OnsetsInferenceEngine(object):
         """Infer precedence graph based solely on the "green lines"
         in MUSCIMA++ annotation: precedence edges. These are encoded
         in the data as inlink/outlink lists
-        in ``cropobject.data['precedence_inlinks']``,
-        and ``cropobject.data['precedence_outlinks']``.
+        in ``Node.data['precedence_inlinks']``,
+        and ``Node.data['precedence_outlinks']``.
 
-        :param nodes: A list of CropObjects, not necessarily
+        :param nodes: A list of Nodes, not necessarily
             only those that participate in the precedence graph.
 
         :return: The list of source nodes of the precedence graph.
         """
         _relevant_clsnames = _CONST.classes_bearing_duration
-        p_cropobjects = [c for c in nodes
+        precedence_nodes = [c for c in nodes
                          if c.class_name in _relevant_clsnames]
 
         if self.strategy.precedence_only_for_objects_connected_to_staff:
-            p_cropobjects = [c for c in p_cropobjects
+            precedence_nodes = [c for c in precedence_nodes
                              if len(self.__children(c, ['staff'])) > 0]
 
-        durations = {c.id: self.beats(c) for c in p_cropobjects}
+        durations = {c.id: self.beats(c) for c in precedence_nodes}
 
-        p_nodes = {}
-        for c in p_cropobjects:
+        precedence_nodes = {}
+        for c in precedence_nodes:
             p_node = PrecedenceGraphNode(objid=c.id,
                                          node=c,
                                          inlinks=[],
                                          outlinks=[],
                                          duration=durations[c.id],
                                          )
-            p_nodes[c.id] = p_node
+            precedence_nodes[c.id] = p_node
 
-        for c in p_cropobjects:
+        for c in precedence_nodes:
             inlinks = []
             outlinks = []
             if 'precedence_inlinks' in c.data:
                 inlinks = c.data['precedence_inlinks']
             if 'precedence_outlinks' in c.data:
                 outlinks = c.data['precedence_outlinks']
-            p_node = p_nodes[c.id]
-            p_node.outlinks = [p_nodes[o] for o in outlinks]
-            p_node.inlinks = [p_nodes[i] for i in inlinks]
+            p_node = precedence_nodes[c.id]
+            p_node.outlinks = [precedence_nodes[o] for o in outlinks]
+            p_node.inlinks = [precedence_nodes[i] for i in inlinks]
 
         # Join staves/systems!
 
@@ -1282,7 +1282,7 @@ class OnsetsInferenceEngine(object):
 
         if len(systems) == 1:
             logging.info('Single-system score, no staff chaining needed.')
-            source_nodes = [n for n in list(p_nodes.values()) if len(n.inlinks) == 0]
+            source_nodes = [n for n in list(precedence_nodes.values()) if len(n.inlinks) == 0]
             return source_nodes
 
         # Check all systems same no. of staffs
@@ -1307,7 +1307,7 @@ class OnsetsInferenceEngine(object):
         # - Assign staffs to sink nodes
         sink_nodes2staff = {}
         staff2sink_nodes = collections.defaultdict(list)
-        for node in list(p_nodes.values()):
+        for node in list(precedence_nodes.values()):
             if len(node.outlinks) == 0:
                 try:
                     staff = self.__children(node.obj, ['staff'])[0]
@@ -1331,7 +1331,7 @@ class OnsetsInferenceEngine(object):
         # - Assign staffs to source nodes
         source_nodes2staff = {}
         staff2source_nodes = collections.defaultdict(list)
-        for node in list(p_nodes.values()):
+        for node in list(precedence_nodes.values()):
             if len(node.inlinks) == 0:
                 staff = self.__children(node.obj, ['staff'])[0]
                 source_nodes2staff[node.obj.id] = staff.id
@@ -1349,7 +1349,7 @@ class OnsetsInferenceEngine(object):
                         sink.outlinks.append(source)
                         source.inlinks.append(sink)
 
-        source_nodes = [n for n in list(p_nodes.values()) if len(n.inlinks) == 0]
+        source_nodes = [n for n in list(precedence_nodes.values()) if len(n.inlinks) == 0]
         return source_nodes
 
     def infer_precedence(self, nodes: List[Node]):
@@ -1391,11 +1391,11 @@ class OnsetsInferenceEngine(object):
         at least *not* be positioned in the horizontal span where
         the 8th notes in the upper voice are.
 
-        Which CropObjects participate in the precedence graph?
+        Which Nodes participate in the precedence graph?
         ------------------------------------------------------
 
         We directly derive precedence graph nodes from the following
-        CropObjects:
+        Nodes:
 
         * Noteheads: empty, full, and grace noteheads of both kinds, which
           are assigned duration based on their type (e.g., quarter, 16th, etc.)
@@ -1437,7 +1437,7 @@ class OnsetsInferenceEngine(object):
 
         The **spine** of the precedence graph is a single path of alternating
         ``measure_separator`` and ``measure`` nodes. ``measure_separator``
-        nodes are constructed from the CropObjects, and ``measure`` nodes
+        nodes are constructed from the Nodes, and ``measure`` nodes
         are created artificially between consecutive ``measure_separator``
         nodes. The measure separator nodes have a duration of 0, while
         the duration of the measure nodes is inferred from the time signature
@@ -1727,7 +1727,7 @@ class OnsetsInferenceEngine(object):
         staff_and_measure_to_objs_map = collections.defaultdict(
             collections.defaultdict(list))
         #: Per staff (indexed by id) and measure (by order no.), keeps a list of
-        #  CropObjects from that staff that fall within that measure.
+        #  Nodes from that staff that fall within that measure.
 
         # Iterate over objects left to right, shift measure if next object
         # over bound of current measure.
@@ -1780,7 +1780,7 @@ class OnsetsInferenceEngine(object):
         objects that correspond to the source nodes of the precedence subgraph.
         These nodes then get connected to their leftwards measure separator node.
 
-        :param nodes: List of CropObjects, assumed to be all from one
+        :param nodes: List of Nodes, assumed to be all from one
             measure.
 
         :returns: A list of PrecedenceGraphNode objects that correspond
@@ -1896,6 +1896,16 @@ class OnsetsInferenceEngine(object):
                               staff.bottom, measure_separator.right - _dr
         return output_bbox
 
+    @staticmethod
+    def interpret_numerals(numerals: List[Node]) -> int:
+        """Returns the given numeral Node as a number, left to right."""
+        for n in numerals:
+            if n.class_name not in _CONST.NUMERALS:
+                raise ValueError('Symbol {0} is not a numeral!'.format(n.id))
+        n_str = ''.join([n.class_name[-1]
+                         for n in sorted(numerals, key=operator.attrgetter('left'))])
+        return int(n_str)
+
     def interpret_time_signature(self, time_signature,
                                  FRACTIONAL_VERTICAL_IOU_THRESHOLD=0.8):
         """Converts the time signature into the beat count (in quarter
@@ -1999,7 +2009,7 @@ class OnsetsInferenceEngine(object):
                 raise NotationGraphError('Time signature has no numerals, but is'
                                          ' not fraction-like! {0}'
                                          ''.format(time_signature.id))
-            beats = _CONST.interpret_numerals(numerals)
+            beats = OnsetsInferenceEngine.interpret_numerals(numerals)
             logging.info('... Beats: {0}'.format(beats))
             return beats
 
@@ -2016,8 +2026,8 @@ class OnsetsInferenceEngine(object):
             largest_gap_idx = max(list(range(len(gaps))), key=lambda i: gaps[i]) + 1
             numerator = numerals[:largest_gap_idx]
             denominator = numerals[largest_gap_idx:]
-            beat_count = _CONST.interpret_numerals(numerator)
-            beat_units = _CONST.interpret_numerals(denominator)
+            beat_count = OnsetsInferenceEngine.interpret_numerals(numerator)
+            beat_units = OnsetsInferenceEngine.interpret_numerals(denominator)
 
             beats = beat_count / (beat_units / 4)
             logging.info('...signature : {0} / {1}, beats: {2}'
@@ -2026,12 +2036,12 @@ class OnsetsInferenceEngine(object):
             return beats
 
     def onsets(self, nodes: List[Node]):
-        """Infers the onsets of notes in the given cropobjects.
+        """Infers the onsets of notes in the given Nodes.
 
         The onsets are measured in beats.
 
         :returns: A id --> onset dict for all notehead-type
-            CropObjects.
+            Nodes.
         """
         # We first find the precedence graph. (This is the hard
         # part.)
@@ -2039,7 +2049,6 @@ class OnsetsInferenceEngine(object):
         # objects. The infer_precedence() method returns a list
         # of the graph's source nodes (of which there is in fact
         # only one, the way it is currently defined).
-        ### precedence_graph = self.infer_precedence(cropobjects)
         precedence_graph = self.infer_precedence_from_annotations(nodes)
         for node in precedence_graph:
             node.onset = 0
@@ -2168,7 +2177,7 @@ class OnsetsInferenceEngine(object):
         logging.info('Processing ties...')
         g = NotationGraph(nodes=nodes)
 
-        def _get_tie_notes(_tie, graph):
+        def __get_tie_notes(_tie, graph):
             notes = graph.parents(_tie, class_filter=['noteheadFull', 'notehead-empty'])
             if len(notes) == 0:
                 raise NotationGraphError('No notes from tie {0}'.format(_tie.id))
@@ -2181,7 +2190,7 @@ class OnsetsInferenceEngine(object):
             return l, r
 
         def _is_note_left(c, _tie, graph):
-            tie_notes = _get_tie_notes(_tie, graph)
+            tie_notes = __get_tie_notes(_tie, graph)
             if len(tie_notes) == 2:
                 l, r = tie_notes
                 return l.id == c.id
@@ -2195,7 +2204,7 @@ class OnsetsInferenceEngine(object):
         # the new onsets dict by the time we process the note on the left
         # of the leftward tie (its predecessor).
         for k in sorted(onsets, key=lambda x: onsets[x], reverse=True):
-            ties = g.children(k, class_filter=['tie'])
+            ties = g.children(k, class_filter=[_CONST.TIE_CLASS_NAME])
             if len(ties) == 0:
                 continue
 
@@ -2205,7 +2214,7 @@ class OnsetsInferenceEngine(object):
             else:
                 tie = ties[0]
             n = g[k]
-            tie_notes = _get_tie_notes(tie, graph=g)
+            tie_notes = __get_tie_notes(tie, graph=g)
             if len(tie_notes) != 2:
                 continue
 
@@ -2228,7 +2237,7 @@ class PrecedenceGraphNode(object):
 
     def __init__(self, objid=None, node: Node = None, inlinks=None, outlinks=None,
                  onset=None, duration=0):
-        # Optional link to CropObjects, or just a placeholder ID.
+        # Optional link to Nodes, or just a placeholder ID.
         self.obj = node
         if objid is None and node is not None:
             objid = node.id

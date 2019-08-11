@@ -1,6 +1,6 @@
 """The script ``add_staffline_symbols.py`` takes as input a CVC-MUSCIMA
-(page, writer) index and a corresponding CropObjectList file
-and adds to the CropObjectList staffline and staff objects."""
+(page, writer) index and a corresponding NodeList file
+and adds to the NodeList staffline and staff objects."""
 import argparse
 import logging
 import os
@@ -19,6 +19,7 @@ from mung.node import Node
 from mung.utils import compute_connected_components
 
 from mung.constants import InferenceEngineConstants as _CONST
+
 
 def build_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__, add_help=True,
@@ -41,13 +42,13 @@ def build_argument_parser():
                              ' to read the CVC_MUSCIMA_ROOT env var. If that does not'
                              ' work, the script will fail.')
 
-    parser.add_argument('-a', '--annot', action='store', # required=True,
+    parser.add_argument('-a', '--annot', action='store',  # required=True,
                         help='The annotation file for which the staffline and staff'
-                             ' CropObjects should be added. If not supplied, default'
-                             ' document/collection names will be used and cropobjects will'
+                             ' Nodes should be added. If not supplied, default'
+                             ' document/collection names will be used and Nodes will'
                              ' be numberd from 0 in the output.')
     parser.add_argument('-e', '--export', action='store',
-                        help='A filename to which the output CropObjectList'
+                        help='A filename to which the output NodeList'
                              ' should be saved. If not given, will print to'
                              ' stdout.')
     parser.add_argument('--stafflines_only', action='store_true',
@@ -88,12 +89,12 @@ def main(args):
     logging.info('Getting staffline connected components.')
 
     #  - Get connected components in gt image.
-    cc, labels, bboxes = compute_connected_components(gt)
+    connected_components, labels, bboxes = compute_connected_components(gt)
 
     #  - Use vertical dimension of CCs to determine which ones belong together
     #    to form stafflines. (Criterion: row overlap.)
     n_rows, n_cols = gt.shape
-    intervals = [[] for _ in range(n_rows)] # For each row: which CCs have pxs on that row?
+    intervals = [[] for _ in range(n_rows)]  # For each row: which CCs have pxs on that row?
     for label, (t, l, b, r) in list(bboxes.items()):
         if label == 0:
             continue
@@ -105,7 +106,7 @@ def main(args):
             intervals[row].append(label)
 
     logging.info('Grouping staffline connected components into stafflines.')
-    staffline_components = []   # For each staffline, we collect the CCs that it is made of
+    staffline_components = []  # For each staffline, we collect the CCs that it is made of
     _in_staffline = False
     _current_staffline_components = []
     for r_labels in intervals:
@@ -169,7 +170,7 @@ def main(args):
     staff_masks = []
 
     for i in range(n_stafflines // 5):
-        _sbb = staffline_bboxes[5*i:5*(i+1)]
+        _sbb = staffline_bboxes[5 * i:5 * (i + 1)]
         _st = min([bb[0] for bb in _sbb])
         _sl = min([bb[1] for bb in _sbb])
         _sb = max([bb[2] for bb in _sbb])
@@ -187,67 +188,67 @@ def main(args):
     #  - Obtain gap region masks from full image
     #  - Add gap region mask to staffline mask.
 
-    # Create the CropObjects for stafflines and staffs:
+    # Create the Nodes for stafflines and staffs:
     #  - Load corresponding annotation, to which the stafflines and
     #    staves should be added. (This is needed to correctly set docname
-    #    and objids.)
+    #    and node_ids.)
     if not args.annot:
-        cropobjects = []
-        next_objid = 0
+        nodes = []
+        next_node_id = 0
         dataset = 'FCNOMR'
         document = os.path.splitext(os.path.basename(args.staff_imfile))[0]
     else:
         if not os.path.isfile(args.annot):
             raise ValueError('Annotation file {0} does not exist!'.format(args.annot))
 
-        logging.info('Creating cropobjects...')
-        cropobjects = read_nodes_from_file(args.annot)
-        logging.info('Non-staffline cropobjects: {0}'.format(len(cropobjects)))
-        next_objid = max([c.id for c in cropobjects]) + 1
-        dataset = cropobjects[0].dataset
-        document = cropobjects[0].document
+        logging.info('Creating Nodes...')
+        nodes = read_nodes_from_file(args.annot)
+        logging.info('Non-staffline Nodes: {0}'.format(len(nodes)))
+        next_node_id = max([c.id for c in nodes]) + 1
+        dataset = nodes[0].dataset
+        document = nodes[0].document
 
-    #  - Create the staffline CropObjects
-    staffline_cropobjects = []
+    #  - Create the staffline Nodes
+    stafflines = []
     for sl_bb, sl_m in zip(staffline_bboxes, staffline_masks):
         t, l, b, r = sl_bb
-        c = Node(id_=next_objid,
+        c = Node(id_=next_node_id,
                  class_name=_CONST.STAFFLINE_CLASS_NAME,
                  top=t, left=l, height=b - t, width=r - l,
                  mask=sl_m,
                  dataset=dataset, document=document)
-        staffline_cropobjects.append(c)
-        next_objid += 1
+        stafflines.append(c)
+        next_node_id += 1
 
     if not args.stafflines_only:
 
-        #  - Create the staff CropObjects
-        staff_cropobjects = []
+        #  - Create the staff Nodes
+        staffs = []
         for s_bb, s_m in zip(staff_bboxes, staff_masks):
             t, l, b, r = s_bb
-            c = Node(id_=next_objid,
+            c = Node(id_=next_node_id,
                      class_name=_CONST.STAFF_CLASS_NAME,
                      top=t, left=l, height=b - t, width=r - l,
                      mask=s_m,
                      dataset=dataset, document=document)
-            staff_cropobjects.append(c)
-            next_objid += 1
+            staffs.append(c)
+            next_node_id += 1
 
         #  - Add the inlinks/outlinks
-        for i, sc in enumerate(staff_cropobjects):
+        for i, sc in enumerate(staffs):
             sl_from = 5 * i
             sl_to = 5 * (i + 1)
-            for sl in staffline_cropobjects[sl_from:sl_to]:
+            for sl in stafflines[sl_from:sl_to]:
                 sl.inlinks.append(sc.id)
                 sc.outlinks.append(sl.id)
 
         # Add the staffspaces.
-        staffspace_cropobjects = []
-        for i, staff in enumerate(staff_cropobjects):
-            current_stafflines = [sc for sc in staffline_cropobjects if sc.id in staff.outlinks]
+        staffspaces = []
+        for i, staff in enumerate(staffs):
+            current_stafflines = [sc for sc in stafflines if sc.id in staff.outlinks]
             sorted_stafflines = sorted(current_stafflines, key=lambda x: x.top)
 
-            current_staffspace_cropobjects = []
+            current_staffspaces = []
 
             # Percussion single-line staves do not have staffspaces.
             if len(sorted_stafflines) == 1:
@@ -284,8 +285,8 @@ def main(args):
                 logging.debug(canvas.shape)
                 logging.debug('l={0}, dl1={1}, dl2={2}, r={3}, dr1={4}, dr2={5}'
                               ''.format(l, dl1, dl2, r, dr1, dr2))
-                #canvas[:s1.height, :] += s1.mask[:, dl1:s1.width-dr1]
-                #canvas[-s2.height:, :] += s2.mask[:, dl2:s2.width-dr2]
+                # canvas[:s1.height, :] += s1.mask[:, dl1:s1.width-dr1]
+                # canvas[-s2.height:, :] += s2.mask[:, dl2:s2.width-dr2]
 
                 # We have to deal with staffline interruptions.
                 # One way to do this
@@ -318,7 +319,7 @@ def main(args):
                 ss_left = l
                 ss_right = r
 
-                staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
+                staffspace = Node(next_node_id, _CONST.STAFFSPACE_CLASS_NAME,
                                   top=ss_top, left=ss_left,
                                   height=ss_bottom - ss_top,
                                   width=ss_right - ss_left,
@@ -328,9 +329,9 @@ def main(args):
                 staffspace.inlinks.append(staff.id)
                 staff.outlinks.append(staffspace.id)
 
-                current_staffspace_cropobjects.append(staffspace)
+                current_staffspaces.append(staffspace)
 
-                next_objid += 1
+                next_node_id += 1
 
             # Add top and bottom staffspace.
             # These outer staffspaces will have the width
@@ -341,7 +342,7 @@ def main(args):
             # Upper staffspace
             tsl = sorted_stafflines[0]
             tsl_heights = tsl.mask.sum(axis=0)
-            tss = current_staffspace_cropobjects[0]
+            tss = current_staffspaces[0]
             tss_heights = tss.mask.sum(axis=0)
 
             uss_top = max(0, tss.top - max(tss_heights))
@@ -354,67 +355,67 @@ def main(args):
             uss_top += tss.height - uss_height
             uss_mask = tss.mask[:uss_height, :] * 1
 
-            staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
+            staffspace = Node(next_node_id, _CONST.STAFFSPACE_CLASS_NAME,
                               top=uss_top, left=uss_left,
                               height=uss_height,
                               width=uss_width,
                               mask=uss_mask,
                               dataset=dataset, document=document)
-            current_staffspace_cropobjects.append(staffspace)
+            current_staffspaces.append(staffspace)
             staff.outlinks.append(staffspace.id)
             staffspace.inlinks.append(staff.id)
-            next_objid += 1
+            next_node_id += 1
 
             # Lower staffspace
-            bss = current_staffspace_cropobjects[-1]
+            bss = current_staffspaces[-1]
             bss_heights = bss.mask.sum(axis=0)
             bsl = sorted_stafflines[-1]
             bsl_heights = bsl.mask.sum(axis=0)
 
-            lss_top = bss.bottom # + max(bsl_heights)
+            lss_top = bss.bottom  # + max(bsl_heights)
             lss_left = bss.left
             lss_width = bss.width
             lss_height = int(bss.height / 1.2)
             lss_mask = bss.mask[:lss_height, :] * 1
 
-            staffspace = Node(next_objid, _CONST.STAFFSPACE_CLASS_NAME,
+            staffspace = Node(next_node_id, _CONST.STAFFSPACE_CLASS_NAME,
                               top=lss_top, left=lss_left,
                               height=lss_height,
                               width=lss_width,
                               mask=lss_mask,
                               dataset=dataset, document=document)
-            current_staffspace_cropobjects.append(staffspace)
+            current_staffspaces.append(staffspace)
             staff.outlinks.append(staffspace.id)
             staffspace.inlinks.append(staff.id)
-            next_objid += 1
+            next_node_id += 1
 
             # ################ End of dealing with upper/lower staffspace ######
 
             # Add to current list
-            staffspace_cropobjects += current_staffspace_cropobjects
+            staffspaces += current_staffspaces
 
         # - Join the lists together
-        cropobjects_with_staffs = cropobjects \
-                                  + staffline_cropobjects \
-                                  + staffspace_cropobjects \
-                                  + staff_cropobjects
+        nodes_with_staffs = nodes \
+                            + stafflines \
+                            + staffspaces \
+                            + staffs
 
     else:
-        cropobjects_with_staffs = cropobjects + staffline_cropobjects
+        nodes_with_staffs = nodes + stafflines
 
-    logging.info('Exporting the new cropobject list: {0} objects'
-                    ''.format(len(cropobjects_with_staffs)))
+    logging.info('Exporting the new Node list: {0} objects'
+                 ''.format(len(nodes_with_staffs)))
     # - Export the combined list.
-    cropobject_string = export_node_list(cropobjects_with_staffs)
+    nodes_string = export_node_list(nodes_with_staffs)
     if args.export is not None:
         with open(args.export, 'w') as hdl:
-            hdl.write(cropobject_string)
+            hdl.write(nodes_string)
     else:
-        print(cropobject_string)
+        print(nodes_string)
 
     _end_time = time.clock()
     logging.info('add_staffline_symbols.py done in {0:.3f} s'
-                    ''.format(_end_time - _start_time))
+                 ''.format(_end_time - _start_time))
 
 
 def staffline_surroundings_mask(staffline: Node) -> Tuple[numpy.ndarray, numpy.ndarray]:
