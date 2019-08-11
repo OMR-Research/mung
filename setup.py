@@ -44,7 +44,7 @@ setup(
     author='Jan Hajič jr. and Alexander Pacha',
     install_requires=['numpy>=1.11.1',
                       'lxml>=3.6.4'],
-    author_email='hajicj@ufal.mff.cuni.cz',
+    author_email='alexander.pacha@tuwien.ac.at',
     description='Tools for the Music Notation Graph representation of music notation, used primarily for optical music recognition.',
     long_description=get_long_description(),
     long_description_content_type="text/markdown",

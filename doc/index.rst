@@ -20,14 +20,15 @@ And more thoroughly in an arXiv.org publication:
 `<https://arxiv.org/pdf/1703.04824.pdf>`_
 
 This pacakge is licensed under the MIT license (see ``LICENSE.txt`` file).
-The package author is Jan Hajič jr. You can contact him at::
+The package authors are Jan Hajič jr and Alexander Pacha. You can contact them at::
 
+  alexander.pacha@tuwien.ac.at
   hajicj@ufal.mff.cuni.cz
 
 Questions and comments are welcome! This package is also hosted on github,
 so if you find a bug, submit an issue (or a pull request!) there:
 
-`<https://github.com/hajicj/muscima>`_
+`<https://github.com/OMR-Research/mung>`_
 
 
 Requirements
