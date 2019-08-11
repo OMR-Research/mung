@@ -1,7 +1,7 @@
-mung.Node module
+mung.node module
 =========================
 
-.. automodule:: mung.Node
+.. automodule:: mung.node
     :members:
     :undoc-members:
     :show-inheritance:
