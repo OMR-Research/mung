@@ -1,7 +1,7 @@
-muscima.cropobject module
+mung.Node module
 =========================
 
-.. automodule:: muscima.cropobject
+.. automodule:: mung.Node
     :members:
     :undoc-members:
     :show-inheritance:

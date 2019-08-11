@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-muscima -- tools for the MUSCIMA++ dataset
+MuNG -- tools for the MUSCIMA++ dataset
 ==========================================
 
-The ``muscima`` package implements tools for easier manipulation of the MUSCIMA++
+The ``mung`` package implements tools for easier manipulation of the MUSCIMA++
 dataset. Download the dataset here:
 
 `<https://ufal.mff.cuni.cz/muscima/download>`_
@@ -33,7 +33,7 @@ so if you find a bug, submit an issue (or a pull request!) there:
 Requirements
 ------------
 
-Python 3.5, otherwise nothing beyond the ``requirements.txt`` file: ``lxml`` and ``numpy``.
+Python 3.6, otherwise nothing beyond the ``requirements.txt`` file: ``lxml`` and ``numpy``.
 If you want to apply pitch inference, you should also get ``music21``.
 
 Installation
@@ -41,7 +41,7 @@ Installation
 
 If you have ``pip``, just run::
 
-  pip install muscima
+  pip install mung
 
 If you don't have ``pip``, then you should `get it <https://pypi.python.org/pypi/pip>`_.
 Or use the `Anaconda distribution <https://www.continuum.io/>`_.
@@ -51,9 +51,9 @@ First steps
 
 Let's first download the dataset::
 
-  curl https://ufal.mff.cuni.cz/~hajicj/2017/docs/MUSCIMA_0.9.zip > MUSCIMA++_0.9.zip
-  unzip MUSCIMA++_0.9.zip
-  cd MUSCIMA++_0.9
+  curl https://github.com/OMR-Research/muscima-pp/releases/download/v2.0/MUSCIMA-pp_v2.0.zip > MUSCIMA-pp_v2.0.zip
+  unzip MUSCIMA-pp_v2.0.zip
+  cd MUSCIMA-pp_v2.0
 
 Take a look at the dataset's ``README.md`` file first. You can also read it online:
 
@@ -68,13 +68,13 @@ ipython if you don't use it!) and parse the data::
 
   ipython
   >>> import os
-  >>> from muscima.io import read_nodes_from_file
-  >>> cropobject_fnames = [os.path.join('data', 'cropobjects', f) for f in os.listdir('data/cropobjects')]
-  >>> docs = [read_nodes_from_file(f) for f in cropobject_fnames]
+  >>> from mung.io import read_nodes_from_file
+  >>> node_filenames = [os.path.join('data', 'nodes_with_staff_annotations', f) for f in os.listdir('data/nodes_with_staff_annotations')]
+  >>> docs = [read_nodes_from_file(f) for f in node_filenames]
   >>> len(docs)
   140
 
-In ``docs``, we now have a list of CropObject lists for each of the 140 documents.
+In ``docs``, we now have a list of Node lists for each of the 140 documents.
 
 Now that the dataset has been parsed, we can try to do some experiments!
 We can do for example symbol classification. Go check out the :ref:`tutorial`!

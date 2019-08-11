@@ -1,7 +1,7 @@
-muscima.grammar module
+mung.dataset module
 ======================
 
-.. automodule:: muscima.grammar
+.. automodule:: mung.dataset
     :members:
     :undoc-members:
     :show-inheritance:

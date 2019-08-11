@@ -1,7 +1,7 @@
-muscima.io module
+mung.io module
 =================
 
-.. automodule:: muscima.io
+.. automodule:: mung.io
     :members:
     :undoc-members:
     :show-inheritance:

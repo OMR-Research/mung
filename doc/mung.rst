@@ -1,4 +1,4 @@
-muscima package
+mung package
 ===============
 
 Submodules
@@ -6,16 +6,16 @@ Submodules
 
 .. toctree::
 
-   muscima.cropobject
-   muscima.cropobject_class
-   muscima.dataset
-   muscima.grammar
-   muscima.io
+   mung.node
+   mung.node_class
+   mung.dataset
+   mung.grammar
+   mung.io
 
 Module contents
 ---------------
 
-.. automodule:: muscima
+.. automodule:: mung
     :members:
     :undoc-members:
     :show-inheritance:
