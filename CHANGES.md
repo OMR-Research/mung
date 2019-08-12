@@ -5,6 +5,9 @@ Changelog
 
 This changelog does not refer to the older `muscima` package.
 
+1.1
+---
+Performance improvements for loading image masks from RLE string.
 
 1.0
 ---
