@@ -807,14 +807,16 @@ class Node(object):
         if mask_string == 'None':
             return None
 
-        values = []
+        mask_flat = numpy.zeros(shape[0]*shape[1], numpy.uint8)
+        index = 0
         for kv in mask_string.split(' '):
             k_string, v_string = kv.split(':')
             k, v = int(k_string), int(v_string)
-            vs = [k for _ in range(v)]
-            values.extend(vs)
+            if k == 1:
+                mask_flat[index:index+v] = 1
+            index += v
 
-        mask = numpy.array(values).reshape(shape)
+        mask = mask_flat.reshape(shape)
         return mask
 
     def join(self, other):
