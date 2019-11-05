@@ -19,6 +19,16 @@ Requires Python >= 3.6.
 2. Download the [MUSCIMA++ dataset](https://github.com/OMR-Research/muscima-pp).
 3. Run through the [tutorial](https://muscima.readthedocs.io/en/latest/Tutorial.html#tutorial).
 
+Fundamentally, the Music Notatation Graph is a very simple construct:
+
+![](doc/MuNG%20Class%20Diagram.png)
+
+It stores the primitives that can be detected by a [Music Object Detector](https://github.com/apacha/MusicObjectDetector-TF)
+as nodes and then store the relations between those nodes. But the devil is
+in the details. To better understand what kind of [relations are useful](https://archives.ismir.net/ismir2019/paper/000006.pdf) 
+and which kind of relations are stored for common western music notation, check out the
+[annotator instruction from MUSCIMarker](https://muscimarker.readthedocs.io/en/latest/instructions.html).
+
 
 
 ## Dataset
