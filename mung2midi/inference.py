@@ -3,13 +3,17 @@ import copy
 import logging
 import operator
 import os
-
+import uuid
 from typing import List, Dict, Tuple
 
+from midi2audio import FluidSynth
+from midiutil import MIDIFile
+
+from mung.constants import InferenceEngineConstants
 from mung.graph import group_staffs_into_systems, NotationGraph, NotationGraphError
-from mung.constants import InferenceEngineConstants as _CONST
 from mung.node import bounding_box_dice_coefficient, Node
 
+_CONST = InferenceEngineConstants()
 
 class OnsetsInferenceStrategy(object):
     def __init__(self):
@@ -127,7 +131,7 @@ class PitchInferenceEngineState(object):
         lines.append('\tinline_accidentals: {0}'.format(self.inline_accidentals))
         return '\n'.join(lines)
 
-    def init_base_pitch(self, clef: Node = None, delta:int=0):
+    def init_base_pitch(self, clef: Node = None, delta: int = 0):
         """Initializes the base pitch while taking into account
         the displacement of the clef from its initial position."""
         self.init_base_pitch_default_staffline(clef)
@@ -184,7 +188,7 @@ class PitchInferenceEngineState(object):
         self.current_clef = clef
         self.current_delta_steps = new_delta_steps
 
-    def set_key(self, number_of_sharps:int=0, number_of_flats:int=0):
+    def set_key(self, number_of_sharps: int = 0, number_of_flats: int = 0):
         """Initialize the staffline delta --> key accidental map.
         Currently works only on standard key signatures, where
         there are no repeating accidentals, no double sharps/flats,
@@ -227,13 +231,13 @@ class PitchInferenceEngineState(object):
 
         self.key_accidentals = new_key_accidentals
 
-    def set_inline_accidental(self, delta:int, accidental:Node):
+    def set_inline_accidental(self, delta: int, accidental: Node):
         self.inline_accidentals[delta] = accidental.class_name
 
     def reset_inline_accidentals(self):
         self.inline_accidentals = {}
 
-    def accidental(self, delta:int) -> int:
+    def accidental(self, delta: int) -> int:
         """Returns the modification, in MIDI code, corresponding
         to the staffline given by the delta."""
         pitch_mod = 0
@@ -264,7 +268,7 @@ class PitchInferenceEngineState(object):
                 pitch_mod = -2
         return pitch_mod
 
-    def pitch(self, delta:int) -> int:
+    def pitch(self, delta: int) -> int:
         """Given a staffline delta, returns the current MIDI pitch code.
 
         (This method is the main interface of the PitchInferenceEngineState.)
@@ -296,7 +300,7 @@ class PitchInferenceEngineState(object):
 
         return pitch
 
-    def pitch_name(self, delta:int) -> Tuple[str, int]:
+    def pitch_name(self, delta: int) -> Tuple[str, int]:
         """Given a staffline delta, returns the name of the corrensponding pitch."""
         delta += self.current_clef_delta_shift
 
@@ -947,12 +951,12 @@ class OnsetsInferenceEngine(object):
         """
         beat = [0]
 
-        stems = self.__children(notehead, ['stem'])
+        stems = self.__children(notehead, [_CONST.STEM_CLASS_NAME])
         flags_and_beams = self.__children(
             notehead,
             _CONST.FLAGS_AND_BEAMS)
 
-        if notehead.class_name.startswith('grace-notehead'):
+        if notehead.class_name in _CONST.GRACE_NOTEHEAD_CLASS_NAMES:
             logging.warning('Notehead {0}: Grace notes get zero duration!'
                             ''.format(notehead.id))
             beat = [0]
@@ -966,17 +970,16 @@ class OnsetsInferenceEngine(object):
                                         ' where multiple durations apply.')
                 beat = [max(beat)]
 
-        elif notehead.class_name == 'notehead-empty':
+        elif notehead.class_name == _CONST.NOTEHEAD_HALF or notehead.class_name == _CONST.NOTEHEAD_WHOLE:
             if len(flags_and_beams) != 0:
-                raise ValueError('Notehead {0} is empty, but has {1} flags and beams!'
-                                 ''.format(notehead.id))
+                raise ValueError('Notehead {0} is empty, but has {1} flags and beams!'.format(notehead.id, len(flags_and_beams)))
 
             if len(stems) == 0:
                 beat = [4]
             else:
                 beat = [2]
 
-        elif notehead.class_name == 'noteheadFull':
+        elif notehead.class_name == _CONST.NOTEHEAD_FULL:
             if len(stems) == 0:
                 self.__warning_or_error('Full notehead {0} has no stem!'.format(notehead.id))
 
@@ -1005,7 +1008,7 @@ class OnsetsInferenceEngine(object):
         """
         duration_modifier = 1
         # Dealing with tuples:
-        tuples = self.__children(notehead, ['tuple'])
+        tuples = self.__children(notehead, [_CONST.TUPLE])
         if len(tuples) > 1:
             raise ValueError('Notehead {0}: Cannot deal with more than one tuple'
                              ' simultaneously.'.format(notehead.id))
@@ -1059,7 +1062,7 @@ class OnsetsInferenceEngine(object):
                                                               tuple_number))
 
         # Duration dots
-        ddots = self.__children(notehead, ['duration-dot'])
+        ddots = self.__children(notehead, [_CONST.AUGMENTATION_DOT])
         dot_duration_modifier = 1
         for i, d in enumerate(ddots):
             dot_duration_modifier += 1 / (2 ** (i + 1))
@@ -1079,19 +1082,20 @@ class OnsetsInferenceEngine(object):
             for whole rests.
 
         """
-        rest_beats_dict = {'whole_rest': 4,  # !!! We should find the Time Signature.
-                           'half_rest': 2,
-                           'quarter_rest': 1,
-                           '8th_rest': 0.5,
-                           '16th_rest': 0.25,
-                           '32th_rest': 0.125,
-                           '64th_and_higher_rest': 0.0625,
+
+        rest_beats_dict = {_CONST.REST_WHOLE: 4,  # !!! We should find the Time Signature.
+                           _CONST.REST_HALF: 2,
+                           _CONST.REST_QUARTER: 1,
+                           _CONST.REST_8TH: 0.5,
+                           _CONST.REST_16TH: 0.25,
+                           _CONST.REST_32ND: 0.125,
+                           _CONST.REST_64TH: 0.0625,
                            # Technically, these two should just apply time sig.,
                            # but the measure-factorized precedence graph
                            # means these durations never have sounding
                            # descendants anyway:
-                           'multi-measure_rest': 4,
-                           'repeat-measure': 4,
+                           _CONST.MULTI_MEASURE_REST: 4,
+                           _CONST.REPEAT_ONE_BAR: 4,
                            }
 
         try:
@@ -1184,12 +1188,12 @@ class OnsetsInferenceEngine(object):
             _CONST.FLAGS_AND_BEAMS)
 
         if len(flags_and_beams) == 0:
-            if notehead.class_name == 'noteheadFull':
+            if notehead.class_name == _CONST.NOTEHEAD_FULL:
                 return [1]
-            elif notehead.class_name == 'notehead-empty':
+            elif notehead.class_name in _CONST.NOTEHEADS_EMPTY:
                 return [2]
 
-        if notehead.class_name == 'notehead-empty':
+        if notehead.class_name in _CONST.NOTEHEADS_EMPTY:
             raise NotationGraphError('Empty notehead with flags and beams: {0}'
                                      ''.format(notehead.id))
 
@@ -1218,7 +1222,7 @@ class OnsetsInferenceEngine(object):
 
         beat = [beat_above]
 
-        tuples = self.__children(notehead, ['tuple'])
+        tuples = self.__children(notehead, [_CONST.TUPLE])
         if len(tuples) % 2 != 0:
             raise NotImplementedError('Cannot deal with multi-stem note'
                                       ' that has an uneven number of tuples:'
@@ -1245,11 +1249,11 @@ class OnsetsInferenceEngine(object):
         """
         _relevant_clsnames = _CONST.classes_bearing_duration
         precedence_nodes = [c for c in nodes
-                         if c.class_name in _relevant_clsnames]
+                            if c.class_name in _relevant_clsnames]
 
         if self.strategy.precedence_only_for_objects_connected_to_staff:
             precedence_nodes = [c for c in precedence_nodes
-                             if len(self.__children(c, ['staff'])) > 0]
+                                if len(self.__children(c, [_CONST.STAFF_CLASS_NAME])) > 0]
 
         durations = {c.id: self.beats(c) for c in precedence_nodes}
 
@@ -2235,7 +2239,7 @@ class PrecedenceGraphNode(object):
     of other ``PrecedenceGraphNode`` instances.
     """
 
-    def __init__(self, objid=None, node: Node = None, inlinks=None, outlinks=None,
+    def __init__(self, objid=None, node: Node = None, inlinks: List[int] = None, outlinks: List[int]=None,
                  onset=None, duration=0):
         # Optional link to Nodes, or just a placeholder ID.
         self.obj = node
@@ -2257,151 +2261,3 @@ class PrecedenceGraphNode(object):
         self.duration = duration
         '''By how much musical time does the object delay the onsets
         of its descendants in the precedence graph?'''
-
-
-class MIDIBuilder(object):
-
-    def midi_matrix_to_pdo(self, midi_matrix, framerate=20, tempo=120):
-        """Builds the pitch, duration and onset dicts from a given MIDI
-        matrix. Does *not* take into account possible re-articulations:
-        repeated adjacent notes are transformed into just one.
-
-        :param midi_matrix: A ``128 x n_frames`` binary numpy array.
-            Expected to be in the less intuitive format, where pitch
-            ``J`` is encoded in row ``(128 - J)`` -- you would plot this
-            with ``origin=lower`` in the ``imshow()`` call.
-
-        :param FPS: each frame in the MIDI matrix corresponds to ``1 / FPS``
-            of a second. Used together with ``tempo`` to determine durations
-            in beats.
-
-        :param tempo: The tempo in which the MIDI matrix should be interpreted.
-            This does not actually matter for the output MIDI -- you can
-            balance it out by using a different ``FPS`` value. However, it is
-            necessary to compute durations and onsets in beats, since this is
-            what the MIDI building functions in ``midiutil.MidiFile`` expect.
-
-        :returns: ``pitches, durations, onsets``. These are dicts indexed
-            by note ID (equivalent to notehead objids in MuNG context).
-            Pitches contain for each note the MIDI pitch code, durations
-            contain its duration in beats, and onsets contain its onset
-            in beats.
-        """
-        pitches = dict()
-        durations = dict()
-        onsets = dict()
-
-        # Collect pitch activities.
-
-        # For each pitch, contains a list of (start_frame, end_frame+1) pairs.
-        activities = collections.defaultdict(list)
-
-        n_frames = midi_matrix.shape[1]
-        n_pitch_classes = midi_matrix.shape[0]
-        currently_active = dict()
-        for i_frame in range(n_frames):
-            # Collect onsets
-            frame = midi_matrix[:, i_frame]
-            for idx, entry in enumerate(frame):
-                # pitch = n_pitch_classes - idx
-                pitch = idx
-                if entry != 0:
-                    if pitch not in currently_active:
-                        # Start activity
-                        currently_active[pitch] = i_frame
-                else:
-                    if pitch in currently_active:
-                        activities[pitch].append((currently_active[pitch], i_frame))
-                        del currently_active[pitch]
-
-        # Convert pitch activities into onset/pitch/duration dicts.
-        notes = []
-        for pitch in activities:
-            for onset_frame, end_frame in activities[pitch]:
-                notes.append((onset_frame, pitch, end_frame - onset_frame))
-        # Sort by start and from lowest to highest:
-        ordered_by_start_frame = sorted(notes)
-
-        # Distribute into pitch/duration/onset dicts
-        for event_idx, (onset_frame, pitch, duration_frames) in enumerate(notes):
-            onset_beats = self.frames2beats(onset_frame,
-                                            framerate=framerate,
-                                            tempo=tempo)
-            duration_beats = self.frames2beats(duration_frames,
-                                               framerate=framerate,
-                                               tempo=tempo)
-            pitches[event_idx] = pitch
-            durations[event_idx] = duration_beats
-            onsets[event_idx] = onset_beats
-
-        logging.debug('{} note events, last onset: beat {} (seconds: {})'
-                      ''.format(len(notes), notes[-1][0], notes[-1][0] * tempo / 60.))
-
-        return pitches, durations, onsets
-
-    def frames2beats(self, n_frames, framerate, tempo):
-        """Converts a number of frames to duration in beats,
-        given a framerate and tempo."""
-        return (n_frames / float(framerate)) * (tempo / 60.)
-
-    def build_midi(self, pitches, durations, onsets, selection=None, tempo=120):
-        from midiutil.MidiFile import MIDIFile
-
-        # create your MIDI object
-        mf = MIDIFile(1)  # only 1 track
-        track = 0  # the only track
-
-        time = 0  # start at the beginning
-        mf.addTrackName(track, time, "Sample Track")
-        mf.addTempo(track, time, tempo)
-
-        channel = 0
-        volume = 100
-
-        keys = list(pitches.keys())
-
-        min_onset = 0
-        if selection is not None:
-            keys = [k for k in keys if k in selection]
-            min_onset = min([onsets[k] for k in keys if k in onsets])
-
-        for objid in keys:
-            if (objid in onsets) and (objid in durations):
-                pitch = pitches[objid]
-                onset = onsets[objid] - min_onset
-                duration = durations[objid]
-                mf.addNote(track, channel, pitch, onset, duration, volume)
-
-        return mf
-
-
-def play_midi(midi,
-              tmp_dir,
-              soundfont='~/.fluidsynth/FluidR3_GM.sf2',
-              cleanup=False):
-    """Plays (or attempts to play) the given MIDIFile object.
-
-    :param midi: A ``midiutils.MidiFile.MIDIFile`` object
-        containing the data that you wish to play.
-
-    :param tmp_dir: A writeable directory where the MIDI will be
-        exported into a temporary file.
-
-    :param soundfont: A *.sf2 soundfont for FluidSynth to load.
-    """
-    from midi2audio import FluidSynth
-
-    import uuid
-    tmp_midi_path = os.path.join(tmp_dir, 'play_' + str(uuid.uuid4())[:8] + '.mid')
-    with open(tmp_midi_path, 'wb') as hdl:
-        midi.writeFile(hdl)
-    if not os.path.isfile(tmp_midi_path):
-        logging.warning('Could not write MIDI data to temp file {0}!'.format(tmp_midi_path))
-        return
-
-    fs = FluidSynth(soundfont)
-    fs.play_midi(tmp_midi_path)
-    # Here's hoping it's a blocking call. Otherwise, just leave the MIDI;
-    # MUSCIMarker cleans its tmp dir whenever it exits.
-    if cleanup:
-        os.unlink(tmp_midi_path)

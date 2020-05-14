@@ -8,8 +8,8 @@ from queue import Queue
 from typing import List, Union, Dict, Set, Tuple, Iterable, Optional
 
 from mung.node import Node
-from mung.constants import InferenceEngineConstants as _CONST
-
+from mung.constants import InferenceEngineConstants
+_CONST = InferenceEngineConstants()
 
 class NotationGraphError(ValueError):
     pass
@@ -119,7 +119,7 @@ class NotationGraph(object):
             parents = self.parents(current_node_id, class_filter=class_filter)
             parent_node_ids = [parent.id for parent in parents]
             for parent_id in parent_node_ids:
-                if parent_id not in queue:
+                if parent_id not in queue.queue:
                     queue.put(parent_id)
 
         return [self.__id_to_node_mapping[objid] for objid in ancestor_node_ids]

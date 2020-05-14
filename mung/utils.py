@@ -4,9 +4,6 @@ import numpy
 from skimage.measure import label
 from typing import Tuple, Dict, Any, List
 
-from mung.constants import InferenceEngineConstants as _CONST
-
-
 def connected_components2bboxes(labels: List[List[int]]) -> Dict[int, List[int]]:
     """Returns a dictionary of bounding boxes (upper left c., lower right c.)
     for each label.

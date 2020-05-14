@@ -3,9 +3,11 @@ import copy
 
 from typing import List, Dict, Tuple, Iterable, Any
 
-from mung.constants import InferenceEngineConstants as _CONST
+from mung.constants import InferenceEngineConstants
 from mung.graph import NotationGraph
 from mung.node import Node
+
+_CONST = InferenceEngineConstants()
 
 
 class MungMatcher(object):

@@ -27,7 +27,8 @@ import logging
 import os
 import time
 
-from mung2midi.inference import PitchInferenceEngine, OnsetsInferenceEngine, MIDIBuilder
+from mung2midi.build_midi import build_midi
+from mung2midi.inference import PitchInferenceEngine, OnsetsInferenceEngine
 from mung.io import read_nodes_from_file, export_node_list
 
 
@@ -108,8 +109,7 @@ def main(args):
         print(export_node_list(nodes))
 
     if args.midi is not None:
-        midi_builder = MIDIBuilder()
-        mf = midi_builder.build_midi(pitches, durations, onsets)
+        mf = build_midi(pitches, durations, onsets)
         with open(args.midi, 'wb') as hdl:
             mf.writeFile(hdl)
 

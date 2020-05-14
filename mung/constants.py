@@ -17,6 +17,7 @@ class InferenceEngineConstants(object):
     STAFFSPACE_CLASS_NAME = 'staffSpace'
     STAFF_CLASS_NAME = 'staff'
     LEGER_LINE_CLASS_NAME = 'legerLine'
+    STEM_CLASS_NAME = 'stem'
 
     STAFF_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME, STAFF_CLASS_NAME]
     STAFFLINE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME]
@@ -39,8 +40,8 @@ class InferenceEngineConstants(object):
     }
 
     SYSTEM_LEVEL_CLASS_NAMES = {
-        'staff_grouping',
-        'measure_separator',
+        'staffGrouping',
+        'measureSeparator',
     }
 
     NOTEHEAD_CLASS_NAMES = {
@@ -51,11 +52,40 @@ class InferenceEngineConstants(object):
         'noteheadHalfSmall',
     }
 
+    NOTEHEAD_FULL = "noteheadFull"
+
+    NOTEHEAD_HALF = "noteheadHalf"
+
+    NOTEHEAD_WHOLE = "noteheadWhole"
+
+    NOTEHEADS_EMPTY = {
+        NOTEHEAD_HALF,
+        NOTEHEAD_WHOLE
+    }
+
+    GRACE_NOTEHEAD_CLASS_NAMES = {
+        'noteheadFullSmall',
+        'noteheadHalfSmall',
+    }
+
     NONGRACE_NOTEHEAD_CLASS_NAMES = {
         'noteheadFull',
         'noteheadHalf',
         'noteheadWhole',
     }
+
+    REST_WHOLE = 'restWhole'
+    REST_HALF = 'restHalf'
+    REST_QUARTER = 'restQuarter'
+    REST_8TH = 'rest8th'
+    REST_16TH = 'rest16th'
+    REST_32ND = 'rest32nd'
+    REST_64TH = 'rest64th'
+    REPEAT_ONE_BAR = 'repeat1Bar'
+    MULTI_MEASURE_REST = 'multiMeasureRest'
+    AUGMENTATION_DOT = 'augmentationDot'
+
+    TUPLE = 'tuple'
 
     CLEF_CLASS_NAMES = {
         G_CLEF,

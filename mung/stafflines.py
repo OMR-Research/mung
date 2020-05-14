@@ -12,9 +12,11 @@ from skimage.morphology import watershed
 from typing import List, Tuple
 
 from mung.graph import NotationGraph, find_noteheads_on_staff_linked_to_leger_line
-from mung.constants import InferenceEngineConstants as _CONST
+from mung.constants import InferenceEngineConstants
 from mung.node import Node, draw_nodes_on_empty_canvas, link_nodes
 from mung.utils import compute_connected_components
+
+_CONST = InferenceEngineConstants()
 
 
 def __has_parent_staff(node: Node, nodes: List[Node]) -> bool:
