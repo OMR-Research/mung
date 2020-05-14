@@ -242,6 +242,10 @@ def read_nodes_from_file(filename: str) -> List[Node]:
 
     :returns: A list of ``Node``s.
     """
+    if not os.path.exists(filename):
+        print("Could not find {0} on disk. Absolute path: {1}".format(filename, os.path.abspath(filename)))
+        return None
+
     tree = etree.parse(filename)
     root = tree.getroot()
     logging.debug('XML parsed.')
@@ -431,7 +435,7 @@ def get_edges(nodes: List[Node], validate: bool = True) -> List[Tuple[int, int]]
     return edges
 
 
-def export_node_list(nodes: List[Node], document: str = None, dataset: str = None) -> str:
+def write_nodes_to_file(nodes: List[Node], document: str = None, dataset: str = None) -> str:
     """Writes the Node data as a XML string. Does not write
     to a file -- use ``with open(output_file) as out_stream:`` etc.
 
@@ -449,6 +453,8 @@ def export_node_list(nodes: List[Node], document: str = None, dataset: str = Non
     lines.append('</Nodes>')
     return '\n'.join(lines)
 
+# For compatibility reasons, keep the old name, even though write_nodes_to_file matches read_nodes_from_file better
+export_node_list = write_nodes_to_file
 
 ##############################################################################
 # Parsing NodeClass lists, mostly for grammars.
