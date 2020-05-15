@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Nodes" >
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="Node" maxOccurs="unbounded" minOccurs="0" >
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element type="xs:int" name="Id" />
+                <xs:element type="xs:string" name="ClassName" />
+                <xs:element type="xs:int" name="Top" />
+                <xs:element type="xs:int" name="Left" />
+                <xs:element type="xs:int" name="Width" />
+                <xs:element type="xs:int" name="Height" />
+                <xs:element type="xs:string" name="Mask" />
+                <xs:element type="xs:string" name="Inlinks" minOccurs="0" />
+                <xs:element type="xs:string" name="Outlinks" minOccurs="0" />
+                <xs:element name="Data" minOccurs="0" >
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="DataItem" minOccurs="0" maxOccurs="unbounded" >
+                        <xs:complexType mixed="true">
+                          <xs:attribute name="key" type="xs:string" />
+                          <xs:attribute name="type" type="xs:string" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="dataset" type="xs:string" use="required" />
+        <xs:attribute name="document" type="xs:string" use="required" />
+      </xs:complexType>
+    </xs:element>
+</xs:schema>

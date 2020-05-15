@@ -2,18 +2,14 @@ import collections
 import copy
 import logging
 import operator
-import os
-import uuid
 from typing import List, Dict, Tuple
-
-from midi2audio import FluidSynth
-from midiutil import MIDIFile
 
 from mung.constants import InferenceEngineConstants
 from mung.graph import group_staffs_into_systems, NotationGraph, NotationGraphError
 from mung.node import bounding_box_dice_coefficient, Node
 
 _CONST = InferenceEngineConstants()
+
 
 class OnsetsInferenceStrategy(object):
     def __init__(self):
@@ -951,8 +947,8 @@ class OnsetsInferenceEngine(object):
         """
         beat = [0]
 
-        stems = self.__children(notehead, [_CONST.STEM_CLASS_NAME])
-        flags_and_beams = self.__children(
+        stems = self.children(notehead, [_CONST.STEM_CLASS_NAME])
+        flags_and_beams = self.children(
             notehead,
             _CONST.FLAGS_AND_BEAMS)
 
@@ -972,7 +968,8 @@ class OnsetsInferenceEngine(object):
 
         elif notehead.class_name == _CONST.NOTEHEAD_HALF or notehead.class_name == _CONST.NOTEHEAD_WHOLE:
             if len(flags_and_beams) != 0:
-                raise ValueError('Notehead {0} is empty, but has {1} flags and beams!'.format(notehead.id, len(flags_and_beams)))
+                raise ValueError(
+                    'Notehead {0} is empty, but has {1} flags and beams!'.format(notehead.id, len(flags_and_beams)))
 
             if len(stems) == 0:
                 beat = [4]
@@ -1008,7 +1005,7 @@ class OnsetsInferenceEngine(object):
         """
         duration_modifier = 1
         # Dealing with tuples:
-        tuples = self.__children(notehead, [_CONST.TUPLE])
+        tuples = self.children(notehead, [_CONST.TUPLE])
         if len(tuples) > 1:
             raise ValueError('Notehead {0}: Cannot deal with more than one tuple'
                              ' simultaneously.'.format(notehead.id))
@@ -1062,7 +1059,7 @@ class OnsetsInferenceEngine(object):
                                                               tuple_number))
 
         # Duration dots
-        ddots = self.__children(notehead, [_CONST.AUGMENTATION_DOT])
+        ddots = self.children(notehead, [_CONST.AUGMENTATION_DOT])
         dot_duration_modifier = 1
         for i, d in enumerate(ddots):
             dot_duration_modifier += 1 / (2 ** (i + 1))
@@ -1182,8 +1179,8 @@ class OnsetsInferenceEngine(object):
 
     def process_multistem_notehead(self, notehead):
         """Attempts to recover the duration options of a multi-stem note."""
-        stems = self.__children(notehead, ['stem'])
-        flags_and_beams = self.__children(
+        stems = self.children(notehead, ['stem'])
+        flags_and_beams = self.children(
             notehead,
             _CONST.FLAGS_AND_BEAMS)
 
@@ -1222,7 +1219,7 @@ class OnsetsInferenceEngine(object):
 
         beat = [beat_above]
 
-        tuples = self.__children(notehead, [_CONST.TUPLE])
+        tuples = self.children(notehead, [_CONST.TUPLE])
         if len(tuples) % 2 != 0:
             raise NotImplementedError('Cannot deal with multi-stem note'
                                       ' that has an uneven number of tuples:'
@@ -1253,7 +1250,7 @@ class OnsetsInferenceEngine(object):
 
         if self.strategy.precedence_only_for_objects_connected_to_staff:
             precedence_nodes = [c for c in precedence_nodes
-                                if len(self.__children(c, [_CONST.STAFF_CLASS_NAME])) > 0]
+                                if len(self.children(c, [_CONST.STAFF_CLASS_NAME])) > 0]
 
         durations = {c.id: self.beats(c) for c in precedence_nodes}
 
@@ -1304,7 +1301,7 @@ class OnsetsInferenceEngine(object):
         # - Assign objects to staffs
         objid2staff = {}
         for c in nodes:
-            staffs = self.__children(c, ['staff'])
+            staffs = self.children(c, ['staff'])
             if len(staffs) == 1:
                 objid2staff[c.id] = staffs[0].id
 
@@ -1314,7 +1311,7 @@ class OnsetsInferenceEngine(object):
         for node in list(precedence_nodes.values()):
             if len(node.outlinks) == 0:
                 try:
-                    staff = self.__children(node.obj, ['staff'])[0]
+                    staff = self.children(node.obj, ['staff'])[0]
                 except IndexError:
                     logging.error('Object {0} is a sink node in the precedence graph, but has no staff!'
                                   ''.format(node.obj.id))
@@ -1337,7 +1334,7 @@ class OnsetsInferenceEngine(object):
         staff2source_nodes = collections.defaultdict(list)
         for node in list(precedence_nodes.values()):
             if len(node.inlinks) == 0:
-                staff = self.__children(node.obj, ['staff'])[0]
+                staff = self.children(node.obj, ['staff'])[0]
                 source_nodes2staff[node.obj.id] = staff.id
                 staff2source_nodes[staff.id].append(node)
 
@@ -1544,7 +1541,7 @@ class OnsetsInferenceEngine(object):
 
         # Add the relationships between the measure separator nodes.
         #  - Get staves to which the mseps are connected
-        msep_staffs = {m.id: self.__children(m, ['staff'])
+        msep_staffs = {m.id: self.children(m, ['staff'])
                        for m in measure_separators}
         #  - Sort first by bottom-most staff to which the msep is connected
         #    to get systems
@@ -1623,7 +1620,7 @@ class OnsetsInferenceEngine(object):
         #    at the beginning of the next one anyway.)
         time_signatures_to_first_measure = {}
         for t in time_signatures:
-            s = self.__children(t, ['staff'])[0]
+            s = self.children(t, ['staff'])[0]
             # - Find the measure pairs
             for i, (left_msep, right_msep) in enumerate(measures):
                 if s not in msep_staffs[right_msep.id]:
@@ -1698,7 +1695,7 @@ class OnsetsInferenceEngine(object):
         #  - This is done by iterating over staves.
         staff_to_objs_map = collections.defaultdict(list)
         for c in onset_objs:
-            ss = self.__children(c, ['staff'])
+            ss = self.children(c, ['staff'])
             for s in ss:
                 staff_to_objs_map[s.id].append(c)
 
@@ -1949,8 +1946,8 @@ class OnsetsInferenceEngine(object):
 
         :returns: The denoted duration of a measure in beats.
         """
-        members = sorted(self.__children(time_signature,
-                                         clsnames=_CONST.TIME_SIGNATURE_MEMBERS),
+        members = sorted(self.children(time_signature,
+                                       class_name_filter=_CONST.TIME_SIGNATURE_MEMBERS),
                          key=lambda x: x.top)
         logging.info('Interpreting time signature {0}'.format(time_signature.id))
         logging.info('... Members {0}'.format([m.class_name for m in members]))
@@ -1963,9 +1960,9 @@ class OnsetsInferenceEngine(object):
         is_whole = False
         is_alla_breve = False
         for m in members:
-            if m.class_name == 'whole-time_mark':
+            if m.class_name == _CONST.TIME_SIG_COMMON:
                 is_whole = True
-            if m.class_name == 'alla_breve':
+            if m.class_name == _CONST.TIME_SIG_CUT_COMMON:
                 is_alla_breve = True
 
         if is_whole or is_alla_breve:
@@ -1979,7 +1976,7 @@ class OnsetsInferenceEngine(object):
 
         # Does the time signature have a fraction-like format?
         is_fraction_like = True
-        has_letter_other = (len([m for m in members if m.class_name == 'letter_other']) > 0)
+        has_letter_other = (len([m for m in members if m.class_name == _CONST.LETTER_OTHER]) > 0)
         #  - Does it have a separator slash?
         if has_letter_other:
             logging.info('... Has fraction slash')
@@ -2004,7 +2001,7 @@ class OnsetsInferenceEngine(object):
             else:
                 is_fraction_like = False
 
-        numerals = sorted(self.__children(time_signature, _CONST.NUMERALS),
+        numerals = sorted(self.children(time_signature, _CONST.NUMERALS),
                           key=lambda x: x.top)
         if not is_fraction_like:
             logging.info('... Non-fractional numeric time sig.')
@@ -2151,13 +2148,16 @@ class OnsetsInferenceEngine(object):
 
         return onsets
 
-    def __children(self, c, clsnames):
+    def children(self, c, class_name_filter: List[str] = None):
         """Retrieve the children of the given Node ``c``
         that have class in ``clsnames``."""
-        return [self.id_to_node_mapping[o] for o in c.outlinks
-                if self.id_to_node_mapping[o].class_name in clsnames]
+        if class_name_filter is None:
+            return [self.id_to_node_mapping[o] for o in c.outlinks]
+        else:
+            return [self.id_to_node_mapping[o] for o in c.outlinks
+                    if self.id_to_node_mapping[o].class_name in class_name_filter]
 
-    def __parents(self, c, clsnames):
+    def __parents(self, c, clsnames: List[str]):
         """Retrieve the parents of the given Node ``c``
         that have class in ``clsnames``."""
         return [self.id_to_node_mapping[i] for i in c.inlinks
@@ -2182,7 +2182,8 @@ class OnsetsInferenceEngine(object):
         g = NotationGraph(nodes=nodes)
 
         def __get_tie_notes(_tie, graph):
-            notes = graph.parents(_tie, class_filter=['noteheadFull', 'notehead-empty'])
+            notes = graph.parents(_tie,
+                                  class_filter=[_CONST.NOTEHEAD_FULL, _CONST.NOTEHEAD_HALF, _CONST.NOTEHEAD_WHOLE])
             if len(notes) == 0:
                 raise NotationGraphError('No notes from tie {0}'.format(_tie.id))
             if len(notes) == 1:
@@ -2239,7 +2240,7 @@ class PrecedenceGraphNode(object):
     of other ``PrecedenceGraphNode`` instances.
     """
 
-    def __init__(self, objid=None, node: Node = None, inlinks: List[int] = None, outlinks: List[int]=None,
+    def __init__(self, objid=None, node: Node = None, inlinks: List[int] = None, outlinks: List[int] = None,
                  onset=None, duration=0):
         # Optional link to Nodes, or just a placeholder ID.
         self.obj = node

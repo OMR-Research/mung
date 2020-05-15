@@ -27,7 +27,7 @@ import logging
 import os
 import time
 
-from mung2midi.build_midi import build_midi
+from mung2midi.run_inference import build_midi
 from mung2midi.inference import PitchInferenceEngine, OnsetsInferenceEngine
 from mung.io import read_nodes_from_file, export_node_list
 

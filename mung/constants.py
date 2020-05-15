@@ -220,6 +220,9 @@ class InferenceEngineConstants(object):
         'timeSignature',
     }
 
+    TIME_SIG_COMMON = 'timeSigCommon'
+    TIME_SIG_CUT_COMMON = 'timeSigCutCommon'
+
     TIME_SIGNATURE_MEMBERS = {
         'timeSigCommon',
         'timeSigCutCommon',
@@ -247,6 +250,8 @@ class InferenceEngineConstants(object):
         'numeral8',
         'numeral9',
     }
+
+    LETTER_OTHER = 'characterOther'
 
     @property
     def classes_affecting_onsets(self):

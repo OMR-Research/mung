@@ -3,7 +3,7 @@ import logging
 import os
 import traceback
 import uuid
-from typing import List
+from typing import List, Dict
 
 from midi2audio import FluidSynth
 from midiutil import MIDIFile
@@ -98,7 +98,7 @@ def frames2beats(n_frames, framerate, tempo):
     return (n_frames / float(framerate)) * (tempo / 60.)
 
 
-def build_midi(pitches, durations, onsets, selection=None, tempo=120) -> MIDIFile:
+def build_midi(pitches: Dict, durations, onsets, selection=None, tempo=120) -> MIDIFile:
     # create your MIDI object
     midi_file = MIDIFile(1)  # only 1 track
     track = 0  # the only track
@@ -262,6 +262,9 @@ def play_midi_file(midi: MIDIFile,
 
 
 if __name__ == '__main__':
+    # play_midi_file_from_disk()
+    # exit()
+
     sample_mung = "mung2midi/sample/CVC-MUSCIMA_W-01_N-10_D-ideal.xml"
     nodes = read_nodes_from_file(sample_mung)
 
