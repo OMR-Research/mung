@@ -502,7 +502,7 @@ class PitchInferenceEngine(object):
                          ''.format(q.class_name, q.id))
             if q.class_name in _CONST.CLEF_CLASS_NAMES:
                 self.process_clef(q)
-            elif q.class_name in _CONST.KEY_SIGNATURE_CLASS_NAMES:
+            elif q.class_name in _CONST.KEY_SIGNATURE:
                 self.process_key_signature(q)
             elif q.class_name in _CONST.MEASURE_SEPARATOR_CLASS_NAMES:
                 self.process_measure_separator(q)
@@ -641,7 +641,7 @@ class PitchInferenceEngine(object):
 
             # Processing leger lines:
             #  - count leger lines
-            lls = self.__children(notehead, _CONST.LEGER_LINE_CLASS_NAME)
+            lls = self.__children(notehead, _CONST.LEGER_LINE)
             n_lls = len(lls)
             if n_lls == 0:
                 raise ValueError('Notehead with no staffline or staffspace,'
@@ -796,20 +796,20 @@ class PitchInferenceEngine(object):
         graph = NotationGraph(nodes)
 
         # Collect staves.
-        self.staves = [c for c in nodes if c.class_name == 'staff']
+        self.staves = [c for c in nodes if c.class_name == InferenceEngineConstants.STAFF]
         logging.info('We have {0} staves.'.format(len(self.staves)))
 
         # Collect clefs and key signatures per staff.
         self.clefs = [c for c in nodes
                       if c.class_name in _CONST.CLEF_CLASS_NAMES]
         if ignore_nonstaff:
-            self.clefs = [c for c in self.clefs if graph.has_children(c, ['staff'])]
+            self.clefs = [c for c in self.clefs if graph.has_children(c, [InferenceEngineConstants.STAFF])]
 
         self.key_signatures = [c for c in nodes
-                               if c.class_name == 'key_signature']
+                               if c.class_name == InferenceEngineConstants.KEY_SIGNATURE]
         if ignore_nonstaff:
             self.key_signatures = [c for c in self.key_signatures
-                                   if graph.has_children(c, ['staff'])]
+                                   if graph.has_children(c, [InferenceEngineConstants.STAFF])]
 
         self.clef_to_staff_map = {}
         # There may be more than one clef per staff.
@@ -817,7 +817,7 @@ class PitchInferenceEngine(object):
         for c in self.clefs:
             # Assuming one staff per clef
             try:
-                s = self.__children(c, ['staff'])[0]
+                s = self.__children(c, [InferenceEngineConstants.STAFF])[0]
             except (KeyError, ValueError):
                 logging.warning('Clef {0} has no staff attached! Will not be'
                                 ' part of pitch inference.'.format(c.id))
@@ -830,7 +830,7 @@ class PitchInferenceEngine(object):
         self.staff_to_key_map = collections.defaultdict(list)
         for k in self.key_signatures:
             try:
-                s = self.__children(k, ['staff'])[0]
+                s = self.__children(k, [InferenceEngineConstants.STAFF])[0]
             except KeyError:
                 logging.warning('Key signature {0} has no staff attached! Will not be'
                                 ' part of pitch inference.'.format(k.id))
@@ -840,14 +840,14 @@ class PitchInferenceEngine(object):
 
         # Collect measure separators.
         self.measure_separators = [c for c in nodes
-                                   if c.class_name == 'measure_separator']
+                                   if c.class_name == InferenceEngineConstants.MEASURE_SEPARATOR]
         if ignore_nonstaff:
             self.measure_separators = [c for c in self.measure_separators
-                                       if graph.has_children(c, ['staff'])]
+                                       if graph.has_children(c, [InferenceEngineConstants.STAFF])]
 
         self.staff_to_msep_map = collections.defaultdict(list)
         for m in self.measure_separators:
-            _m_staves = self.__children(m, ['staff'])
+            _m_staves = self.__children(m, [InferenceEngineConstants.STAFF])
             # (Measure separators might belong to multiple staves.)
             for s in _m_staves:
                 self.staff_to_msep_map[s.id].append(m)
@@ -858,11 +858,11 @@ class PitchInferenceEngine(object):
                           if c.class_name in _CONST.NOTEHEAD_CLASS_NAMES]
         if ignore_nonstaff:
             self.noteheads = [c for c in self.noteheads
-                              if graph.has_children(c, ['staff'])]
+                              if graph.has_children(c, [InferenceEngineConstants.STAFF])]
 
         self.staff_to_noteheads_map = collections.defaultdict(list)
         for n in self.noteheads:
-            s = self.__children(n, ['staff'])[0]
+            s = self.__children(n, [InferenceEngineConstants.STAFF])[0]
             self.staff_to_noteheads_map[s.id].append(n)
 
     def __children(self, c: Node, class_names: List[str]) -> List[Node]:
@@ -947,7 +947,7 @@ class OnsetsInferenceEngine(object):
         """
         beat = [0]
 
-        stems = self.children(notehead, [_CONST.STEM_CLASS_NAME])
+        stems = self.children(notehead, [_CONST.STEM])
         flags_and_beams = self.children(
             notehead,
             _CONST.FLAGS_AND_BEAMS)
@@ -1140,7 +1140,7 @@ class OnsetsInferenceEngine(object):
         graph = NotationGraph(list(self.id_to_node_mapping.values()))
 
         # Find current time signature
-        staffs = graph.children(node, class_filter=[_CONST.STAFF_CLASS_NAME])
+        staffs = graph.children(node, class_filter=[_CONST.STAFF])
 
         if len(staffs) == 0:
             logging.warning('Interpreting object {0} as measure-lasting, but'
@@ -1250,11 +1250,11 @@ class OnsetsInferenceEngine(object):
 
         if self.strategy.precedence_only_for_objects_connected_to_staff:
             precedence_nodes = [c for c in precedence_nodes
-                                if len(self.children(c, [_CONST.STAFF_CLASS_NAME])) > 0]
+                                if len(self.children(c, [_CONST.STAFF])) > 0]
 
         durations = {c.id: self.beats(c) for c in precedence_nodes}
 
-        precedence_nodes = {}
+        p_nodes = {}
         for c in precedence_nodes:
             p_node = PrecedenceGraphNode(objid=c.id,
                                          node=c,
@@ -1262,18 +1262,18 @@ class OnsetsInferenceEngine(object):
                                          outlinks=[],
                                          duration=durations[c.id],
                                          )
-            precedence_nodes[c.id] = p_node
+            p_nodes[c.id] = p_node
 
-        for c in precedence_nodes:
+        for c in p_nodes.values():
             inlinks = []
             outlinks = []
             if 'precedence_inlinks' in c.data:
                 inlinks = c.data['precedence_inlinks']
             if 'precedence_outlinks' in c.data:
                 outlinks = c.data['precedence_outlinks']
-            p_node = precedence_nodes[c.id]
-            p_node.outlinks = [precedence_nodes[o] for o in outlinks]
-            p_node.inlinks = [precedence_nodes[i] for i in inlinks]
+            p_node = p_nodes[c.node_id]
+            p_node.outlinks = [p_nodes[o] for o in outlinks]
+            p_node.inlinks = [p_nodes[i] for i in inlinks]
 
         # Join staves/systems!
 
@@ -1283,7 +1283,7 @@ class OnsetsInferenceEngine(object):
 
         if len(systems) == 1:
             logging.info('Single-system score, no staff chaining needed.')
-            source_nodes = [n for n in list(precedence_nodes.values()) if len(n.inlinks) == 0]
+            source_nodes = [n for n in list(p_nodes.values()) if len(n.inlinks) == 0]
             return source_nodes
 
         # Check all systems same no. of staffs
@@ -1301,17 +1301,17 @@ class OnsetsInferenceEngine(object):
         # - Assign objects to staffs
         objid2staff = {}
         for c in nodes:
-            staffs = self.children(c, ['staff'])
+            staffs = self.children(c, [InferenceEngineConstants.STAFF])
             if len(staffs) == 1:
                 objid2staff[c.id] = staffs[0].id
 
         # - Assign staffs to sink nodes
         sink_nodes2staff = {}
         staff2sink_nodes = collections.defaultdict(list)
-        for node in list(precedence_nodes.values()):
+        for node in list(p_nodes.values()):
             if len(node.outlinks) == 0:
                 try:
-                    staff = self.children(node.obj, ['staff'])[0]
+                    staff = self.children(node.obj, [InferenceEngineConstants.STAFF])[0]
                 except IndexError:
                     logging.error('Object {0} is a sink node in the precedence graph, but has no staff!'
                                   ''.format(node.obj.id))
@@ -1332,9 +1332,9 @@ class OnsetsInferenceEngine(object):
         # - Assign staffs to source nodes
         source_nodes2staff = {}
         staff2source_nodes = collections.defaultdict(list)
-        for node in list(precedence_nodes.values()):
+        for node in list(p_nodes.values()):
             if len(node.inlinks) == 0:
-                staff = self.children(node.obj, ['staff'])[0]
+                staff = self.children(node.obj, [InferenceEngineConstants.STAFF])[0]
                 source_nodes2staff[node.obj.id] = staff.id
                 staff2source_nodes[staff.id].append(node)
 
@@ -1350,7 +1350,7 @@ class OnsetsInferenceEngine(object):
                         sink.outlinks.append(source)
                         source.inlinks.append(sink)
 
-        source_nodes = [n for n in list(precedence_nodes.values()) if len(n.inlinks) == 0]
+        source_nodes = [n for n in list(p_nodes.values()) if len(n.inlinks) == 0]
         return source_nodes
 
     def infer_precedence(self, nodes: List[Node]):
@@ -1541,7 +1541,7 @@ class OnsetsInferenceEngine(object):
 
         # Add the relationships between the measure separator nodes.
         #  - Get staves to which the mseps are connected
-        msep_staffs = {m.id: self.children(m, ['staff'])
+        msep_staffs = {m.id: self.children(m, [InferenceEngineConstants.STAFF])
                        for m in measure_separators}
         #  - Sort first by bottom-most staff to which the msep is connected
         #    to get systems
@@ -1620,7 +1620,7 @@ class OnsetsInferenceEngine(object):
         #    at the beginning of the next one anyway.)
         time_signatures_to_first_measure = {}
         for t in time_signatures:
-            s = self.children(t, ['staff'])[0]
+            s = self.children(t, [InferenceEngineConstants.STAFF])[0]
             # - Find the measure pairs
             for i, (left_msep, right_msep) in enumerate(measures):
                 if s not in msep_staffs[right_msep.id]:
@@ -1695,7 +1695,7 @@ class OnsetsInferenceEngine(object):
         #  - This is done by iterating over staves.
         staff_to_objs_map = collections.defaultdict(list)
         for c in onset_objs:
-            ss = self.children(c, ['staff'])
+            ss = self.children(c, [InferenceEngineConstants.STAFF])
             for s in ss:
                 staff_to_objs_map[s.id].append(c)
 
@@ -2074,27 +2074,24 @@ class OnsetsInferenceEngine(object):
 
         # We will only be appending to the queue, so the
         # start of the queue is defined simply by the index.
-        __qstart = 0
-        __prec_clsnames = _CONST.classes_affecting_onsets
-        __n_prec_nodes = len([c for c in nodes
-                              if c.class_name in __prec_clsnames])
-        __delayed_prec_nodes = dict()
-        while (len(queue) - __qstart) > 0:
-            # if len(queue) > 2 * __n_prec_nodes:
+        qstart = 0
+        delayed_prec_nodes = dict()
+        while (len(queue) - qstart) > 0:
+            # if len(queue) > 2 * n_prec_nodes:
             #     logging.warning('Safety valve triggered: queue growing endlessly!')
             #     break
 
-            q = queue[__qstart]
-            logging.debug('Current @{0}: {1}'.format(__qstart, q.obj.id))
-            logging.debug('Will add @{0}: {1}'.format(__qstart, q.outlinks))
+            q = queue[qstart]
+            logging.debug('Current @{0}: {1}'.format(qstart, q.obj.id))
+            logging.debug('Will add @{0}: {1}'.format(qstart, q.outlinks))
 
-            __qstart += 1
+            qstart += 1
             for post_q in q.outlinks:
                 if post_q not in queue:
                     queue.append(post_q)
 
             logging.debug('Queue state: {0}'
-                          ''.format([ppq.obj.id for ppq in queue[__qstart:]]))
+                          ''.format([ppq.obj.id for ppq in queue[qstart:]]))
 
             logging.debug('  {0} has onset: {1}'.format(q.node_id, q.onset))
             if q.onset is not None:
@@ -2111,19 +2108,19 @@ class OnsetsInferenceEngine(object):
                 logging.warning('Found node with predecessor that has no onset yet; delaying processing: {0}'
                                 ''.format(q.obj.id))
                 queue.append(q)
-                if q in __delayed_prec_nodes:
+                if q in delayed_prec_nodes:
                     logging.warning('This node has already been delayed once! Breaking.')
                     logging.warning('Queue state: {0}'
-                                    ''.format([ppq.obj.id for ppq in queue[__qstart:]]))
+                                    ''.format([ppq.obj.id for ppq in queue[qstart:]]))
                     break
                 else:
-                    __delayed_prec_nodes[q.obj.id] = q
+                    delayed_prec_nodes[q.obj.id] = q
                     continue
 
             prec_durations = [pq.duration for pq in prec_qs]
 
-            logging.debug('    Prec_onsets @{0}: {1}'.format(__qstart - 1, prec_onsets))
-            logging.debug('    Prec_durations @{0}: {1}'.format(__qstart - 1, prec_durations))
+            logging.debug('    Prec_onsets @{0}: {1}'.format(qstart - 1, prec_onsets))
+            logging.debug('    Prec_durations @{0}: {1}'.format(qstart - 1, prec_durations))
 
             onset_proposals = [o + d for o, d in zip(prec_onsets, prec_durations)]
             if min(onset_proposals) != max(onset_proposals):
@@ -2262,3 +2259,5 @@ class PrecedenceGraphNode(object):
         self.duration = duration
         '''By how much musical time does the object delay the onsets
         of its descendants in the precedence graph?'''
+
+        self.data = node.data

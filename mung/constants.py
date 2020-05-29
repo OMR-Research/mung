@@ -13,16 +13,16 @@ class InferenceEngineConstants(object):
     is smaller than this, it means the notehead is most probably *NOT*
     on the l.l. and is next to it.'''
 
-    STAFFLINE_CLASS_NAME = 'staffLine'
-    STAFFSPACE_CLASS_NAME = 'staffSpace'
-    STAFF_CLASS_NAME = 'staff'
-    LEGER_LINE_CLASS_NAME = 'legerLine'
-    STEM_CLASS_NAME = 'stem'
+    STAFFLINE = 'staffLine'
+    STAFFSPACE = 'staffSpace'
+    STAFF = 'staff'
+    LEGER_LINE = 'legerLine'
+    STEM = 'stem'
 
-    STAFF_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME, STAFF_CLASS_NAME]
-    STAFFLINE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, STAFFSPACE_CLASS_NAME]
+    STAFF_CLASSES = [STAFFLINE, STAFFSPACE, STAFF]
+    STAFFLINE_CLASS_NAMES = [STAFFLINE, STAFFSPACE]
 
-    STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE_CLASS_NAME, LEGER_LINE_CLASS_NAME]
+    STAFFLINE_LIKE_CLASS_NAMES = [STAFFLINE, LEGER_LINE]
     TIE_CLASS_NAME = 'tie'
 
     G_CLEF = 'gClef'
@@ -93,12 +93,12 @@ class InferenceEngineConstants(object):
         F_CLEF
     }
 
-    KEY_SIGNATURE_CLASS_NAMES = {
-        'keySignature',
-    }
+    KEY_SIGNATURE = 'keySignature'
+
+    MEASURE_SEPARATOR = 'measureSeparator'
 
     MEASURE_SEPARATOR_CLASS_NAMES = {
-        'measureSeparator',
+        MEASURE_SEPARATOR,
     }
 
     FLAGS_CLASS_NAMES = {

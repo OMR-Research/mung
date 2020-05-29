@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Nodes dataset="testdataset" document="01_basic_binary"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="CVC-MUSCIMA_Schema.xsd">
+<Nodes dataset="MUSCIMA-pp_2.0" document="01_basic_binary" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CVC-MUSCIMA_Schema.xsd">
     <Node>
         <Id>0</Id>
         <ClassName>noteheadFull</ClassName>
@@ -85,7 +83,7 @@
     </Node>
     <Node>
         <Id>8</Id>
-        <ClassName>notehead-empty</ClassName>
+        <ClassName>noteheadHalf</ClassName>
         <Top>246</Top>
         <Left>205</Left>
         <Width>20</Width>
@@ -98,7 +96,7 @@
     </Node>
     <Node>
         <Id>9</Id>
-        <ClassName>duration-dot</ClassName>
+        <ClassName>augmentationDot</ClassName>
         <Top>255</Top>
         <Left>225</Left>
         <Width>5</Width>
@@ -108,7 +106,7 @@
     </Node>
     <Node>
         <Id>10</Id>
-        <ClassName>duration-dot</ClassName>
+        <ClassName>augmentationDot</ClassName>
         <Top>88</Top>
         <Left>347</Left>
         <Width>4</Width>
@@ -118,7 +116,7 @@
     </Node>
     <Node>
         <Id>11</Id>
-        <ClassName>sharp</ClassName>
+        <ClassName>accidentalSharp</ClassName>
         <Top>87</Top>
         <Left>136</Left>
         <Width>12</Width>
@@ -128,7 +126,7 @@
     </Node>
     <Node>
         <Id>12</Id>
-        <ClassName>sharp</ClassName>
+        <ClassName>accidentalSharp</ClassName>
         <Top>244</Top>
         <Left>145</Left>
         <Width>15</Width>
@@ -138,7 +136,7 @@
     </Node>
     <Node>
         <Id>13</Id>
-        <ClassName>quarter_rest</ClassName>
+        <ClassName>restQuarter</ClassName>
         <Top>209</Top>
         <Left>207</Left>
         <Width>15</Width>
@@ -147,7 +145,7 @@
     </Node>
     <Node>
         <Id>14</Id>
-        <ClassName>quarter_rest</ClassName>
+        <ClassName>restQuarter</ClassName>
         <Top>204</Top>
         <Left>253</Left>
         <Width>16</Width>
@@ -199,7 +197,7 @@
     </Node>
     <Node>
         <Id>19</Id>
-        <ClassName>ledger_line</ClassName>
+        <ClassName>legerLine</ClassName>
         <Top>91</Top>
         <Left>372</Left>
         <Width>14</Width>
@@ -209,7 +207,7 @@
     </Node>
     <Node>
         <Id>20</Id>
-        <ClassName>ledger_line</ClassName>
+        <ClassName>legerLine</ClassName>
         <Top>88</Top>
         <Left>327</Left>
         <Width>18</Width>
@@ -249,7 +247,7 @@
     </Node>
     <Node>
         <Id>24</Id>
-        <ClassName>ornament(s)</ClassName>
+        <ClassName>ornament</ClassName>
         <Top>66</Top>
         <Left>327</Left>
         <Width>29</Width>
@@ -259,7 +257,7 @@
     </Node>
     <Node>
         <Id>25</Id>
-        <ClassName>notehead-empty</ClassName>
+        <ClassName>noteheadHalf</ClassName>
         <Top>234</Top>
         <Left>257</Left>
         <Width>18</Width>
@@ -279,7 +277,7 @@
     </Node>
     <Node>
         <Id>27</Id>
-        <ClassName>ledger_line</ClassName>
+        <ClassName>legerLine</ClassName>
         <Top>232</Top>
         <Left>316</Left>
         <Width>25</Width>
@@ -289,7 +287,7 @@
     </Node>
     <Node>
         <Id>28</Id>
-        <ClassName>staccato-dot</ClassName>
+        <ClassName>articulationStaccato</ClassName>
         <Top>85</Top>
         <Left>218</Left>
         <Width>7</Width>
@@ -299,7 +297,7 @@
     </Node>
     <Node>
         <Id>29</Id>
-        <ClassName>g-clef</ClassName>
+        <ClassName>gClef</ClassName>
         <Top>94</Top>
         <Left>92</Left>
         <Width>42</Width>
@@ -308,7 +306,7 @@
     </Node>
     <Node>
         <Id>30</Id>
-        <ClassName>f-clef</ClassName>
+        <ClassName>fClef</ClassName>
         <Top>246</Top>
         <Left>91</Left>
         <Width>43</Width>
@@ -316,8 +314,18 @@
         <Mask>0:13 1:5 0:36 1:9 0:31 1:14 0:28 1:16 0:25 1:20 0:22 1:10 0:2 1:10 0:20 1:9 0:8 1:7 0:18 1:8 0:12 1:5 0:17 1:7 0:14 1:6 0:16 1:6 0:16 1:5 0:15 1:6 0:18 1:5 0:14 1:5 0:19 1:6 0:13 1:5 0:20 1:5 0:7 1:4 0:2 1:5 0:20 1:5 0:7 1:5 0:1 1:4 0:22 1:5 0:6 1:5 0:1 1:4 0:22 1:5 0:7 1:3 0:2 1:4 0:22 1:4 0:14 1:3 0:23 1:4 0:13 1:4 0:22 1:4 0:13 1:5 0:21 1:4 0:13 1:5 0:21 1:4 0:15 1:4 0:20 1:5 0:14 1:5 0:19 1:4 0:10 1:1 0:5 1:4 0:19 1:5 0:6 1:5 0:4 1:5 0:18 1:5 0:6 1:5 0:5 1:6 0:16 1:5 0:6 1:5 0:6 1:8 0:13 1:5 0:8 1:2 0:9 1:6 0:13 1:5 0:20 1:5 0:13 1:5 0:38 1:5 0:38 1:5 0:38 1:5 0:38 1:5 0:38 1:5 0:38 1:5 0:38 1:4 0:39 1:4 0:39 1:4 0:38 1:5 0:38 1:5 0:38 1:5 0:38 1:4 0:39 1:4 0:38 1:5 0:37 1:6 0:37 1:5 0:38 1:4 0:39 1:4 0:38 1:5 0:37 1:6 0:20 1:2 0:16 1:4 0:20 1:3 0:14 1:6 0:19 1:3 0:14 1:6 0:20 1:4 0:12 1:7 0:20 1:4 0:11 1:6 0:22 1:4 0:11 1:6 0:22 1:8 0:4 1:8 0:24 1:18 0:26 1:15 0:30 1:13 0:32 1:9 0:25</Mask>
     </Node>
     <Node>
+        <Id>49</Id>
+        <ClassName>dynamicLetterP</ClassName>
+        <Top>185</Top>
+        <Left>207</Left>
+        <Width>16</Width>
+        <Height>24</Height>
+        <Mask>0:11 1:1 0:12 1:6 0:9 1:8 0:7 1:10 0:5 1:11 0:5 1:11 0:4 1:6 0:1 1:5 0:4 1:5 0:1 1:6 0:4 1:11 0:4 1:11 0:4 1:12 0:4 1:10 0:5 1:11 0:5 1:9 0:7 1:6 0:10 1:6 0:10 1:6 0:10 1:6 0:9 1:6 0:10 1:6 0:10 1:5 0:11 1:5 0:12 1:4 0:12 1:4 0:11</Mask>
+        <Inlinks>32</Inlinks>
+    </Node>
+    <Node>
         <Id>31</Id>
-        <ClassName>letter_p</ClassName>
+        <ClassName>characterSmallP</ClassName>
         <Top>185</Top>
         <Left>207</Left>
         <Width>16</Width>
@@ -327,17 +335,17 @@
     </Node>
     <Node>
         <Id>32</Id>
-        <ClassName>dynamics_text</ClassName>
+        <ClassName>dynamicsText</ClassName>
         <Top>185</Top>
         <Left>207</Left>
         <Width>16</Width>
         <Height>24</Height>
         <Mask>0:11 1:1 0:12 1:6 0:9 1:8 0:7 1:10 0:5 1:11 0:5 1:11 0:4 1:6 0:1 1:5 0:4 1:5 0:1 1:6 0:4 1:11 0:4 1:11 0:4 1:12 0:4 1:10 0:5 1:11 0:5 1:9 0:7 1:6 0:10 1:6 0:10 1:6 0:10 1:6 0:9 1:6 0:10 1:6 0:10 1:5 0:11 1:5 0:12 1:4 0:12 1:4 0:11</Mask>
-        <Outlinks>31</Outlinks>
+        <Outlinks>31 49</Outlinks>
     </Node>
     <Node>
         <Id>33</Id>
-        <ClassName>letter_d</ClassName>
+        <ClassName>characterSmallD</ClassName>
         <Top>178</Top>
         <Left>246</Left>
         <Width>16</Width>
@@ -347,7 +355,7 @@
     </Node>
     <Node>
         <Id>34</Id>
-        <ClassName>letter_o</ClassName>
+        <ClassName>characterSmallO</ClassName>
         <Top>190</Top>
         <Left>258</Left>
         <Width>11</Width>
@@ -357,7 +365,7 @@
     </Node>
     <Node>
         <Id>35</Id>
-        <ClassName>letter_l</ClassName>
+        <ClassName>characterSmallL</ClassName>
         <Top>176</Top>
         <Left>266</Left>
         <Width>11</Width>
@@ -367,7 +375,7 @@
     </Node>
     <Node>
         <Id>36</Id>
-        <ClassName>letter_c</ClassName>
+        <ClassName>characterSmallC</ClassName>
         <Top>185</Top>
         <Left>281</Left>
         <Width>8</Width>
@@ -377,7 +385,7 @@
     </Node>
     <Node>
         <Id>37</Id>
-        <ClassName>letter_e</ClassName>
+        <ClassName>characterSmallE</ClassName>
         <Top>182</Top>
         <Left>288</Left>
         <Width>11</Width>
@@ -387,7 +395,7 @@
     </Node>
     <Node>
         <Id>38</Id>
-        <ClassName>other_text</ClassName>
+        <ClassName>otherText</ClassName>
         <Top>176</Top>
         <Left>246</Left>
         <Width>53</Width>
@@ -397,7 +405,7 @@
     </Node>
     <Node>
         <Id>39</Id>
-        <ClassName>key_signature</ClassName>
+        <ClassName>keySignature</ClassName>
         <Top>87</Top>
         <Left>136</Left>
         <Width>12</Width>
@@ -407,7 +415,7 @@
     </Node>
     <Node>
         <Id>40</Id>
-        <ClassName>key_signature</ClassName>
+        <ClassName>keySignature</ClassName>
         <Top>244</Top>
         <Left>145</Left>
         <Width>15</Width>
@@ -417,7 +425,7 @@
     </Node>
     <Node>
         <Id>41</Id>
-        <ClassName>numeral_3</ClassName>
+        <ClassName>numeral3</ClassName>
         <Top>112</Top>
         <Left>158</Left>
         <Width>18</Width>
@@ -427,7 +435,7 @@
     </Node>
     <Node>
         <Id>42</Id>
-        <ClassName>numeral_3</ClassName>
+        <ClassName>numeral3</ClassName>
         <Top>250</Top>
         <Left>167</Left>
         <Width>20</Width>
@@ -437,7 +445,7 @@
     </Node>
     <Node>
         <Id>43</Id>
-        <ClassName>numeral_4</ClassName>
+        <ClassName>numeral4</ClassName>
         <Top>289</Top>
         <Left>166</Left>
         <Width>19</Width>
@@ -447,7 +455,7 @@
     </Node>
     <Node>
         <Id>44</Id>
-        <ClassName>numeral_4</ClassName>
+        <ClassName>numeral4</ClassName>
         <Top>151</Top>
         <Left>156</Left>
         <Width>15</Width>
@@ -457,7 +465,7 @@
     </Node>
     <Node>
         <Id>45</Id>
-        <ClassName>time_signature</ClassName>
+        <ClassName>timeSignature</ClassName>
         <Top>112</Top>
         <Left>156</Left>
         <Width>20</Width>
@@ -467,7 +475,7 @@
     </Node>
     <Node>
         <Id>46</Id>
-        <ClassName>time_signature</ClassName>
+        <ClassName>timeSignature</ClassName>
         <Top>250</Top>
         <Left>166</Left>
         <Width>21</Width>
@@ -477,7 +485,7 @@
     </Node>
     <Node>
         <Id>47</Id>
-        <ClassName>thin_barline</ClassName>
+        <ClassName>barline</ClassName>
         <Top>107</Top>
         <Left>386</Left>
         <Width>15</Width>
@@ -487,7 +495,7 @@
     </Node>
     <Node>
         <Id>48</Id>
-        <ClassName>measure_separator</ClassName>
+        <ClassName>measureSeparator</ClassName>
         <Top>107</Top>
         <Left>386</Left>
         <Width>15</Width>

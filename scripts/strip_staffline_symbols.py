@@ -44,7 +44,7 @@ def main(args):
 
     ##########################################################################
     staff_id_to_node_mapping = {node.id: node for node in nodes
-                              if node.class_name in _CONST.STAFF_CLASS_NAMES}
+                                if node.class_name in _CONST.STAFF_CLASSES}
 
     output_nodes = []
     for node in nodes:

@@ -227,7 +227,7 @@ def read_nodes_from_file(filename: str) -> List[Node]:
     48
 
     Let's also test the ``data`` attribute:
-    >>> file_with_data = os.path.join(test_data_dir, '01_basic_binary.xml')
+    >>> file_with_data = os.path.join(test_data_dir, '01_basic_binary_1.0.xml')
     >>> nodes = read_nodes_from_file(file_with_data)
     >>> nodes[0].data['pitch_step']
     'G'

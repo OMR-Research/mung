@@ -23,7 +23,7 @@ def add_staff_relationships(nodes: List[Node],
 
     ##########################################################################
     logging.info('Find the staff-related symbols')
-    staffs = [c for c in nodes if c.class_name == _CONST.STAFF_CLASS_NAME]
+    staffs = [c for c in nodes if c.class_name == _CONST.STAFF]
 
     staff_related_symbols = defaultdict(list)  # type: defaultdict[str, List[Node]]
     notehead_symbols = defaultdict(list)  # type: defaultdict[str, List[Node]]
@@ -76,11 +76,11 @@ def add_staff_relationships(nodes: List[Node],
     # Sort the staff objects top-down. Assumes stafflines do not cross,
     # and that there are no crazy curves at the end that would make the lower
     # stafflines stick out over the ones above them...
-    stafflines = [c for c in nodes if c.class_name == _CONST.STAFFLINE_CLASS_NAME]
+    stafflines = [c for c in nodes if c.class_name == _CONST.STAFFLINE]
     stafflines = sorted(stafflines, key=lambda c: c.top)
-    staffspaces = [c for c in nodes if c.class_name == _CONST.STAFFSPACE_CLASS_NAME]
+    staffspaces = [c for c in nodes if c.class_name == _CONST.STAFFSPACE]
     staffspaces = sorted(staffspaces, key=lambda c: c.top)
-    staves = [c for c in nodes if c.class_name == _CONST.STAFF_CLASS_NAME]
+    staves = [c for c in nodes if c.class_name == _CONST.STAFF]
     staves = sorted(staves, key=lambda c: c.top)
 
     # Indexing data structures.
@@ -127,7 +127,7 @@ def add_staff_relationships(nodes: List[Node],
             # If notehead has leger lines, skip it for now.
             has_leger_line = False
             for o in node.outlinks:
-                if id_to_node_mapping[o].class_name == _CONST.LEGER_LINE_CLASS_NAME:
+                if id_to_node_mapping[o].class_name == _CONST.LEGER_LINE:
                     has_leger_line = True
                     break
 
@@ -135,7 +135,7 @@ def add_staff_relationships(nodes: List[Node],
                 # Attach to the appropriate staff:
                 # meaning, staff closest to the innermost leger line.
                 lls = [id_to_node_mapping[o] for o in node.outlinks
-                       if id_to_node_mapping[o].class_name == _CONST.LEGER_LINE_CLASS_NAME]
+                       if id_to_node_mapping[o].class_name == _CONST.LEGER_LINE]
                 # Furthest from notehead's top is innermost.
                 # (If notehead is below staff and crosses a ll., one
                 #  of these numbers will be negative. But that doesn't matter.)

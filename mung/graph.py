@@ -408,7 +408,7 @@ def group_staffs_into_systems(nodes: List[Node],
         measure_separators = [c for c in nodes if c.class_name in _CONST.MEASURE_SEPARATOR_CLASS_NAMES]
         measure_separators = sorted(measure_separators, key=operator.attrgetter('left'))
         # Use only the leftmost measure separator for each staff.
-        staffs = [c for c in nodes if c.class_name in [_CONST.STAFF_CLASS_NAME]]
+        staffs = [c for c in nodes if c.class_name in [_CONST.STAFF]]
 
         if leftmost_measure_separators_only:
             leftmost_measure_separators = set()
@@ -469,7 +469,7 @@ def group_by_staff(nodes: List[Node]) -> Dict[int, List[Node]]:
     """
     g = NotationGraph(nodes=nodes)
 
-    staffs = [c for c in nodes if c.class_name == _CONST.STAFF_CLASS_NAME]
+    staffs = [c for c in nodes if c.class_name == _CONST.STAFF]
     objects_per_staff = dict()  # type: Dict[int, List[Node]]
     for staff in staffs:
         descendants = g.descendants(staff)
@@ -523,8 +523,8 @@ def find_related_staffs(query_nodes: List[Node], all_nodes: Union[NotationGraph,
 
     related_staffs = set()
     for c in query_nodes:
-        desc_staffs = graph.descendants(c, class_filter=[_CONST.STAFF_CLASS_NAME])
-        anc_staffs = graph.ancestors(c, class_filter=[_CONST.STAFF_CLASS_NAME])
+        desc_staffs = graph.descendants(c, class_filter=[_CONST.STAFF])
+        anc_staffs = graph.ancestors(c, class_filter=[_CONST.STAFF])
         current_staffs = set(desc_staffs + anc_staffs)
         related_staffs = related_staffs.union(current_staffs)
 
@@ -603,7 +603,7 @@ def find_leger_lines_with_noteheads_from_both_directions(nodes: List[Node]) -> L
     problem_leger_lines = []
 
     for node in nodes:
-        if node.class_name != _CONST.LEGER_LINE_CLASS_NAME:
+        if node.class_name != _CONST.LEGER_LINE:
             continue
 
         noteheads = graph.parents(node, class_filter=_CONST.NOTEHEAD_CLASS_NAMES)
@@ -636,7 +636,7 @@ def find_noteheads_with_leger_line_and_staff_conflict(nodes: List[Node]) -> List
         if node.class_name not in _CONST.NOTEHEAD_CLASS_NAMES:
             continue
 
-        lls = graph.children(node, [_CONST.LEGER_LINE_CLASS_NAME])
+        lls = graph.children(node, [_CONST.LEGER_LINE])
         staff_objs = graph.children(node, _CONST.STAFFLINE_CLASS_NAMES)
         if lls and staff_objs:
             problem_noteheads.append(node)
@@ -665,7 +665,7 @@ def find_noteheads_on_staff_linked_to_leger_line(nodes: List[Node]) -> List[Node
         if node.class_name not in _CONST.NOTEHEAD_CLASS_NAMES:
             continue
 
-        lls = graph.children(node, [_CONST.LEGER_LINE_CLASS_NAME])
+        lls = graph.children(node, [_CONST.LEGER_LINE])
         if len(lls) == 0:
             continue
 
@@ -706,11 +706,11 @@ def find_misdirected_leger_line_edges(nodes: List[Node], retain_ll_for_disconnec
         if node.class_name not in _CONST.NOTEHEAD_CLASS_NAMES:
             continue
 
-        lls = graph.children(node, [_CONST.LEGER_LINE_CLASS_NAME])
+        lls = graph.children(node, [_CONST.LEGER_LINE])
         if not lls:
             continue
 
-        staffs = graph.children(node, [_CONST.STAFF_CLASS_NAME])
+        staffs = graph.children(node, [_CONST.STAFF])
         if not staffs:
             logging.warning('Notehead {0} not connected to any staff!'.format(node.id))
             continue
@@ -720,7 +720,7 @@ def find_misdirected_leger_line_edges(nodes: List[Node], retain_ll_for_disconnec
         # Because of mistakes in notehead-ll edges, can actually be
         # *on* the staff. (If it is on a staffline, then the edge is
         # definitely wrong.)
-        stafflines = sorted(graph.children(staff, [_CONST.STAFFLINE_CLASS_NAME]),
+        stafflines = sorted(graph.children(staff, [_CONST.STAFFLINE]),
                             key=lambda x: x.top)
         p_top = resolve_notehead_wrt_staffline(node, stafflines[0])
         p_bottom = resolve_notehead_wrt_staffline(node, stafflines[-1])
@@ -743,9 +743,9 @@ def find_misdirected_leger_line_edges(nodes: List[Node], retain_ll_for_disconnec
                 _current_misdirected_object_pairs.append([node, ll])
 
         if retain_ll_for_disconnected_noteheads:
-            staffline_like_children = graph.children(node, class_filter=[_CONST.STAFFLINE_CLASS_NAME,
-                                                                         _CONST.STAFFSPACE_CLASS_NAME,
-                                                                         _CONST.LEGER_LINE_CLASS_NAME])
+            staffline_like_children = graph.children(node, class_filter=[_CONST.STAFFLINE,
+                                                                         _CONST.STAFFSPACE,
+                                                                         _CONST.LEGER_LINE])
             # If all the notehead's links to staffline-like objects are scheduled to be discarded:
             if len(staffline_like_children) == len(_current_misdirected_object_pairs):
                 # Remove them from the schedule
@@ -771,9 +771,9 @@ def resolve_leger_line_or_staffline_object(nodes: List[Node]):
         if node.class_name not in _CONST.NOTEHEAD_CLASS_NAMES:
             continue
 
-        lls = graph.children(node, [_CONST.LEGER_LINE_CLASS_NAME])
+        lls = graph.children(node, [_CONST.LEGER_LINE])
         stafflines = graph.children(node, _CONST.STAFFLINE_CLASS_NAMES)
-        staff = graph.children(node, _CONST.STAFF_CLASS_NAME)
+        staff = graph.children(node, _CONST.STAFF)
 
         if len(lls) == 0:
             continue
@@ -841,7 +841,7 @@ def find_contained_nodes(nodes: List[Node], mask_threshold: float = 0.95):
     # we are just checking bounding boxes for candidates first,
     # it does not matter too much.
 
-    nonstaff_nodes = [node for node in nodes if node.class_name not in _CONST.STAFF_CLASS_NAMES]
+    nonstaff_nodes = [node for node in nodes if node.class_name not in _CONST.STAFF_CLASSES]
 
     contained_nodes = []
     for c1 in nonstaff_nodes:

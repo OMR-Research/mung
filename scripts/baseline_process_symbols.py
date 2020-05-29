@@ -57,7 +57,7 @@ def add_key_signatures(nodes: List[Node]) -> List[Node]:
 
     key_signatures = []
 
-    staffs = [m for m in nodes if m.class_name == _CONST.STAFF_CLASS_NAME]
+    staffs = [m for m in nodes if m.class_name == _CONST.STAFF]
     for s in staffs:
 
         # Take the leftmost clef C.
@@ -101,7 +101,7 @@ def add_key_signatures(nodes: List[Node]) -> List[Node]:
 
         # Build key signature and connect it to staff
         if len(key_signature_accidentals) > 0:
-            key_signature_class_names = list(_CONST.KEY_SIGNATURE_CLASS_NAMES)[0]
+            key_signature_class_names = list(_CONST.KEY_SIGNATURE)[0]
             # Note: there might be spurious links from the accidentals
             # to notheads, if they were mis-interpreted during parsing.
             # This actually might not matter; needs testing.
@@ -364,7 +364,7 @@ class PairwiseClassificationParser(object):
 
 
 def do_parse(nodes: List[Node], parser: PairwiseClassificationParser) -> List[Node]:
-    non_staff_nodes = [node for node in nodes if node.class_name not in _CONST.STAFF_CLASS_NAMES]
+    non_staff_nodes = [node for node in nodes if node.class_name not in _CONST.STAFF_CLASSES]
     edges = parser.parse(non_staff_nodes)
 
     # Add edges
@@ -476,7 +476,7 @@ def infer_precedence_edges(nodes: List[Node], factor_by_staff=True) -> List[Tupl
     # and infer precedence on these subgroups.
     if factor_by_staff:
         staffs = [c for c in nodes
-                  if c.class_name == _CONST.STAFF_CLASS_NAME]
+                  if c.class_name == _CONST.STAFF]
         logging.info('_infer_precedence: got {0} staffs'.format(len(staffs)))
         staff_objids = {c.id: i for i, c in enumerate(staffs)}
         precedence_nodes_per_staff = [[] for _ in staffs]
