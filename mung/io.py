@@ -227,7 +227,7 @@ def read_nodes_from_file(filename: str) -> List[Node]:
     48
 
     Let's also test the ``data`` attribute:
-    >>> file_with_data = os.path.join(test_data_dir, '01_basic_binary_1.0.xml')
+    >>> file_with_data = os.path.join(test_data_dir, '01_basic_binary_2.0.xml')
     >>> nodes = read_nodes_from_file(file_with_data)
     >>> nodes[0].data['pitch_step']
     'G'
@@ -236,7 +236,7 @@ def read_nodes_from_file(filename: str) -> List[Node]:
     >>> nodes[0].data['precedence_outlinks']
     [8, 17]
     >>> nodes[0].dataset
-    'testdataset'
+    'MUSCIMA-pp_2.0'
     >>> nodes[0].document
     '01_basic_binary'
 

@@ -8,23 +8,21 @@ import pickle
 import pprint
 import time
 import traceback
-
-import numpy
-from muscima.inference import MIDIBuilder
-from sklearn.feature_extraction import DictVectorizer
 from typing import List, Dict, Tuple
 
+import numpy
+from mung.constants import InferenceEngineConstants as _CONST
 from mung.grammar import DependencyGrammar
 from mung.graph import find_beams_incoherent_with_stems, NotationGraph
 from mung.graph import find_contained_nodes, remove_contained_nodes
 from mung.graph import find_misdirected_leger_line_edges
-from mung2midi.inference import OnsetsInferenceEngine, PitchInferenceEngine
-from mung.constants import InferenceEngineConstants as _CONST
 from mung.io import parse_node_classes, read_nodes_from_file, export_node_list
 from mung.node import bounding_box_intersection, merge_multiple_nodes, link_nodes, Node
 from mung.stafflines import merge_staffline_segments, build_staff_nodes, \
     build_staffspace_nodes, \
     add_staff_relationships
+from mung2midi.inference import OnsetsInferenceEngine, PitchInferenceEngine
+from sklearn.feature_extraction import DictVectorizer
 
 
 def add_key_signatures(nodes: List[Node]) -> List[Node]:
@@ -640,10 +638,7 @@ def build_midi(nodes: List[Node], selected_nodes: List[Node] = None,
     ids_of_selected_nodes = [c.id for c in selected_nodes]
 
     # Build the MIDI data
-    midi_builder = MIDIBuilder()
-    mf = midi_builder.build_midi(
-        pitches=pitches, durations=durations, onsets=onsets,
-        selection=ids_of_selected_nodes, tempo=tempo)
+    mf = build_midi(pitches=pitches, durations=durations, onsets=onsets, selection=ids_of_selected_nodes, tempo=tempo)
 
     return mf
 
