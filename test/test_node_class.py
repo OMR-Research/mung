@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from mung.io import parse_node_classes
@@ -26,7 +27,10 @@ class NodeClassTest(unittest.TestCase):
         expected_number_of_classes = 163
 
         # Act
-        node_classes = parse_node_classes("test/test_data/mff-muscima-classes-annot.xml")
+        test_data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test', 'test_data')
+        classes_file = os.path.join(test_data_dir, 'mff-muscima-classes-annot.xml')
+
+        node_classes = parse_node_classes(classes_file)
 
         # Assert
         self.assertEqual(len(node_classes), expected_number_of_classes)

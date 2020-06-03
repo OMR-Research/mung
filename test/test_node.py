@@ -49,7 +49,7 @@ class NodeTest(unittest.TestCase):
 
     def test_read_nodes_from_file_with_data(self):
         test_data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'test', 'test_data')
-        file = os.path.join(test_data_dir, '01_basic_binary_1.0.xml')
+        file = os.path.join(test_data_dir, '01_basic_binary_2.0.xml')
         nodes = read_nodes_from_file(file)
         self.assertEqual("G", nodes[0].data['pitch_step'])
         self.assertEqual(79, nodes[0].data['midi_pitch_code'])
