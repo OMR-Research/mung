@@ -10,6 +10,7 @@ import time
 import traceback
 
 import numpy
+from muscima.inference import MIDIBuilder
 from sklearn.feature_extraction import DictVectorizer
 from typing import List, Dict, Tuple
 
@@ -17,7 +18,7 @@ from mung.grammar import DependencyGrammar
 from mung.graph import find_beams_incoherent_with_stems, NotationGraph
 from mung.graph import find_contained_nodes, remove_contained_nodes
 from mung.graph import find_misdirected_leger_line_edges
-from mung2midi.inference import OnsetsInferenceEngine, MIDIBuilder, PitchInferenceEngine
+from mung2midi.inference import OnsetsInferenceEngine, PitchInferenceEngine
 from mung.constants import InferenceEngineConstants as _CONST
 from mung.io import parse_node_classes, read_nodes_from_file, export_node_list
 from mung.node import bounding_box_intersection, merge_multiple_nodes, link_nodes, Node
