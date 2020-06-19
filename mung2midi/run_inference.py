@@ -266,7 +266,8 @@ if __name__ == '__main__':
     # exit()
 
     # sample_mung = "mung2midi/sample/CVC-MUSCIMA_W-01_N-10_D-ideal.xml"
-    sample_mung = "test/test_data/01_basic_binary_2.0.xml"
+    # sample_mung = "test/test_data/01_basic_binary_2.0.xml"
+    sample_mung = "/Users/elona/Documents/GitHub/mung2midi/mung/test/test_data/CVC-MUSCIMA_W-01_N-10_D-ideal.pdo.xml"
     nodes = read_nodes_from_file(sample_mung)
 
     midi_file = convert_mung_to_midi(nodes)
