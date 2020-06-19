@@ -228,8 +228,9 @@ def play_midi_file_from_disk(midi_path="mung2midi/sample/The_Nutcracker_Russion_
     :param midi_path: Path to a MIDI file on the disc
     :param soundfont: A *.sf2 soundfont for FluidSynth to load.
     """
-    fs = FluidSynth(soundfont)
-    fs.play_midi(midi_path)
+    fs = FluidSynth(sound_font=soundfont)
+    if os.path.exists(midi_path):
+        fs.play_midi(midi_path)
 
 
 def play_midi_file(midi: MIDIFile,
@@ -248,6 +249,7 @@ def play_midi_file(midi: MIDIFile,
     """
 
     tmp_midi_path = os.path.join(tmp_dir, 'play_' + str(uuid.uuid4())[:8] + '.mid')
+    os.makedirs(os.path.dirname(tmp_midi_path), exist_ok=True)
     with open(tmp_midi_path, 'wb') as hdl:
         midi.writeFile(hdl)
     if not os.path.isfile(tmp_midi_path):
@@ -267,7 +269,7 @@ if __name__ == '__main__':
 
     # sample_mung = "mung2midi/sample/CVC-MUSCIMA_W-01_N-10_D-ideal.xml"
     # sample_mung = "test/test_data/01_basic_binary_2.0.xml"
-    sample_mung = "/Users/elona/Documents/GitHub/mung2midi/mung/test/test_data/CVC-MUSCIMA_W-01_N-10_D-ideal.pdo.xml"
+    sample_mung = "../test/temp_data_test/CVC-MUSCIMA_W-01_N-10_D-ideal.pdo.xml"
     nodes = read_nodes_from_file(sample_mung)
 
     midi_file = convert_mung_to_midi(nodes)
