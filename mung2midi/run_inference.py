@@ -1,4 +1,3 @@
-  
 import collections
 import logging
 import os
@@ -18,18 +17,22 @@ def midi_matrix_to_pdo(midi_matrix, framerate=20, tempo=120):
     """Builds the pitch, duration and onset dicts from a given MIDI
     matrix. Does *not* take into account possible re-articulations:
     repeated adjacent notes are transformed into just one.
+
     :param midi_matrix: A ``128 x n_frames`` binary numpy array.
         Expected to be in the less intuitive format, where pitch
         ``J`` is encoded in row ``(128 - J)`` -- you would plot this
         with ``origin=lower`` in the ``imshow()`` call.
+
     :param FPS: each frame in the MIDI matrix corresponds to ``1 / FPS``
         of a second. Used together with ``tempo`` to determine durations
         in beats.
+
     :param tempo: The tempo in which the MIDI matrix should be interpreted.
         This does not actually matter for the output MIDI -- you can
         balance it out by using a different ``FPS`` value. However, it is
         necessary to compute durations and onsets in beats, since this is
         what the MIDI building functions in ``midiutil.MidiFile`` expect.
+
     :returns: ``pitches, durations, onsets``. These are dicts indexed
         by note ID (equivalent to notehead objids in MuNG context).
         Pitches contain for each note the MIDI pitch code, durations
@@ -131,10 +134,13 @@ def convert_mung_to_midi(nodes: List[Node],
     """Attempts to export a MIDI file from the current graph. Assumes that
     all the staff objects and their relations have been correctly established,
     and that the correct precedence graph is available.
+
     :param retain_pitches: If set, will record the pitch information
         in pitched objects.
+
     :param retain_durations: If set, will record the duration information
         in objects to which it applies.
+
     :returns: A single-track ``midiutil.MidiFile.MIDIFile`` object. It can be
         written to a stream using its ``mf.writeFile()`` method."""
     pitch_inference_engine = PitchInferenceEngine()
@@ -218,12 +224,12 @@ def play_midi_file_from_disk(midi_path="mung2midi/sample/The_Nutcracker_Russion_
                              soundfont='mung2midi/UprightPianoKW-small-SF2-20190703/UprightPianoKW-small-20190703.sf2'):
     """Plays (or attempts to play) the given MIDI file.
     Requires Fluidsynth to be installed on your machine, see https://github.com/FluidSynth/fluidsynth/wiki/Download
+
     :param midi_path: Path to a MIDI file on the disc
     :param soundfont: A *.sf2 soundfont for FluidSynth to load.
     """
-    fs = FluidSynth(sound_font=soundfont)
-    if os.path.exists(midi_path):
-        fs.play_midi(midi_path)
+    fs = FluidSynth('/Users/elona/Documents/GitHub/mung/mung2midi/UprightPianoKW-small-SF2-20190703/UprightPianoKW-small-20190703.sf2')
+    fs.play_midi(midi_path)
 
 
 def play_midi_file(midi: MIDIFile,
@@ -231,15 +237,17 @@ def play_midi_file(midi: MIDIFile,
                    soundfont='mung2midi/UprightPianoKW-small-SF2-20190703/UprightPianoKW-small-20190703.sf2',
                    cleanup=False):
     """Plays (or attempts to play) the given MIDIFile object.
+
     :param midi: A ``midiutils.MidiFile.MIDIFile`` object
         containing the data that you wish to play.
+
     :param tmp_dir: A writeable directory where the MIDI will be
         exported into a temporary file.
+
     :param soundfont: A *.sf2 soundfont for FluidSynth to load.
     """
 
     tmp_midi_path = os.path.join(tmp_dir, 'play_' + str(uuid.uuid4())[:8] + '.mid')
-    os.makedirs(os.path.dirname(tmp_midi_path), exist_ok=True)
     with open(tmp_midi_path, 'wb') as hdl:
         midi.writeFile(hdl)
     if not os.path.isfile(tmp_midi_path):
@@ -259,8 +267,9 @@ if __name__ == '__main__':
 
     # sample_mung = "mung2midi/sample/CVC-MUSCIMA_W-01_N-10_D-ideal.xml"
     # sample_mung = "test/test_data/01_basic_binary_2.0.xml"
-    sample_mung = "../test/temp_data_test/CVC-MUSCIMA_W-01_N-10_D-ideal.pdo.xml"
+    sample_mung = "/Users/elona/Documents/GitHub/mung2midi/mung/test/test_data/CVC-MUSCIMA_W-01_N-10_D-ideal.pdo.xml"
     nodes = read_nodes_from_file(sample_mung)
 
     midi_file = convert_mung_to_midi(nodes)
     play_midi_file(midi_file)
+
