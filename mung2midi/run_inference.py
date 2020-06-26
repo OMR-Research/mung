@@ -228,7 +228,7 @@ def play_midi_file_from_disk(midi_path="mung2midi/sample/The_Nutcracker_Russion_
     :param midi_path: Path to a MIDI file on the disc
     :param soundfont: A *.sf2 soundfont for FluidSynth to load.
     """
-    fs = FluidSynth(soundfont)
+    fs = FluidSynth('/Users/elona/Documents/GitHub/mung/mung2midi/UprightPianoKW-small-SF2-20190703/UprightPianoKW-small-20190703.sf2')
     fs.play_midi(midi_path)
 
 
