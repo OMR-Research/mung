@@ -435,9 +435,16 @@ def get_edges(nodes: List[Node], validate: bool = True) -> List[Tuple[int, int]]
     return edges
 
 
-def write_nodes_to_file(nodes: List[Node], document: str = None, dataset: str = None) -> str:
-    """Writes the Node data as a XML string. Does not write
-    to a file -- use ``with open(output_file) as out_stream:`` etc.
+def write_nodes_to_file(nodes: List[Node], file_path: str, document: str = None, dataset: str = None) -> None:
+    output = write_nodes_to_string(nodes, document, dataset)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, mode="w") as output_file:
+        output_file.write(output)
+
+
+def write_nodes_to_string(nodes: List[Node], document: str = None, dataset: str = None) -> str:
+    """Writes the Node data as an XML string. Does not write
+    to a file -- use ``write_nodes_to_file`` if you want that behavior.
 
     """
     # This is the data string, the rest is formalities
@@ -445,9 +452,8 @@ def write_nodes_to_file(nodes: List[Node], document: str = None, dataset: str = 
 
     lines = list()
     lines.append('<?xml version="1.0" encoding="utf-8"?>')
-    lines.append('<Nodes dataset={0} document={1}'
+    lines.append('<Nodes dataset="{0}" document="{1}"'
                  ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
-                 ' xmlns:xsd="http://www.w3.org/2001/XMLSchema"'
                  ' xsi:noNamespaceSchemaLocation="CVC-MUSCIMA_Schema.xsd">'.format(dataset, document))
     lines.append(nodes_string)
     lines.append('</Nodes>')
