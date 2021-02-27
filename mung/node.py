@@ -310,6 +310,9 @@ class Node(object):
     @property
     def class_name(self) -> str:
         return self.__class_name
+    
+    def set_class_name(self, class_name_):
+        self.__class_name = class_name_
 
     @property
     def dataset(self) -> str:
@@ -643,7 +646,7 @@ class Node(object):
         lines = []
         lines.append('<Node>')
         lines.append('\t<Id>{0}</Id>'.format(self.id))
-        lines.append('\t<ClassName>{0}</ClassName>'.format(self.class_name))
+        lines.append('\t<ClassName>{0}</ClassName>'.format(self.class_name)) # TODO change this if relevant for final XML notation 
         lines.append('\t<Top>{0}</Top>'.format(self.top))
         lines.append('\t<Left>{0}</Left>'.format(self.left))
         lines.append('\t<Width>{0}</Width>'.format(self.__width))
