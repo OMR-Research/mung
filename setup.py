@@ -25,9 +25,11 @@ def get_long_description():
     if os.path.isfile(readme) and os.path.isfile(changes):
         long_description = read(readme, changes)
     else:
-        logging.warning('Could not find README.md and CHANGES.md file'
-                        ' in directory {0}. Contents:'
-                        ' {1}'.format(here, os.listdir(here)))
+        logging.warning(
+            'Could not find README.md and CHANGES.md file'
+            ' in directory {0}. Contents:'
+            ' {1}'.format(here, os.listdir(here))
+            )
         long_description = 'Tools for the Music Notation Graph representation of' \
                            ' music notation, used primarily for optical music' \
                            ' recognition. The MUSCIMA++ dataset uses this data' \
@@ -42,10 +44,10 @@ setup(
     url='https://mung.readthedocs.io',
     license='MIT Software License',
     author='Jan Hajič jr. and Alexander Pacha',
-    install_requires=['numpy>=1.11.1',
-                      'lxml>=3.6.4'],
+    install_requires=['numpy', 'lxml', 'scikit-image'],
     author_email='alexander.pacha@tuwien.ac.at',
-    description='Tools for the Music Notation Graph representation of music notation, used primarily for optical music recognition.',
+    description='Tools for the Music Notation Graph representation of music notation, used primarily for optical '
+                'music recognition.',
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     packages=['mung', 'mung2midi'],

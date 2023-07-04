@@ -10,7 +10,7 @@ It was used for instance in the [MUSCIMA++](https://ufal.mff.cuni.cz/muscima) da
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE.txt)
 [![codecov](https://codecov.io/gh/OMR-Research/mung/branch/master/graph/badge.svg)](https://codecov.io/gh/OMR-Research/mung)
 
-Requires Python >= 3.6.
+Requires Python >= 3.6 and was tested with Python 3.11.
 
 
 ## Getting started

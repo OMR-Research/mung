@@ -5,6 +5,10 @@ Changelog
 
 This changelog does not refer to the older `muscima` package.
 
+1.2
+---
+New release with updated libraries and executed tests with Python 3.11
+
 1.1
 ---
 Performance improvements for loading image masks from RLE string.
