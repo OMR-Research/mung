@@ -1,7 +1,7 @@
 import copy
 import itertools
 import logging
-from typing import List, Union, Tuple, Optional, Any
+from typing import List, Tuple, Optional, Any
 
 import numpy
 from math import ceil

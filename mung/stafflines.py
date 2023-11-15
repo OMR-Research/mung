@@ -8,7 +8,7 @@ import pprint
 
 import numpy
 from skimage.filters import gaussian
-from skimage.morphology import watershed
+from skimage.segmentation import watershed
 from typing import List, Tuple
 
 from mung.graph import NotationGraph, find_noteheads_on_staff_linked_to_leger_line

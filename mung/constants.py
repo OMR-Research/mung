@@ -1,7 +1,5 @@
 """This module implements constants that are used inside the pitch,
 duration and onset inference algorithm."""
-import operator
-
 
 class InferenceEngineConstants(object):
     """This class stores the constants used for pitch inference."""
@@ -275,4 +273,3 @@ class InferenceEngineConstants(object):
         output.update(self.NONGRACE_NOTEHEAD_CLASS_NAMES)
         output.update(self.REST_CLASS_NAMES)
         return output
-

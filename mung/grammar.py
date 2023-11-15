@@ -23,12 +23,9 @@ to the specification.
 
 """
 import codecs
-import logging
-import os
-import pprint
-
 import collections
-
+import logging
+import pprint
 from typing import Tuple, List, Set, Dict
 
 
@@ -269,7 +266,7 @@ class DependencyGrammar(object):
         self.outlink_aggregated_cardinalities = {}  # type: Dict[str, Tuple[int, int]]
 
         rules, inlink_cardinalities, outlink_cardinalities, inlink_aggregated_cardinalitites, \
-        outlink_aggregated_cardinalitites = self.parse_dependency_grammar_rules(grammar_filename)
+            outlink_aggregated_cardinalitites = self.parse_dependency_grammar_rules(grammar_filename)
 
         if self.__validate_rules(rules):
             self.rules = rules
@@ -454,7 +451,7 @@ class DependencyGrammar(object):
 
     def parse_dependency_grammar_rules(self, filename: str) -> \
             Tuple[List[Tuple[str, str]], Dict[str, Dict[str, Tuple[int, int]]], Dict[str, Dict[str, Tuple[int, int]]],
-                  Dict[str, Tuple[int, int]], Dict[str, Tuple[int, int]]]:
+            Dict[str, Tuple[int, int]], Dict[str, Tuple[int, int]]]:
         """Returns the rules stored in the given rule file.
 
         A dependency grammar rule file contains grammar lines,
@@ -571,7 +568,7 @@ class DependencyGrammar(object):
         in_agg_cards = collections.OrderedDict()
 
         _no_rule_line_output = [], collections.OrderedDict(), collections.OrderedDict(), \
-                               collections.OrderedDict(), collections.OrderedDict()
+            collections.OrderedDict(), collections.OrderedDict()
         if line.strip().startswith('#'):
             return _no_rule_line_output
         if len(line.strip()) == 0:
@@ -623,8 +620,8 @@ class DependencyGrammar(object):
         # These cardinalities apply to all left-hand side tokens,
         # for edges leading to any of the right-hand side tokens.
         lhs_cards = collections.OrderedDict()
-        for l in lhs_tokens:
-            token, lhs_cmin, lhs_cmax = self.parse_token(l)
+        for left_token in lhs_tokens:
+            token, lhs_cmin, lhs_cmax = self.parse_token(left_token)
             all_tokens = self.__matching_names(token)
             lhs_symbols.extend(all_tokens)
             for t in all_tokens:
@@ -632,8 +629,8 @@ class DependencyGrammar(object):
 
         rhs_symbols = []
         rhs_cards = collections.OrderedDict()
-        for r in rhs_tokens:
-            token, rhs_cmin, rhs_cmax = self.parse_token(r)
+        for right_token in rhs_tokens:
+            token, rhs_cmin, rhs_cmax = self.parse_token(right_token)
             all_tokens = self.__matching_names(token)
             rhs_symbols.extend(all_tokens)
             for t in all_tokens:
@@ -641,16 +638,16 @@ class DependencyGrammar(object):
 
         # Build the outputs from the cartesian product
         # of left-hand and right-hand tokens.
-        for l in lhs_symbols:
-            if l not in out_cards:
-                out_cards[l] = collections.OrderedDict()
-            for r in rhs_symbols:
-                if r not in in_cards:
-                    in_cards[r] = collections.OrderedDict()
+        for left_token in lhs_symbols:
+            if left_token not in out_cards:
+                out_cards[left_token] = collections.OrderedDict()
+            for right_token in rhs_symbols:
+                if right_token not in in_cards:
+                    in_cards[right_token] = collections.OrderedDict()
 
-                rules.append((l, r))
-                out_cards[l][r] = lhs_cards[l]
-                in_cards[r][l] = rhs_cards[r]
+                rules.append((left_token, right_token))
+                out_cards[left_token][right_token] = lhs_cards[left_token]
+                in_cards[right_token][left_token] = rhs_cards[right_token]
 
         # Fixed rule ordering
         rules = sorted(rules)

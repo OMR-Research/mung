@@ -1,8 +1,7 @@
-import logging
-
 import numpy
 from skimage.measure import label
-from typing import Tuple, Dict, Any, List
+from typing import Tuple, Dict, List
+
 
 def connected_components2bboxes(labels: List[List[int]]) -> Dict[int, List[int]]:
     """Returns a dictionary of bounding boxes (upper left c., lower right c.)
@@ -50,4 +49,3 @@ def compute_connected_components(image: numpy.ndarray) -> \
     number_of_connected_components = int(labels.max())
     bboxes = connected_components2bboxes(labels)
     return number_of_connected_components, labels, bboxes
-

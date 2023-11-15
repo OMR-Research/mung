@@ -9,7 +9,7 @@ import time
 import numpy
 
 from skimage.io import imread
-from skimage.morphology import watershed
+from skimage.segmentation import watershed
 from skimage.filters import gaussian
 from typing import Tuple
 
