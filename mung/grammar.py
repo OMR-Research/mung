@@ -27,6 +27,7 @@ import collections
 import logging
 import pprint
 from typing import Tuple, List, Set, Dict
+import os
 
 
 class DependencyGrammarParseError(ValueError):
