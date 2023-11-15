@@ -4,7 +4,7 @@ The ``mung`` (**Mu**sic **N**otation **G**raph) package implements a graph repre
  of music notation that is especially amenable to Optical Music Recognition (OMR).
 It was used for instance in the [MUSCIMA++](https://ufal.mff.cuni.cz/muscima) dataset of music notation.
 
-[![Build Status](https://travis-ci.org/OMR-Research/mung.svg?branch=master)](https://travis-ci.org/OMR-Research/mung)
+[![Python application](https://github.com/OMR-Research/mung/actions/workflows/python-app.yml/badge.svg)](https://github.com/OMR-Research/mung/actions/workflows/python-app.yml)
 [![PyPI version](https://badge.fury.io/py/mung.svg)](https://badge.fury.io/py/mung)
 [![Documentation Status](https://readthedocs.org/projects/mung/badge/?version=latest)](https://mung.readthedocs.io/en/latest/?badge=latest)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE.txt)
