@@ -813,7 +813,7 @@ class Node(object):
         mask_flat = numpy.zeros(shape[0]*shape[1], numpy.uint8)
         index = 0
 
-        mask_string = mask_string.strip().rstrip()
+        mask_string = mask_string.rstrip()
 
         for kv in mask_string.split(' '):
             k_string, v_string = kv.split(':')
