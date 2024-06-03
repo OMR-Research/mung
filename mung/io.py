@@ -250,18 +250,10 @@ def read_nodes_from_file(filename: str) -> List[Node]:
     root = tree.getroot()
     logging.debug('XML parsed.')
     nodes = []
-    dataset = 'Unknown'
 
-    if 'dataset' in root.attrib:
-        dataset = root.attrib['dataset']
-    document = 'Unknown'
-
-    if 'document' in root.attrib:
-        document = root.attrib['document']
-    node_tag = 'Node'
-
-    if not list(root.iter(node_tag)):
-        node_tag = 'CropObject'
+    dataset = root.attrib.get('dataset', 'Unknown')
+    document = root.attrib.get('document', 'Unknown')
+    node_tag = 'Node' if list(root.iter('Node')) else 'CropObject'
 
     for i, node in enumerate(root.iter(node_tag)):
         ######################################################
